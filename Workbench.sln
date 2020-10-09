@@ -5,22 +5,22 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Workbench", "Workbench\Workbench.vcxproj", "{166D1957-31FA-4900-BC05-80E795D64AAB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sanbox", "Sanbox\Sanbox.vcxproj", "{44D3556A-E22A-4173-9F53-241155548AF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{166D1957-31FA-4900-BC05-80E795D64AAB}.Debug|x64.ActiveCfg = Debug|x64
 		{166D1957-31FA-4900-BC05-80E795D64AAB}.Debug|x64.Build.0 = Debug|x64
-		{166D1957-31FA-4900-BC05-80E795D64AAB}.Debug|x86.ActiveCfg = Debug|Win32
-		{166D1957-31FA-4900-BC05-80E795D64AAB}.Debug|x86.Build.0 = Debug|Win32
 		{166D1957-31FA-4900-BC05-80E795D64AAB}.Release|x64.ActiveCfg = Release|x64
 		{166D1957-31FA-4900-BC05-80E795D64AAB}.Release|x64.Build.0 = Release|x64
-		{166D1957-31FA-4900-BC05-80E795D64AAB}.Release|x86.ActiveCfg = Release|Win32
-		{166D1957-31FA-4900-BC05-80E795D64AAB}.Release|x86.Build.0 = Release|Win32
+		{44D3556A-E22A-4173-9F53-241155548AF8}.Debug|x64.ActiveCfg = Debug|x64
+		{44D3556A-E22A-4173-9F53-241155548AF8}.Debug|x64.Build.0 = Debug|x64
+		{44D3556A-E22A-4173-9F53-241155548AF8}.Release|x64.ActiveCfg = Release|x64
+		{44D3556A-E22A-4173-9F53-241155548AF8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
