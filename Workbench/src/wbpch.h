@@ -10,6 +10,7 @@
 #include <utility>
 #include <functional>
 #include <atomic>
+#include <mutex>
 
 #include <string>
 #include <sstream>

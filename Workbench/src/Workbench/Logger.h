@@ -54,9 +54,16 @@ namespace Workbench {
 		template<typename T>
 		void get_arg(ArgVec& arg_vec, T arg);
 
+		void set_output_color(log_level level);
+		const char* parse_date_time(char opt);
 	protected:
-		std::atomic<std::string> m_name;
-		std::atomic<std::string> m_format;
+		static std::mutex s_write_mutex;
+
+		HANDLE m_console_handle;
+
+		std::mutex m_data_mutex;
+		std::string m_name;
+		std::string m_format;
 	};
 }
 
