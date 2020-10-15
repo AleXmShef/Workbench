@@ -5,51 +5,97 @@ namespace Workbench {
 
 	std::mutex Logger::s_write_mutex;
 
-	Logger::Logger(Msg name) :m_name(name), m_format("%^%T%n%v%$")
+	std::shared_ptr<Logger> Logger::s_CoreLogger;
+	std::shared_ptr<Logger> Logger::s_ClientLogger;
+
+	Logger::Logger(MSG_TYPE name) :m_name(name), m_format("%^[%T] <%n> : %v%$")
 	{
 		m_console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
-	void Logger::set_formatting(Msg format)
+	void Logger::Init() {
+		s_CoreLogger = std::make_shared<Logger>("WORKBENCH");
+		s_ClientLogger = std::make_shared<Logger>("APP");
+	}
+
+	void Logger::set_formatting(MSG_TYPE format)
 	{
 		m_data_mutex.lock();
 		m_format = format;
 		m_data_mutex.unlock();
 	}
 
-	inline void Logger::log(Msg msg)
+	void Logger::log(MSG_TYPE msg)
 	{
-		log(msg, log_level::regular);
+		log(std::forward<std::string>(msg), log_level::regular);
 	}
 
-	inline void Logger::log(Msg msg, log_level level)
+	void Logger::log(MSG_TYPE msg, log_level level)
 	{
+		const char* _format = m_format.c_str();
 		s_write_mutex.lock();
-		for (int i = 1; i < strlen(msg); i+=2) {
-			switch (msg[i]) {
-			case '^': 
-			{							//begin colored segment
-				set_output_color(level);
-				break;
+		set_output_color();
+		for (int i = 0; i < strlen(_format); i++) {
+			if (_format[i] == '%' && i < strlen(_format)) {
+				switch (_format[i + 1]) {
+				case '^':
+				{										//begin colored segment
+					set_output_color(level);
+						break;
+				}
+				case 'T':
+				{										// HH:MM:SS
+					std::cout << parse_date_time('T');
+						break;
+				}
+				case 'n':								//logger name
+				{
+					std::cout << m_name;
+					break;
+				}
+				case 'v':								//message
+				{
+					std::cout << msg;
+					break;
+				}
+				case '$':
+				{
+					set_output_color();
+					break;
+				}
+				default:
+				{
+					break;
+				}
+				}
+				i++;
 			}
-			case 'T':
-			{
-
-				break;
-			}
+			else {
+				std::cout << _format[i];
 			}
 		}
+		std::cout << "\n";
 		s_write_mutex.unlock();
 	}
 
-	inline const char* Logger::parse_date_time(char opt) {
+	const char* Logger::parse_date_time(char opt) {
+		time_t rawtime;
+		struct tm timeinfo;
+		time(&rawtime);
+		localtime_s(&timeinfo, &rawtime);
 
+		char* buff = new char[70];
+		
 		switch (opt) {
-
+		case 'T':
+		{
+			strftime(buff, sizeof(char)*70, "%T", &timeinfo);
+			return buff;
+		}
 		}
 	}
 
-	inline void Logger::set_output_color(log_level level) {
+	void Logger::set_output_color(log_level level) {
 		int color;
 		switch (level) {
 			case log_level::regular:
@@ -64,7 +110,7 @@ namespace Workbench {
 			}
 			case log_level::info:
 			{
-				color = FOREGROUND_BLUE;
+				color = FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY;
 				break;
 			}
 			case log_level::warn:
@@ -73,6 +119,11 @@ namespace Workbench {
 				break;
 			}
 			case log_level::error:
+			{
+				color = FOREGROUND_RED;
+				break;
+			}
+			case log_level::critical:
 			{
 				color = FOREGROUND_RED | FOREGROUND_INTENSITY;
 				break;
@@ -86,66 +137,29 @@ namespace Workbench {
 		SetConsoleTextAttribute(m_console_handle, color);
 	}
 
-	inline void Logger::parse_msg(Msg msg, ArgVec arg_vec)
+	void Logger::parse_msg(std::string& msg, ArgVec arg_vec)
 	{
+		std::regex arg_regex("\\{\\d+\\}", std::regex_constants::ECMAScript | std::regex_constants::icase);
 
-	}
+		auto args_begin = std::sregex_iterator(msg.begin(), msg.end(), arg_regex);
+		auto args_end = std::sregex_iterator();
 
-	template<typename ...Args>
-	inline void Logger::log(Msg msg, Args ...args)
-	{
-		log(msg, log_level::regular, args...);
-	}
-	template<typename ...Args>
-	inline void Logger::log(Msg msg, log_level level, Args ...args)
-	{
-		ArgVec msg_args;
-		parse_args(msg_args, args...);
-		parse_msg(msg, msg_args);
-		log(msg, level);
-	}
+		std::vector<std::smatch> vec;
 
-	template<typename ...Args>
-	inline void Logger::trace(Msg msg, Args ...args)
-	{
-		log(msg, log_level::trace, args...);
-	}
+		int counter = 0;
+		for (std::sregex_iterator i = args_begin; i != args_end; ++i) {
+			vec.push_back(*i);
+		}
+		for (int i = vec.size() - 1; i >= 0; i--) {
+			auto arg_raw = vec[i].str();
+			int arg_index = stoi(arg_raw.substr(1, arg_raw.length() - 2));
 
-	template<typename ...Args>
-	inline void Logger::info(Msg msg, Args ...args)
-	{
-		log(msg, log_level::info, args...);
-	}
-
-	template<typename ...Args>
-	inline void Logger::warn(Msg msg, Args ...args)
-	{
-		log(msg, log_level::warn, args...);
-	}
-
-	template<typename ...Args>
-	inline void Logger::critical(Msg msg, Args ...args)
-	{
-		log(msg, log_level::critical, args...);
-	}
-
-	template<typename ...Args>
-	inline void Logger::error(Msg msg, Args ...args)
-	{
-		log(msg, log_level::error, args...);
-	}
-
-	template<typename ...Args>
-	void Logger::parse_args(ArgVec& arg_vec, Args ...args)
-	{
-		(get_arg(arg_vec, args), ...);
-	}
-
-	template<typename T>
-	void Logger::get_arg(ArgVec& arg_vec, T arg)
-	{
-		std::stringstream ss;
-		ss << arg;
-		arg_vec.push_back(ss.str());
+			if (arg_index < arg_vec.size()) {
+				int pos = vec[i].position();
+				int length = vec[i].length();
+				msg.erase(pos, length);
+				msg.insert(pos, arg_vec[arg_index]);
+			}
+		}
 	}
 }

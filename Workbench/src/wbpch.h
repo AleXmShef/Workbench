@@ -13,6 +13,7 @@
 #include <mutex>
 
 #include <string>
+#include <regex>
 #include <sstream>
 #include <vector>
 #include <unordered_map>

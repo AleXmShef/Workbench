@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "Logger.h"
 
 namespace Workbench {
 	class WORKBENCH_API Engine

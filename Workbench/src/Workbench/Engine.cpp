@@ -22,7 +22,9 @@ namespace Workbench {
 	}
 
 	void Engine::Run() {
-		std::cout << "Welcome to Workbench!\n";
+		Logger::Init();
+		WB_CORE_LOG("Workbench started {1}, {0}", 1, 5);
+		WB_INFO("Log started");
 		while (1) {
 			m_windows[0]->OnUpdate();
 		}
