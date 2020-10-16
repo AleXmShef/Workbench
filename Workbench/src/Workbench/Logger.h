@@ -22,7 +22,7 @@ namespace Workbench {
 
 		static void Init();
 
-		void set_formatting(MSG_TYPE format = "%^%T%n%v%$");
+		void set_formatting(MSG_TYPE format = "%^[%T] <%n> : %v%$");
 
 		void log(MSG_TYPE msg);
 		void log(MSG_TYPE msg, log_level level);
