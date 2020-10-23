@@ -22,6 +22,8 @@ namespace Workbench {
 		void Run();
 
 	private:
+		bool m_isRunning = true;
+
 		std::unique_ptr<EngineProps> m_props = nullptr;
 		std::vector<Window*> m_windows;
 	};

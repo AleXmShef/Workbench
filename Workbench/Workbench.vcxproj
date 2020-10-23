@@ -22,6 +22,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Events\Event.h" />
     <ClInclude Include="src\Workbench\Logger.h" />
     <ClInclude Include="src\Platform\Windows\WindowsUtility.h" />
     <ClInclude Include="src\Workbench.h" />

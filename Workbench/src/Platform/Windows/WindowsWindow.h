@@ -8,6 +8,7 @@ namespace Workbench {
 		WindowsWindow(Window::WindowProps* props);
 
 		virtual void OnUpdate() override;
+		virtual void OnClose() override;
 
 		virtual std::pair<uint32_t, uint32_t> GetDimensions() const override;
 

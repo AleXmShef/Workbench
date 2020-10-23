@@ -4,6 +4,8 @@
 namespace Workbench {
 
 	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
+		Logger::Init();
+
 		auto windowProps = new Window::WindowProps;
 		*windowProps = {
 			m_props->windowTitle,
@@ -22,11 +24,10 @@ namespace Workbench {
 	}
 
 	void Engine::Run() {
-		Logger::Init();
-		WB_CORE_LOG("Workbench started");
-		WB_INFO("Log started");
-		while (1) {
-			m_windows[0]->OnUpdate();
+		WB_CORE_LOG("Workbench started, main thread_id: {0}", std::this_thread::get_id());
+		while (m_isRunning) {
+			for(Window* window : m_windows)
+				window->OnUpdate();
 		}
 	}
 

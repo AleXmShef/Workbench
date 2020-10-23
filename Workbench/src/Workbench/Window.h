@@ -14,6 +14,7 @@ public:
 	virtual ~Window() {};
 
 	virtual void OnUpdate() = 0;
+	virtual void OnClose() = 0;
 
 	virtual std::pair<uint32_t, uint32_t> GetDimensions() const = 0;
 
