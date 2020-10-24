@@ -39,6 +39,7 @@ namespace Workbench {
 		if (m_hWnd) {
 			ShowWindow(m_hWnd, 1);
 			m_assocForWindowsProc.insert({m_hWnd, this});
+			MainEventBus::getInstance()->sendEvent(new WindowEvent("test"));
 		}
 		else
 			WB_CORE_ERROR("Failed to create window, failed HWND: {0}", m_hWnd);

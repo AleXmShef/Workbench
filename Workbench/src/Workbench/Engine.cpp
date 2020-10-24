@@ -6,6 +6,8 @@ namespace Workbench {
 	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
 		Logger::Init();
 
+		MainEventBus::getInstance()->subscribe(this, &Engine::onWindowEvent);
+
 		auto windowProps = new Window::WindowProps;
 		*windowProps = {
 			m_props->windowTitle,

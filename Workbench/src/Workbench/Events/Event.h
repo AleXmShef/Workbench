@@ -1,36 +1,71 @@
 #pragma once
-#include "Core.h"
+#include "wbpch.h"
 
 namespace Workbench {
 	class Event {
 	public:
-		template<typename T>
-		Event(T event_type) : m_EventType(event_type) {
+		Event() {};
+		~Event() {};
+	};
 
+	class HandlerFunctionBase {
+	public:
+		virtual ~HandlerFunctionBase() {};
+		void exec(const Event* event) {
+			call(event);
+		}
+	protected:
+		virtual void call(const Event* event) = 0;
+	};
+
+	template<class EventConsumer, class EventType>
+	class MemberFunctionHandler : public HandlerFunctionBase {
+	public:
+		typedef void (EventConsumer::*MemberFn)(const EventType*);
+
+		MemberFunctionHandler(EventConsumer* consumer_instance, MemberFn member_function) 
+			: m_Consumer(consumer_instance), m_MemberFunction(member_function) {};
+
+	protected:
+		virtual void call(const Event* event) override {
+			(m_Consumer->*m_MemberFunction)(static_cast<const EventType*>(event));
 		}
 
 	protected:
+		EventConsumer* m_Consumer;
+		MemberFn m_MemberFunction;
 	};
 
-	//EMITS_EVENTS {
-	//	None = 0,
+	class EventBus {
+	public:
+		using EventConsumerMap = std::unordered_map<std::type_index, std::vector<HandlerFunctionBase*>>;
 
-	//	//Window events
-	//	WindowClosed, WindowResized, WindowGainedFocus, WindowLostFocus, WindowMoved,
+		template<class EventConsumer, class EventType>
+		void subscribe(EventConsumer* consumer, void (EventConsumer::* memFn)(const EventType*)) {
+			m_EventConsumerMap[typeid(EventType)].push_back(new MemberFunctionHandler<EventConsumer, EventType>(consumer, memFn));
+		};
 
-	//	//Input events
-	//	KeyPressed, KeyReleased,
-	//	MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		template<class EventConsumer>
+		void unsubscribe(EventConsumer* consumer, class EventType) {
+			
+		}
 
-	//	//Engine events
-	//	EngineTick, EngineUpdate, EngineRender
-	//};
+		template <class EventType>
+		void sendEvent(const EventType* event) {
+			for (auto consumer_fn : m_EventConsumerMap[typeid(*event)]) {
+				consumer_fn->exec(event);
+			}
+		}
+	protected:
+		EventConsumerMap m_EventConsumerMap;
+	};
 
+	class MainEventBus : public EventBus {
+	public:
+		static MainEventBus* getInstance() { return m_Instance; };
+	protected:
+		MainEventBus() {};
+		static MainEventBus* m_Instance;
+	};
 }
 
-#define EMITS_EVENTS \
-	using EventCallbackFn = std::function<void(Workbench::Event&)>;\
-	protected: std::array<EventCallbackFn*> m_EventCallbacks;\
-	public: virtual void AddEventCallback(const EventCallbackFn* callback) {m_EventCallbacks.push_back(callback)}\
-			virtual void RemoveEventCallback(const EventCallbackFn* callback) {for(int i = 0; i < m_EventCallbacks.size(); i++) if(callback == _callback) m_EventCallback.erase(m_EventCallbacks.begin() + i);}\
-	enum class Events

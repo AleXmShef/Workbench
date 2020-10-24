@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Logger.h"
+#include "Events/Event.h"
 
 namespace Workbench {
 	class WORKBENCH_API Engine
@@ -21,6 +22,10 @@ namespace Workbench {
 		
 		void Run();
 
+	private:
+		void onWindowEvent(const Window::WindowEvent* event) {
+			WB_CORE_INFO("Window event: {0}", event->getMsg());
+		}
 	private:
 		bool m_isRunning = true;
 
