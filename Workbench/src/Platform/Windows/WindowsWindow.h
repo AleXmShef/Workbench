@@ -20,7 +20,7 @@ namespace Workbench {
 		static std::unordered_map<HWND, WindowsWindow*> m_assocForWindowsProc;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		void CallBackDelegate(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		LRESULT CALLBACK CallBackDelegate(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	protected:
 		HINSTANCE m_hInstance = NULL;
 		WNDCLASS m_wndClass;

@@ -91,6 +91,11 @@ namespace Workbench {
 		{
 			strftime(buff, sizeof(char)*70, "%T", &timeinfo);
 			return buff;
+			break;
+		}
+		default: 
+		{
+			return "";
 		}
 		}
 	}
@@ -150,13 +155,13 @@ namespace Workbench {
 		for (std::sregex_iterator i = args_begin; i != args_end; ++i) {
 			vec.push_back(*i);
 		}
-		for (int i = vec.size() - 1; i >= 0; i--) {
+		for (int64_t i = vec.size() - 1; i >= 0; i--) {
 			auto arg_raw = vec[i].str();
 			int arg_index = stoi(arg_raw.substr(1, arg_raw.length() - 2));
 
 			if (arg_index < arg_vec.size()) {
-				int pos = vec[i].position();
-				int length = vec[i].length();
+				int64_t pos = vec[i].position();
+				int64_t length = vec[i].length();
 				msg.erase(pos, length);
 				msg.insert(pos, arg_vec[arg_index]);
 			}

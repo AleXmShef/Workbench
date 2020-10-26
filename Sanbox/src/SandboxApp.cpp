@@ -6,9 +6,12 @@ int main(int argc, char** argv) {
 		std::cout << argv[i] << "\n";
 	}
 
-	auto pEngParams = new Workbench::Engine::EngineProps;
-	Workbench::Engine mEngine(pEngParams);
-	mEngine.Run();
-
-	return 0;
+	int result;
+	{
+		auto pEngParams = new Workbench::Engine::EngineProps;
+		Workbench::Engine mEngine(pEngParams);
+		result = mEngine.Run();
+	}
+	system("pause");
+	return result;
 }

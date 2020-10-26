@@ -1,7 +1,13 @@
 #pragma once
+#pragma warning(disable : 4251)
 #include "Core.h"
 #include "Logger.h"
 #include "Events/Event.h"
+
+#ifdef WB_PLATFORM_WINDOWS
+	#include "Platform/Windows/WindowsWindow.h"
+	#define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
+#endif
 
 namespace Workbench {
 	class WORKBENCH_API Engine
@@ -20,16 +26,15 @@ namespace Workbench {
 		Engine(EngineProps* pParams);
 		~Engine();
 		
-		void Run();
+		int Run();
 
 	private:
-		void onWindowEvent(const Window::WindowEvent* event) {
-			WB_CORE_INFO("Window event: {0}", event->getMsg());
-		}
+		void onWindowEventCallback(const Window::Event* event);
 	private:
 		bool m_isRunning = true;
 
 		std::unique_ptr<EngineProps> m_props = nullptr;
-		std::vector<Window*> m_windows;
+		Window* m_BaseWindow = nullptr;
+		std::vector<Window*> m_SecondaryWindows;
 	};
 }

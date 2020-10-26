@@ -1,5 +1,6 @@
 #include "wbpch.h"
 #include "Logger.h"
+#include "Events/Event.h"
 
 #include "WindowsWindow.h"
 #include "WindowsUtility.h"
@@ -39,7 +40,7 @@ namespace Workbench {
 		if (m_hWnd) {
 			ShowWindow(m_hWnd, 1);
 			m_assocForWindowsProc.insert({m_hWnd, this});
-			MainEventBus::getInstance()->sendEvent(new WindowEvent("test"));
+			POST_EVENT(new WindowCreatedEvent(this));
 		}
 		else
 			WB_CORE_ERROR("Failed to create window, failed HWND: {0}", m_hWnd);
@@ -48,9 +49,11 @@ namespace Workbench {
 	void WindowsWindow::OnUpdate() {
 		//process messages from Windows
 		MSG msg = {};
-		GetMessage(&msg, m_hWnd, 0, 0);
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
+		while (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
+			//GetMessage(&msg, m_hWnd, 0, 0);
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+		}
 	}
 
 	void WindowsWindow::OnClose()
@@ -59,24 +62,47 @@ namespace Workbench {
 	}
 
 	LRESULT CALLBACK WindowsWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-		if (uMsg == WM_DESTROY) {
-			WB_CORE_TRACE("Closing window: {0}, thread_id: {1}", hwnd, std::this_thread::get_id());
-		}
 		if(!m_assocForWindowsProc.empty())
-			m_assocForWindowsProc[hwnd]->CallBackDelegate(hwnd, uMsg, wParam, lParam);
-		return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+			return m_assocForWindowsProc[hwnd]->CallBackDelegate(hwnd, uMsg, wParam, lParam);
+		else
+			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindow::CallBackDelegate(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	LRESULT CALLBACK WindowsWindow::CallBackDelegate(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		switch (uMsg) {
 		case WM_DESTROY: {
 			OnClose();
+			POST_EVENT(new WindowDestroyedEvent(this));
+			return 0;
 			break;
 		}
 		case WM_SIZE: {
 			UINT width = LOWORD(lParam);
 			UINT height = HIWORD(lParam);
+			m_props->windowHeight = height;
+			m_props->windowWidth = width;
+			SEND_EVENT(new WindowResizedEvent(width, height));
+			return 0;
+			break;
 		}
+		case WM_MOUSEMOVE: {
+			UINT x = GET_X_LPARAM(lParam);
+			UINT y = GET_Y_LPARAM(lParam);
+			POST_EVENT(new WindowMouseMovedEvent(x, y));
+			return 0;
+			break;
+		}
+		case WM_PAINT: {
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(m_hWnd, &ps);
+
+			FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_GRAYTEXT + 1));
+			EndPaint(m_hWnd, &ps);
+			return 0;
+			break;
+		}
+		default:
+			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 		}
 		//Event delegation here
 	}
