@@ -25,11 +25,11 @@ namespace Workbench {
 			0,
 			L"IDK",
 			s2ws(m_props->windowTitle).c_str(),
-			WS_OVERLAPPEDWINDOW,
+			m_props->isFullScreen ? WS_POPUP : WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			m_props->windowWidth,
-			m_props->windowHeight,
+			m_props->isFullScreen ? GetSystemMetrics(SM_CXSCREEN) : m_props->windowWidth,
+			m_props->isFullScreen ? GetSystemMetrics(SM_CYSCREEN) : m_props->windowHeight,
 			NULL,
 			NULL,
 			m_hInstance,
@@ -38,8 +38,8 @@ namespace Workbench {
 
 		//show the window
 		if (m_hWnd) {
-			ShowWindow(m_hWnd, 1);
-			m_assocForWindowsProc.insert({m_hWnd, this});
+			ShowWindow(m_hWnd, SW_SHOW);
+			m_assocForWindowsProc.insert({ m_hWnd, this });
 			POST_EVENT(new WindowCreatedEvent(this));
 		}
 		else
@@ -49,7 +49,7 @@ namespace Workbench {
 	void WindowsWindow::OnUpdate() {
 		//process messages from Windows
 		MSG msg = {};
-		while (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
+		while (PeekMessageA(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
 			//GetMessage(&msg, m_hWnd, 0, 0);
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
@@ -62,7 +62,7 @@ namespace Workbench {
 	}
 
 	LRESULT CALLBACK WindowsWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-		if(!m_assocForWindowsProc.empty())
+		if (!m_assocForWindowsProc.empty())
 			return m_assocForWindowsProc[hwnd]->CallBackDelegate(hwnd, uMsg, wParam, lParam);
 		else
 			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
@@ -102,7 +102,7 @@ namespace Workbench {
 			break;
 		}
 		default:
-			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+			return DefWindowProc(hwnd, uMsg, wParam, lParam);
 		}
 		//Event delegation here
 	}

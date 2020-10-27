@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
 	int result;
 	{
 		auto pEngParams = new Workbench::Engine::EngineProps;
+		pEngParams->windowTitle = "Sandbox";
 		Workbench::Engine mEngine(pEngParams);
 		result = mEngine.Run();
 	}

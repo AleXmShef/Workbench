@@ -5,8 +5,8 @@
 #include "Events/Event.h"
 
 #ifdef WB_PLATFORM_WINDOWS
-	#include "Platform/Windows/WindowsWindow.h"
-	#define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
+#include "Platform/Windows/WindowsWindow.h"
+#define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
 #endif
 
 namespace Workbench {
@@ -15,7 +15,7 @@ namespace Workbench {
 	public:
 		struct EngineProps {
 			bool showWindow = false;
-			std::string windowTitle = "Workbench Sandbox";
+			std::string windowTitle = "Your title here";
 			uint32_t windowWidth = 1280;
 			uint32_t windowHeight = 720;
 			bool isFullScreen = false;
@@ -25,7 +25,7 @@ namespace Workbench {
 	public:
 		Engine(EngineProps* pParams);
 		~Engine();
-		
+
 		int Run();
 
 	private:
