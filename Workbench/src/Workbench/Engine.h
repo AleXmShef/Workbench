@@ -31,7 +31,8 @@ namespace Workbench {
 	private:
 		void onWindowEventCallback(const Window::Event* event);
 	private:
-		bool m_isRunning = true;
+		bool m_mainLoopFlag = true;
+		bool m_onPause = false;
 
 		std::unique_ptr<EngineProps> m_props = nullptr;
 		Window* m_BaseWindow = nullptr;

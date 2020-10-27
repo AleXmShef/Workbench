@@ -18,6 +18,8 @@ namespace Workbench {
 		};
 
 		m_BaseWindow = WB_CREATE_NATIVE_WINDOW(windowProps);
+
+		WB_CORE_INFO("Workbench initialized successfuly, main thread_id: {0}", std::this_thread::get_id());
 	}
 
 	Engine::~Engine() {
@@ -40,8 +42,15 @@ namespace Workbench {
 			WB_CORE_LOG("Window destroyed event");
 			if (((Window::WindowDestroyedEvent*)event)->getWindow() == m_BaseWindow) {
 				WB_CORE_LOG("Base window closed, terminating.");
-				m_isRunning = false;
+				m_mainLoopFlag = false;
 			}
+			break;
+		}
+
+		case E::WindowBeganResizeEvent :
+		{
+			//Will be possible when window will have a separate thread for processing messages
+			//m_onPause = true;
 			break;
 		}
 
@@ -49,6 +58,7 @@ namespace Workbench {
 		{
 			auto [width, height] = ((Window::WindowResizedEvent*)event)->dimensions;
 			WB_CORE_LOG("Window resized event: width: {0}, height : {1}", width, height);
+			m_onPause = false;
 			break;
 		}
 
@@ -63,10 +73,11 @@ namespace Workbench {
 	}
 
 	int Engine::Run() {
-		WB_CORE_INFO("Workbench started, main thread_id: {0}", std::this_thread::get_id());
-		while (m_isRunning) {
-			FLUSH_EVENTS();
-			m_BaseWindow->OnUpdate();
+		while (m_mainLoopFlag) {
+			if (!m_onPause) {
+				FLUSH_EVENTS();
+				m_BaseWindow->OnUpdate();
+			}
 		}
 		WB_CORE_INFO("Program ended normally.");
 		return 0;

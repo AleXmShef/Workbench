@@ -26,6 +26,8 @@ namespace Workbench {
 		WNDCLASS m_wndClass;
 		HWND m_hWnd;
 
+		bool _wasResizing = false;
+
 		std::unique_ptr<WindowProps> m_props;
 	};
 }

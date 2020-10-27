@@ -8,6 +8,7 @@ namespace Workbench {
 
 		EMITS_EVENTS {
 			WindowCreatedEvent = 0,
+			WindowBeganResizeEvent,
 			WindowResizedEvent,
 			WindowLostFocusEvent,
 			WindowGainedFocusEvent,
@@ -32,6 +33,10 @@ namespace Workbench {
 			const Window* getWindow() const { return window_instance; }
 		protected:
 			Window* window_instance = nullptr;
+		};
+
+		class WindowBeganResizeEvent EVENT {
+		SET_EVENT_TYPE(WindowBeganResizeEvent)
 		};
 
 		class WindowResizedEvent EVENT {

@@ -8,14 +8,14 @@ namespace Workbench {
 	std::shared_ptr<Logger> Logger::s_CoreLogger;
 	std::shared_ptr<Logger> Logger::s_ClientLogger;
 
-	Logger::Logger(MSG_TYPE name) :m_name(name), m_format("%^[%T] <%n> : %v%$")
+	Logger::Logger(MSG_TYPE name, log_level main_log_level) :m_name(name), m_format("%^[%T] <%n> : %v%$"), m_main_log_level(main_log_level)
 	{
 		m_console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
 	void Logger::Init() {
-		s_CoreLogger = std::make_shared<Logger>("WORKBENCH");
-		s_ClientLogger = std::make_shared<Logger>("APP");
+		s_CoreLogger = std::make_shared<Logger>("WORKBENCH", CORE_LOG_LEVEL);
+		s_ClientLogger = std::make_shared<Logger>("APP", LOG_LEVEL);
 	}
 
 	void Logger::set_formatting(MSG_TYPE format)
@@ -32,50 +32,52 @@ namespace Workbench {
 
 	void Logger::log(MSG_TYPE msg, log_level level)
 	{
-		const char* _format = m_format.c_str();
-		s_write_mutex.lock();
-		set_output_color();
-		for (int i = 0; i < strlen(_format); i++) {
-			if (_format[i] == '%' && i < strlen(_format)) {
-				switch (_format[i + 1]) {
-				case '^':
-				{										//begin colored segment
-					set_output_color(level);
+		if (level >= m_main_log_level) {
+			const char* _format = m_format.c_str();
+			s_write_mutex.lock();
+			set_output_color();
+			for (int i = 0; i < strlen(_format); i++) {
+				if (_format[i] == '%' && i < strlen(_format)) {
+					switch (_format[i + 1]) {
+					case '^':
+					{										//begin colored segment
+						set_output_color(level);
 						break;
-				}
-				case 'T':
-				{										// HH:MM:SS
-					std::cout << parse_date_time('T');
+					}
+					case 'T':
+					{										// HH:MM:SS
+						std::cout << parse_date_time('T');
 						break;
+					}
+					case 'n':								//logger name
+					{
+						std::cout << m_name;
+						break;
+					}
+					case 'v':								//message
+					{
+						std::cout << msg;
+						break;
+					}
+					case '$':
+					{
+						set_output_color();
+						break;
+					}
+					default:
+					{
+						break;
+					}
+					}
+					i++;
 				}
-				case 'n':								//logger name
-				{
-					std::cout << m_name;
-					break;
+				else {
+					std::cout << _format[i];
 				}
-				case 'v':								//message
-				{
-					std::cout << msg;
-					break;
-				}
-				case '$':
-				{
-					set_output_color();
-					break;
-				}
-				default:
-				{
-					break;
-				}
-				}
-				i++;
 			}
-			else {
-				std::cout << _format[i];
-			}
+			std::cout << "\n";
+			s_write_mutex.unlock();
 		}
-		std::cout << "\n";
-		s_write_mutex.unlock();
 	}
 
 	const char* Logger::parse_date_time(char opt) {

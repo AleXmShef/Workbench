@@ -76,12 +76,25 @@ namespace Workbench {
 			return 0;
 			break;
 		}
+		case WM_ENTERSIZEMOVE: {
+			POST_EVENT(new WindowBeganResizeEvent());
+			return 0;
+			break;
+		}
+		case WM_EXITSIZEMOVE: {
+			if (_wasResizing) {
+				SEND_EVENT(new WindowResizedEvent(m_props->windowWidth, m_props->windowHeight));
+				_wasResizing = false;
+			}
+			return 0;
+			break;
+		}
 		case WM_SIZE: {
 			UINT width = LOWORD(lParam);
 			UINT height = HIWORD(lParam);
 			m_props->windowHeight = height;
 			m_props->windowWidth = width;
-			SEND_EVENT(new WindowResizedEvent(width, height));
+			_wasResizing = true;
 			return 0;
 			break;
 		}

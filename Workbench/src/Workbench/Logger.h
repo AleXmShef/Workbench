@@ -19,9 +19,7 @@ namespace Workbench {
 			critical
 		};
 
-		Logger(MSG_TYPE name);
-
-		static void Init();
+		Logger(MSG_TYPE name, log_level main_log_level = log_level::info);
 
 		void set_formatting(MSG_TYPE format = "%^[%T] <%n> : %v%$");
 
@@ -94,6 +92,7 @@ namespace Workbench {
 
 		void set_output_color(log_level level = log_level::regular);
 		const char* parse_date_time(char opt);
+	
 	protected:
 		static std::mutex s_write_mutex;
 
@@ -103,9 +102,15 @@ namespace Workbench {
 		std::string m_name;
 		std::string m_format;
 
+		log_level m_main_log_level;
+
+	//static access
 	public:
+		static void Init();
+
 		static std::shared_ptr<Logger>& get_core_logger() { return s_CoreLogger; };
 		static std::shared_ptr<Logger>& get_client_logger() { return s_ClientLogger; };
+
 	protected:
 		static std::shared_ptr<Logger> s_CoreLogger;
 		static std::shared_ptr<Logger> s_ClientLogger;
