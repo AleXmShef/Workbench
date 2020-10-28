@@ -6,6 +6,7 @@ namespace Workbench {
 	std::mutex Logger::s_write_mutex;
 
 	std::shared_ptr<Logger> Logger::s_CoreLogger;
+	std::shared_ptr<Logger> Logger::s_RendererLogger;
 	std::shared_ptr<Logger> Logger::s_ClientLogger;
 
 	Logger::Logger(MSG_TYPE name, log_level main_log_level) :m_name(name), m_format("%^[%T] <%n> : %v%$"), m_main_log_level(main_log_level)
@@ -15,6 +16,7 @@ namespace Workbench {
 
 	void Logger::Init() {
 		s_CoreLogger = std::make_shared<Logger>("WORKBENCH", CORE_LOG_LEVEL);
+		s_RendererLogger = std::make_shared<Logger>("RENDERER", CORE_LOG_LEVEL);
 		s_ClientLogger = std::make_shared<Logger>("APP", LOG_LEVEL);
 	}
 
@@ -60,7 +62,7 @@ namespace Workbench {
 						break;
 					}
 					case '$':
-					{
+					{										//end colored segment
 						set_output_color();
 						break;
 					}

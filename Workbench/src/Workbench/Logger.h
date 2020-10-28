@@ -7,6 +7,18 @@
 #define MSG_RVALUE(x) std::forward<std::string>(x)
 
 namespace Workbench {
+	template<class T>
+	std::ostream& operator <<(std::ostream& os, const std::vector<T>& vec) {
+		os << "{";
+		for (size_t i = 0; i < vec.size(); ++i) {
+			os << vec[i];
+			if (i < vec.size() - 1)
+				os << ", ";
+		}
+		os << "}\n";
+		return os;
+	}
+
 	class WORKBENCH_API Logger {
 	public:
 
@@ -109,10 +121,12 @@ namespace Workbench {
 		static void Init();
 
 		static std::shared_ptr<Logger>& get_core_logger() { return s_CoreLogger; };
+		static std::shared_ptr<Logger>& get_renderer_logger() { return s_RendererLogger; };
 		static std::shared_ptr<Logger>& get_client_logger() { return s_ClientLogger; };
 
 	protected:
 		static std::shared_ptr<Logger> s_CoreLogger;
+		static std::shared_ptr<Logger> s_RendererLogger;
 		static std::shared_ptr<Logger> s_ClientLogger;
 	};
 }
@@ -124,6 +138,14 @@ namespace Workbench {
 #define WB_CORE_WARN(...)		::Workbench::Logger::get_core_logger()->warn(__VA_ARGS__)
 #define WB_CORE_ERROR(...)		::Workbench::Logger::get_core_logger()->error(__VA_ARGS__)
 #define WB_CORE_CRITICAL(...)	::Workbench::Logger::get_core_logger()->critical(__VA_ARGS__)
+
+//core log macros
+#define WB_RENDERER_LOG(...)		::Workbench::Logger::get_renderer_logger()->log(__VA_ARGS__)
+#define WB_RENDERER_TRACE(...)		::Workbench::Logger::get_renderer_logger()->trace(__VA_ARGS__)
+#define WB_RENDERER_INFO(...)		::Workbench::Logger::get_renderer_logger()->info(__VA_ARGS__)
+#define WB_RENDERER_WARN(...)		::Workbench::Logger::get_renderer_logger()->warn(__VA_ARGS__)
+#define WB_RENDERER_ERROR(...)		::Workbench::Logger::get_renderer_logger()->error(__VA_ARGS__)
+#define WB_RENDERER_CRITICAL(...)	::Workbench::Logger::get_renderer_logger()->critical(__VA_ARGS__)
 
 //client log macros
 #define WB_LOG(...)				::Workbench::Logger::get_client_logger()->log(__VA_ARGS__)

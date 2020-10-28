@@ -16,6 +16,7 @@ namespace Workbench {
 		virtual bool IsVSync() const override;
 
 		virtual void* GetNativeWindow() override;
+		HWND GetHWND();
 	protected:
 		static std::unordered_map<HWND, WindowsWindow*> m_assocForWindowsProc;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

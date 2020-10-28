@@ -135,4 +135,8 @@ namespace Workbench {
 	void* WindowsWindow::GetNativeWindow() {
 		return (void*)m_hInstance;
 	}
+
+	HWND WindowsWindow::GetHWND() {
+		return m_hWnd;
+	}
 }

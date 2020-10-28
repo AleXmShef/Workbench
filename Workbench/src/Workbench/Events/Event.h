@@ -1,6 +1,5 @@
 #pragma once
 #include "wbpch.h"
-#include "Logger.h"
 
 namespace Workbench {
 	class Event {
@@ -96,6 +95,8 @@ namespace Workbench {
 	};
 }
 
+#define BIND_EVENT(instance, method) MainEventBus::getInstance()->subscribe(instance, &method)
+
 #define EMITS_EVENTS	enum class Events;\
 						class Event : public Workbench::Event \
 						{\
@@ -107,9 +108,9 @@ namespace Workbench {
 
 #define EVENT_TYPES Events
 
-#define SET_EVENT_TYPE(x)\
+#define SET_EVENT_TYPE(x) \
 public:\
-	virtual Events getType() const override {return Events::x;};
+virtual Events getType() const override {return Events::x;};
 
 #define GET_EVENT_TYPE(x) x->getType()
 

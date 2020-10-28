@@ -6,7 +6,7 @@ namespace Workbench {
 	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
 		Logger::Init();
 
-		MainEventBus::getInstance()->subscribe(this, &Engine::onWindowEventCallback);
+		BIND_EVENT(this, Engine::onWindowEventCallback);
 
 		auto windowProps = new Window::WindowProps;
 		*windowProps = {
@@ -17,13 +17,13 @@ namespace Workbench {
 			m_props->isVsync
 		};
 
-		m_BaseWindow = WB_CREATE_NATIVE_WINDOW(windowProps);
+		m_BaseWindow = std::unique_ptr<Window>(WB_CREATE_NATIVE_WINDOW(windowProps));
 
 		WB_CORE_INFO("Workbench initialized successfuly, main thread_id: {0}", std::this_thread::get_id());
 	}
 
 	Engine::~Engine() {
-		delete m_BaseWindow;
+		m_BaseWindow.reset();
 	}
 
 	void Engine::onWindowEventCallback(const Window::Event* event) {
@@ -40,7 +40,7 @@ namespace Workbench {
 		case E::WindowDestroyedEvent :
 		{
 			WB_CORE_LOG("Window destroyed event");
-			if (((Window::WindowDestroyedEvent*)event)->getWindow() == m_BaseWindow) {
+			if (((Window::WindowDestroyedEvent*)event)->getWindow() == m_BaseWindow.get()) {
 				WB_CORE_LOG("Base window closed, terminating.");
 				m_mainLoopFlag = false;
 			}
@@ -73,10 +73,14 @@ namespace Workbench {
 	}
 
 	int Engine::Run() {
+		m_Renderer = std::unique_ptr<d3dRenderer>(new d3dRenderer);
+		m_Renderer->Init(m_BaseWindow);
+
 		while (m_mainLoopFlag) {
 			if (!m_onPause) {
 				FLUSH_EVENTS();
 				m_BaseWindow->OnUpdate();
+				m_Renderer->Draw();
 			}
 		}
 		WB_CORE_INFO("Program ended normally.");
