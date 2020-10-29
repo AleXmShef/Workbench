@@ -131,6 +131,9 @@ namespace Workbench {
 	};
 }
 
+#define LOG
+
+#ifdef LOG
 //core log macros
 #define WB_CORE_LOG(...)		::Workbench::Logger::get_core_logger()->log(__VA_ARGS__)
 #define WB_CORE_TRACE(...)		::Workbench::Logger::get_core_logger()->trace(__VA_ARGS__)
@@ -154,3 +157,31 @@ namespace Workbench {
 #define WB_WARN(...)			::Workbench::Logger::get_client_logger()->warn(__VA_ARGS__)
 #define WB_ERROR(...)			::Workbench::Logger::get_client_logger()->error(__VA_ARGS__)
 #define WB_CRITICAL(...)		::Workbench::Logger::get_client_logger()->critical(__VA_ARGS__)
+
+#else
+
+//core log macros
+#define WB_CORE_LOG(...)		
+#define WB_CORE_TRACE(...)		
+#define WB_CORE_INFO(...)		
+#define WB_CORE_WARN(...)		
+#define WB_CORE_ERROR(...)		
+#define WB_CORE_CRITICAL(...)	
+
+//core log macros
+#define WB_RENDERER_LOG(...)	
+#define WB_RENDERER_TRACE(...)	
+#define WB_RENDERER_INFO(...)	
+#define WB_RENDERER_WARN(...)	
+#define WB_RENDERER_ERROR(...)	
+#define WB_RENDERER_CRITICAL(...)
+
+//client log macros
+#define WB_LOG(...)				
+#define WB_TRACE(...)			
+#define WB_INFO(...)			
+#define WB_WARN(...)			
+#define WB_ERROR(...)			
+#define WB_CRITICAL(...)	
+
+#endif

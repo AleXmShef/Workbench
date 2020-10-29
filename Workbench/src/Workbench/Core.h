@@ -4,7 +4,7 @@
 #ifndef LOG_LEVEL
 	#define LOG_LEVEL Logger::log_level::regular
 #endif
-#define CORE_LOG_LEVEL Logger::log_level::info
+#define CORE_LOG_LEVEL Logger::log_level::trace
 #define RENDERER_LOG_LEVEL Logger::log_level::regular
 
 #ifdef WB_PLATFORM_WINDOWS

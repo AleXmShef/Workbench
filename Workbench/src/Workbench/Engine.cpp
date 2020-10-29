@@ -23,7 +23,7 @@ namespace Workbench {
 	}
 
 	Engine::~Engine() {
-		m_BaseWindow.reset();
+		
 	}
 
 	void Engine::onWindowEventCallback(const Window::Event* event) {
@@ -42,9 +42,21 @@ namespace Workbench {
 			WB_CORE_LOG("Window destroyed event");
 			if (((Window::WindowDestroyedEvent*)event)->getWindow() == m_BaseWindow.get()) {
 				WB_CORE_LOG("Base window closed, terminating.");
+				m_Renderer.reset();
+				m_BaseWindow.reset();
 				m_mainLoopFlag = false;
 			}
 			break;
+		}
+
+		case E::WindowLostFocusEvent :
+		{
+			m_onPause = true;
+		}
+
+		case E::WindowGainedFocusEvent :
+		{
+			m_onPause = false;
 		}
 
 		case E::WindowBeganResizeEvent :
@@ -76,11 +88,13 @@ namespace Workbench {
 		m_Renderer = std::unique_ptr<d3dRenderer>(new d3dRenderer);
 		m_Renderer->Init(m_BaseWindow);
 
+		FLUSH_EVENTS();
+		m_BaseWindow->OnUpdate();
 		while (m_mainLoopFlag) {
+			m_BaseWindow->OnUpdate();
 			if (!m_onPause) {
-				FLUSH_EVENTS();
-				m_BaseWindow->OnUpdate();
 				m_Renderer->Draw();
+				FLUSH_EVENTS();
 			}
 		}
 		WB_CORE_INFO("Program ended normally.");

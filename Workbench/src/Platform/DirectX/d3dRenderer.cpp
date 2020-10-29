@@ -4,6 +4,11 @@
 #include "Logger.h"
 
 namespace Workbench {
+	d3dRenderer::~d3dRenderer() {
+		if (m_d3dDevice != nullptr)
+			FlushCommandQueue();
+	}
+
 	void d3dRenderer::Init(std::shared_ptr<Window> window) {
 		WB_RENDERER_INFO("Initializing DirectX 12");
 
@@ -14,10 +19,17 @@ namespace Workbench {
 			m_hWnd = ((WindowsWindow*)m_window.get())->GetHWND();
 		}
 		else {
-			WB_RENDERER_CRITICAL("Trying to initialize DirectX with nonWindows window");
+			WB_RENDERER_CRITICAL("Trying to initialize DirectX with non-WIN32 API window");
 			return;
 		}
 
+		//initialize directx debug layer when in debug build
+#if  defined(DEBUG) || defined(_DEBUG)
+		pCom<ID3D12Debug> debugController;
+		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+			debugController->EnableDebugLayer();
+		}
+#endif // DEBUG
 
 		//Begin Initialization
 		//Create DXGI Factory
@@ -27,8 +39,10 @@ namespace Workbench {
 			return;
 		}
 
+		auto adapters = GetAdapters();
+
 		//Create hardware device
-		HRESULT createdHardwareDevice = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_d3dDevice));
+		HRESULT createdHardwareDevice = D3D12CreateDevice(adapters[0], D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_d3dDevice));
 		if (FAILED(createdHardwareDevice)) {
 			WB_RENDERER_CRITICAL("Failed to create hardware device");
 		}
@@ -60,6 +74,9 @@ namespace Workbench {
 		CreateRtvAndDsvDescriptorHeaps();
 
 		onResize();
+		
+		//temporarily disable Alt+Enter combo for going fullscreen
+		m_dxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
 
 		WB_RENDERER_INFO("DirectX successfully initialized!");
 	}
@@ -126,7 +143,7 @@ namespace Workbench {
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = s_SwapChainBufferCount;									//buffer count (2 or 3)
 		sd.OutputWindow = m_hWnd;													//windows hwnd
-		sd.Windowed = true;															//is windowed
+		sd.Windowed = m_window->IsFullscreen() ? false : true;						//is windowed
 		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -188,13 +205,14 @@ namespace Workbench {
 		if (m_Fence->GetCompletedValue() < m_CurrentFence)
 		{
 			HANDLE eventHandle = CreateEventEx(nullptr, NULL, false, EVENT_ALL_ACCESS);
+			if (eventHandle != 0) {
+				// Fire event when GPU hits current fence.  
+				m_Fence->SetEventOnCompletion(m_CurrentFence, eventHandle);
 
-			// Fire event when GPU hits current fence.  
-			m_Fence->SetEventOnCompletion(m_CurrentFence, eventHandle);
-
-			// Wait until the GPU hits current fence event is fired.
-			WaitForSingleObject(eventHandle, INFINITE);
-			CloseHandle(eventHandle);
+				// Wait until the GPU hits current fence event is fired.
+				WaitForSingleObject(eventHandle, INFINITE);
+				CloseHandle(eventHandle);
+			}
 		}
 	}
 
@@ -207,12 +225,12 @@ namespace Workbench {
 		//reset command list
 		m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr);
 
-		//reset buffers
+		//reset buffer com pointers (= nullptr)
 		for (int i = 0; i < s_SwapChainBufferCount; ++i)
 			m_SwapChainBuffer[i].Reset();
 		m_DepthStencilBuffer.Reset();
 
-		//resize buffers
+		//resize sawpchain buffers
 		m_SwapChain->ResizeBuffers(
 			s_SwapChainBufferCount,
 			newWidth, newHeight,
@@ -224,6 +242,7 @@ namespace Workbench {
 
 		//NEED TO UNDERSTAND THIS
 
+		//create back buffer views (since buffers themselves were already created by the swapchain???)
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(m_RtvHeap->GetCPUDescriptorHandleForHeapStart());
 		for (UINT i = 0; i < s_SwapChainBufferCount; i++)
 		{
@@ -232,7 +251,7 @@ namespace Workbench {
 			rtvHeapHandle.Offset(1, m_RtvDescriptorSize);
 		}
 
-		// Create the depth/stencil buffer and view.
+		//create depth/stencil buffer
 		D3D12_RESOURCE_DESC depthStencilDesc;
 		depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		depthStencilDesc.Alignment = 0;
@@ -265,7 +284,7 @@ namespace Workbench {
 			&optClear,
 			IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf()));
 
-		// Create descriptor to mip level 0 of entire resource using the format of the resource.
+		//create depth/stencil view
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 		dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
@@ -298,6 +317,7 @@ namespace Workbench {
 
 	void d3dRenderer::Draw() {
 		if (m_window != nullptr) {
+
 			m_DirectCmdListAlloc->Reset();
 
 			m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr);
@@ -340,4 +360,25 @@ namespace Workbench {
 			FlushCommandQueue();
 		}
 	}
+
+	std::vector<IDXGIAdapter*> d3dRenderer::GetAdapters() {
+		UINT i = 0;
+		IDXGIAdapter* adapter = nullptr;
+		std::vector<IDXGIAdapter*> adapterList;
+
+		WB_RENDERER_LOG("Available adapters:");
+
+		while (m_dxgiFactory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND) {
+			DXGI_ADAPTER_DESC desc;
+			adapter->GetDesc(&desc);
+			std::wstring desc_ = L"";
+			desc_ += desc.Description;
+			WB_RENDERER_LOG("\t{0}", ws2s(desc_));
+			adapterList.push_back(adapter);
+
+			++i;
+		}
+
+		return adapterList;
+	};
 }

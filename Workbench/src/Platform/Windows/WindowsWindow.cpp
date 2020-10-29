@@ -70,6 +70,10 @@ namespace Workbench {
 
 	LRESULT CALLBACK WindowsWindow::CallBackDelegate(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		switch (uMsg) {
+		case WM_ACTIVATE: {
+			return 0;
+			break;
+		}
 		case WM_DESTROY: {
 			OnClose();
 			POST_EVENT(new WindowDestroyedEvent(this));
@@ -78,6 +82,7 @@ namespace Workbench {
 		}
 		case WM_ENTERSIZEMOVE: {
 			POST_EVENT(new WindowBeganResizeEvent());
+			_wasResizing = true;
 			return 0;
 			break;
 		}
@@ -90,12 +95,36 @@ namespace Workbench {
 			break;
 		}
 		case WM_SIZE: {
-			UINT width = LOWORD(lParam);
-			UINT height = HIWORD(lParam);
-			m_props->windowHeight = height;
-			m_props->windowWidth = width;
-			_wasResizing = true;
+			switch (wParam) {
+			case SIZE_MINIMIZED: {
+				SEND_EVENT(new WindowLostFocusEvent());
+				return 0;
+				break;
+			}
+			case SIZE_RESTORED: {
+				UINT width = LOWORD(lParam);
+				UINT height = HIWORD(lParam);
+				if (width != m_props->windowWidth || height != m_props->windowHeight) {
+					UINT width = LOWORD(lParam);
+					UINT height = HIWORD(lParam);
+					m_props->windowWidth = width;
+					m_props->windowHeight = height;
+					if (!_wasResizing)
+						SEND_EVENT(new WindowResizedEvent(m_props->windowWidth, m_props->windowHeight));
+				}
+				else {
+					SEND_EVENT(new WindowGainedFocusEvent());
+					return 0;
+					break;
+				}
+			}
+			}
 			return 0;
+			break;
+		}
+		case WM_MENUCHAR: {
+			// Don't beep when we alt-enter.
+			return MAKELRESULT(0, MNC_CLOSE);
 			break;
 		}
 		case WM_MOUSEMOVE: {
@@ -105,18 +134,8 @@ namespace Workbench {
 			return 0;
 			break;
 		}
-		case WM_PAINT: {
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(m_hWnd, &ps);
-
-			FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_GRAYTEXT + 1));
-			EndPaint(m_hWnd, &ps);
-			return 0;
-			break;
 		}
-		default:
-			return DefWindowProc(hwnd, uMsg, wParam, lParam);
-		}
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 		//Event delegation here
 	}
 
@@ -130,6 +149,10 @@ namespace Workbench {
 
 	void WindowsWindow::SetVSync(bool enabled) {
 		m_props->isVsync = enabled;
+	}
+
+	bool WindowsWindow::IsFullscreen() const {
+		return m_props->isFullScreen;
 	}
 
 	void* WindowsWindow::GetNativeWindow() {

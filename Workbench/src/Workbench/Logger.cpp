@@ -16,7 +16,7 @@ namespace Workbench {
 
 	void Logger::Init() {
 		s_CoreLogger = std::make_shared<Logger>("WORKBENCH", CORE_LOG_LEVEL);
-		s_RendererLogger = std::make_shared<Logger>("RENDERER", CORE_LOG_LEVEL);
+		s_RendererLogger = std::make_shared<Logger>("RENDERER", RENDERER_LOG_LEVEL);
 		s_ClientLogger = std::make_shared<Logger>("APP", LOG_LEVEL);
 	}
 

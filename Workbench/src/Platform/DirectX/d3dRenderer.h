@@ -22,6 +22,7 @@ namespace Workbench {
 	class d3dRenderer : public Renderer {
 	public:
 		virtual void Init(std::shared_ptr<Window> window) override;
+		~d3dRenderer();
 
 		virtual void Draw() override;
 	protected:

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX\d3dRenderer.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsUtility.cpp" />
     <ClCompile Include="src\Workbench\Events\Event.cpp" />
     <ClCompile Include="src\Workbench\Logger.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Events/Event.h"
+#include "Logger.h"
 
 namespace Workbench {
 	class WORKBENCH_API Window {
@@ -46,6 +47,14 @@ namespace Workbench {
 			std::pair<uint32_t, uint32_t> dimensions;
 		};
 
+		class WindowLostFocusEvent EVENT {
+		SET_EVENT_TYPE(WindowLostFocusEvent)
+		};
+
+		class WindowGainedFocusEvent EVENT {
+		SET_EVENT_TYPE(WindowGainedFocusEvent)
+		};
+
 		class WindowMouseMovedEvent EVENT {
 		SET_EVENT_TYPE(WindowMouseMovedEvent)
 		public:
@@ -63,7 +72,9 @@ namespace Workbench {
 			bool isVsync = true;
 		};
 	public:
-		virtual ~Window() {};
+		virtual ~Window() {
+			
+		};
 
 		virtual void OnUpdate() = 0;
 		virtual void OnClose() = 0;
@@ -72,6 +83,7 @@ namespace Workbench {
 
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
+		virtual bool IsFullscreen() const = 0;
 
 		virtual void* GetNativeWindow() = 0;
 	};

@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "WindowsUtility.h"
 
 namespace Workbench {
 	class WindowsWindow : public Window
@@ -14,6 +15,7 @@ namespace Workbench {
 
 		virtual void SetVSync(bool enabled) override;
 		virtual bool IsVSync() const override;
+		virtual bool IsFullscreen() const override;
 
 		virtual void* GetNativeWindow() override;
 		HWND GetHWND();
