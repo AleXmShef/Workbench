@@ -17,7 +17,9 @@ namespace Workbench {
 		m_wndClass.lpfnWndProc = WindowsWindow::WindowProc;
 		m_wndClass.hInstance = m_hInstance;
 		m_wndClass.lpszClassName = L"IDK";
-
+		m_wndClass.hIcon = LoadIcon(0, IDI_APPLICATION);
+		m_wndClass.hCursor = LoadCursor(0, IDC_ARROW);
+		
 		RegisterClass(&m_wndClass);
 
 		//create Windows window
@@ -49,10 +51,10 @@ namespace Workbench {
 	void WindowsWindow::OnUpdate() {
 		//process messages from Windows
 		MSG msg = {};
-		while (PeekMessageA(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
+		while (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
 			//GetMessage(&msg, m_hWnd, 0, 0);
 			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 
@@ -122,6 +124,12 @@ namespace Workbench {
 			return 0;
 			break;
 		}
+		case WM_GETMINMAXINFO: {
+			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+			return 0;
+			break;
+		}
 		case WM_MENUCHAR: {
 			// Don't beep when we alt-enter.
 			return MAKELRESULT(0, MNC_CLOSE);
@@ -134,6 +142,14 @@ namespace Workbench {
 			return 0;
 			break;
 		}
+
+		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_MBUTTONUP:
+		case WM_RBUTTONUP:
+			return 0;
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 		//Event delegation here
