@@ -6,6 +6,10 @@ namespace Workbench {
 	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
 		Logger::Init();
 
+#ifndef WB_DEBUG
+		FreeConsole();
+#endif
+
 		BIND_EVENT(this, Engine::onWindowEventCallback);
 
 		auto windowProps = new Window::WindowProps;
@@ -19,17 +23,17 @@ namespace Workbench {
 
 		m_BaseWindow = std::unique_ptr<Window>(WB_CREATE_NATIVE_WINDOW(windowProps));
 
-		WB_CORE_INFO("Workbench initialized successfuly, main thread_id: {0}", std::this_thread::get_id());
+		WB_CORE_INFO("Workbench successfuly initialized, main thread_id: {0}", std::this_thread::get_id());
 	}
 
 	Engine::~Engine() {
 		
 	}
 
-	void Engine::onWindowEventCallback(const Window::Event* event) {
+	void Engine::onWindowEventCallback(const Event<Window::Events>* event) {
 		using E = Window::Events;
 
-		switch (GET_EVENT_TYPE(event)) {
+		switch (event->getType()) {
 
 		case E::WindowCreatedEvent :
 		{
@@ -52,11 +56,13 @@ namespace Workbench {
 		case E::WindowLostFocusEvent :
 		{
 			m_onPause = true;
+			break;
 		}
 
 		case E::WindowGainedFocusEvent :
 		{
 			m_onPause = false;
+			break;
 		}
 
 		case E::WindowBeganResizeEvent :
@@ -96,6 +102,8 @@ namespace Workbench {
 				m_Renderer->Draw();
 				FLUSH_EVENTS();
 			}
+			else
+				Sleep(5);
 		}
 		WB_CORE_INFO("Program ended normally.");
 		return 0;

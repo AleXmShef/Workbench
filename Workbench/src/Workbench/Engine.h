@@ -32,7 +32,7 @@ namespace Workbench {
 		int Run();
 
 	private:
-		void onWindowEventCallback(const Window::Event* event);
+		void onWindowEventCallback(const Event < Window::Events>* event);
 	private:
 		bool m_mainLoopFlag = true;
 		bool m_onPause = false;

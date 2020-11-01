@@ -11,7 +11,7 @@ namespace Workbench {
 		Renderer();
 	protected:
 		std::shared_ptr<Window> m_window;
-		void onWindowEventCallback(const Window::Event* event);
+		void onWindowEventCallback(const Event<Window::Events>* event);
 		virtual void onResize() = 0;
 	};
 }

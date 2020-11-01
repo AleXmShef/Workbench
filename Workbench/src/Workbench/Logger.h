@@ -131,9 +131,7 @@ namespace Workbench {
 	};
 }
 
-#define LOG
-
-#ifdef LOG
+#ifdef WB_DEBUG
 //core log macros
 #define WB_CORE_LOG(...)		::Workbench::Logger::get_core_logger()->log(__VA_ARGS__)
 #define WB_CORE_TRACE(...)		::Workbench::Logger::get_core_logger()->trace(__VA_ARGS__)

@@ -2,12 +2,9 @@
 #include "Event.h"
 
 namespace Workbench {
-	Event::Event() {};
-	Event::~Event() {};
+	AbstractCallbackHandler::~AbstractCallbackHandler() {};
 
-	HandlerFunctionBase::~HandlerFunctionBase() {};
-
-	void HandlerFunctionBase::exec(const Event* event) {
+	void AbstractCallbackHandler::exec(const AbstractEvent* event) {
 		call(event);
 	}
 
@@ -22,9 +19,9 @@ namespace Workbench {
 		}
 	}
 
-	void EventBus::propagateEvent(Event* event, std::type_index type) {
-		for (auto consumer_fn : m_EventConsumerMap[type]) {
-			consumer_fn->exec(event);
+	void EventBus::propagateEvent(AbstractEvent* event, std::type_index type) {
+		for (auto callback : m_SubscribersMap[type]) {
+			callback->exec(event);
 		}
 	}
 

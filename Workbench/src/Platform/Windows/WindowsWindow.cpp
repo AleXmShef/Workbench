@@ -42,7 +42,7 @@ namespace Workbench {
 		if (m_hWnd) {
 			ShowWindow(m_hWnd, SW_SHOW);
 			m_assocForWindowsProc.insert({ m_hWnd, this });
-			POST_EVENT(new WindowCreatedEvent(this));
+			//POST_EVENT(new WindowCreatedEvent(this));
 		}
 		else
 			WB_CORE_ERROR("Failed to create window, failed HWND: {0}", m_hWnd);

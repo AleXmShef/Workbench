@@ -14,7 +14,7 @@ namespace Workbench {
 		m_window = window;
 	}
 
-	void Renderer::onWindowEventCallback(const Window::Event* event) {
+	void Renderer::onWindowEventCallback(const Event<Window::Events>* event) {
 		switch (GET_EVENT_TYPE(event)) {
 		case Window::Events::WindowResizedEvent: {
 			onResize();

@@ -10,7 +10,6 @@ namespace Workbench {
 	}
 
 	void d3dRenderer::Init(std::shared_ptr<Window> window) {
-		WB_RENDERER_INFO("Initializing DirectX 12");
 
 		Renderer::Init(window);
 
@@ -23,8 +22,8 @@ namespace Workbench {
 			return;
 		}
 
-		//initialize directx debug layer when in debug build
-#if  defined(DEBUG) || defined(_DEBUG)
+		//initialize DirectX debug layer when in debug build
+#ifdef WB_DEBUG
 		pCom<ID3D12Debug> debugController;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 			debugController->EnableDebugLayer();
@@ -39,14 +38,26 @@ namespace Workbench {
 			return;
 		}
 
+
+
 		auto adapters = GetAdapters();
 
 		//Create hardware device
-		HRESULT createdHardwareDevice = D3D12CreateDevice(adapters[0], D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_d3dDevice));
+		HRESULT createdHardwareDevice = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_d3dDevice));
 		if (FAILED(createdHardwareDevice)) {
 			WB_RENDERER_CRITICAL("Failed to create hardware device");
 		}
 
+		//Get current adapter
+
+		auto adapterLuid = m_d3dDevice->GetAdapterLuid();
+		IDXGIAdapter4* _adapter;
+		m_dxgiFactory->EnumAdapterByLuid(adapterLuid, IID_PPV_ARGS(&_adapter));
+		DXGI_ADAPTER_DESC desc;
+		_adapter->GetDesc(&desc);
+		WB_RENDERER_LOG("Using adapter:");
+		WB_RENDERER_LOG("\t{0}", ws2s(desc.Description));
+		
 		//Create fence object
 		m_d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence));
 
@@ -78,7 +89,7 @@ namespace Workbench {
 		//temporarily disable Alt+Enter combo for going fullscreen
 		m_dxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
 
-		WB_RENDERER_INFO("DirectX successfully initialized!");
+		WB_RENDERER_INFO("DirectX successfully initialized");
 	}
 
 	HRESULT d3dRenderer::CreateCommandObjects() {

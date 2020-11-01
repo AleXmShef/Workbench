@@ -13,6 +13,8 @@ int main(int argc, char** argv) {
 		Workbench::Engine mEngine(pEngParams);
 		result = mEngine.Run();
 	}
+#if defined(WB_DEBUG)
 	system("pause");
+#endif
 	return result;
 }
