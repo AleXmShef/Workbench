@@ -8,6 +8,8 @@ namespace Workbench {
 	public:
 		WindowsWindow(Window::WindowProps* props);
 
+		virtual bool checkForButtonPress(WB_KEYCODES button) override;
+
 		virtual void OnUpdate() override;
 		virtual void OnClose() override;
 

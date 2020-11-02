@@ -27,7 +27,7 @@ namespace Workbench {
 	}
 
 	Engine::~Engine() {
-		
+		UNBIND(this, Engine::onWindowEventCallback);
 	}
 
 	void Engine::onWindowEventCallback(const Event<Window::Events>* event) {
@@ -83,7 +83,32 @@ namespace Workbench {
 		case E::WindowMouseMovedEvent :
 		{
 			auto [xPos, yPos] = ((Window::WindowMouseMovedEvent*)event)->getCoords();
-			WB_CORE_LOG("Window mouse moved event: {0}, {1}", xPos, yPos);
+			//WB_CORE_LOG("Window mouse moved event: {0}, {1}", xPos, yPos);
+			break;
+		}
+
+		case E::WindowMouseButtonPressedEvent :
+		{
+			auto button = ((Window::WindowMouseButtonPressedEvent*)event)->getButton();
+			switch (button) {
+			case WB_KEYCODES::LMB:
+				WB_CORE_LOG("Left mouse button pressed");
+				break;
+			case WB_KEYCODES::MMB:
+				WB_CORE_LOG("Middle mouse button pressed");
+				break;
+			case WB_KEYCODES::RMB:
+				WB_CORE_LOG("Right mouse button pressed");
+				break;
+			}
+			break;
+		}
+
+		case E::WindowButtonPressedEvent :
+		{
+			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
+			if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
+				WB_CORE_TRACE("Button pressed: {}", (char)key);
 			break;
 		}
 

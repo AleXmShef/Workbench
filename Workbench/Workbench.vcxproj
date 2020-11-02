@@ -29,6 +29,7 @@
     <ClInclude Include="src\Platform\DirectX\d3dRenderer.h" />
     <ClInclude Include="src\Platform\DirectX\d3dx12.h" />
     <ClInclude Include="src\Workbench\Events\Event.h" />
+    <ClInclude Include="src\Workbench\Input\Keycodes.h" />
     <ClInclude Include="src\Workbench\Logger.h" />
     <ClInclude Include="src\Platform\Windows\WindowsUtility.h" />
     <ClInclude Include="src\Workbench.h" />

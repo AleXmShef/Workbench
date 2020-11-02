@@ -148,7 +148,7 @@ namespace Workbench {
 
 	void Logger::parse_msg(std::string& msg, ArgVec arg_vec)
 	{
-		std::regex arg_regex("\\{\\d+\\}", std::regex_constants::ECMAScript | std::regex_constants::icase);
+		std::regex arg_regex("\\{\\d*.{0,1}\\}", std::regex_constants::ECMAScript | std::regex_constants::icase);
 
 		auto args_begin = std::sregex_iterator(msg.begin(), msg.end(), arg_regex);
 		auto args_end = std::sregex_iterator();
@@ -160,10 +160,24 @@ namespace Workbench {
 			vec.push_back(*i);
 		}
 		for (int64_t i = vec.size() - 1; i >= 0; i--) {
+			bool hexModifier = false;
 			auto arg_raw = vec[i].str();
-			int arg_index = stoi(arg_raw.substr(1, arg_raw.length() - 2));
+			int arg_index;
+			if (arg_raw.length() == 2)
+				arg_index = 0;
+			else if (arg_raw[arg_raw.length() - 2] == 'h') {
+				hexModifier = true;
+				arg_index = stoi(arg_raw.substr(1, arg_raw.length() - 3));
+			}
+			else
+				arg_index = stoi(arg_raw.substr(1, arg_raw.length() - 2));
 
-			if (arg_index < arg_vec.size()) {
+			if (arg_index < arg_vec.size() && arg_index >= 0) {
+				if (hexModifier) {
+					std::stringstream ss;
+					ss << std::hex << "0x" << stoi(arg_vec[arg_index]) << std::dec;
+					arg_vec[arg_index] = ss.str().c_str();
+				}
 				int64_t pos = vec[i].position();
 				int64_t length = vec[i].length();
 				msg.erase(pos, length);

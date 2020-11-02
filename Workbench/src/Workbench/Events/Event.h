@@ -105,6 +105,8 @@ namespace Workbench {
 
 #define BIND_EVENT(instance, method) MainEventBus::getInstance()->subscribe(instance, &method)
 
+#define UNBIND(instance, method) MainEventBus::getInstance()->unsubscribe(instance, &method)
+
 #define EMITS_EVENTS enum class Events
 
 #define EVENT : public Event<Events>

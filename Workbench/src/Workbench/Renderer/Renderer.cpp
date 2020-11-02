@@ -7,7 +7,7 @@ namespace Workbench {
 		BIND_EVENT(this, Renderer::onWindowEventCallback);
 	}
 	Renderer::~Renderer() { 
-		
+		UNBIND(this, Renderer::onWindowEventCallback);
 	}
 
 	void Renderer::Init(std::shared_ptr<Window> window) {

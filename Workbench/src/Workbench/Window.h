@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Events/Event.h"
+#include "Input/Keycodes.h"
 #include "Logger.h"
 
 namespace Workbench {
@@ -15,7 +16,12 @@ namespace Workbench {
 			WindowGainedFocusEvent,
 			WindowDestroyedEvent,
 
-			WindowMouseMovedEvent
+			WindowMouseMovedEvent,
+			WindowMouseButtonPressedEvent,
+			WindowMouseButtonReleasedEvent,
+
+			WindowButtonPressedEvent,
+			WindowButtonReleasedEvent
 		};
 
 		class WindowCreatedEvent EVENT {
@@ -64,6 +70,33 @@ namespace Workbench {
 			uint32_t xPos, yPos;
 		};
 
+		class WindowMouseButtonPressedEvent EVENT {
+		SET_EVENT_TYPE(WindowMouseButtonPressedEvent)
+		public:
+			WindowMouseButtonPressedEvent(WB_KEYCODES mouse_button) : m_mouse_button(mouse_button) {};
+			WB_KEYCODES getButton() { return m_mouse_button; };
+		protected:
+			WB_KEYCODES m_mouse_button;
+		};
+
+		class WindowButtonPressedEvent EVENT {
+			SET_EVENT_TYPE(WindowButtonPressedEvent)
+		public:
+			WindowButtonPressedEvent(WB_KEYCODES button) : m_button(button) {};
+			inline WB_KEYCODES getButton() { return m_button; };
+		protected:
+			WB_KEYCODES m_button;
+		};
+
+		class WindowButtonReleasedEvent EVENT {
+		SET_EVENT_TYPE(WindowButtonReleasedEvent)
+		public:
+			WindowButtonReleasedEvent(WB_KEYCODES button) : m_button(button) {};
+			inline WB_KEYCODES getButton() { return m_button; };
+		protected:
+			WB_KEYCODES m_button;
+		};
+
 		struct WindowProps {
 			std::string windowTitle = "Workbench Sandbox";
 			uint32_t windowWidth = 1280;
@@ -75,6 +108,8 @@ namespace Workbench {
 		virtual ~Window() {
 			
 		};
+
+		virtual bool checkForButtonPress(WB_KEYCODES button) = 0;
 
 		virtual void OnUpdate() = 0;
 		virtual void OnClose() = 0;

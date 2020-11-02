@@ -48,6 +48,11 @@ namespace Workbench {
 			WB_CORE_ERROR("Failed to create window, failed HWND: {0}", m_hWnd);
 	}
 
+	bool WindowsWindow::checkForButtonPress(WB_KEYCODES button) {
+		auto state = GetKeyState(WbToWinKeycode(button));
+		return state < 0;
+	}
+
 	void WindowsWindow::OnUpdate() {
 		//process messages from Windows
 		MSG msg = {};
@@ -135,6 +140,13 @@ namespace Workbench {
 			return MAKELRESULT(0, MNC_CLOSE);
 			break;
 		}
+		case WM_KEYDOWN: {
+			if (!CHECK_BIT(lParam, 30)) {
+				POST_EVENT(new WindowButtonPressedEvent(WinToWbKeycode(wParam)));
+			}
+			return 0;
+			break;
+		}
 		case WM_MOUSEMOVE: {
 			UINT x = GET_X_LPARAM(lParam);
 			UINT y = GET_Y_LPARAM(lParam);
@@ -142,17 +154,24 @@ namespace Workbench {
 			return 0;
 			break;
 		}
-
 		case WM_LBUTTONDOWN:
+			POST_EVENT(new WindowMouseButtonPressedEvent(WinToWbKeycode(VK_LBUTTON)));
+			return 0;
+			break;
 		case WM_MBUTTONDOWN:
+			POST_EVENT(new WindowMouseButtonPressedEvent(WinToWbKeycode(VK_MBUTTON)));
+			return 0;
+			break;
 		case WM_RBUTTONDOWN:
+			POST_EVENT(new WindowMouseButtonPressedEvent(WinToWbKeycode(VK_RBUTTON)));
+			return 0;
+			break;
 		case WM_LBUTTONUP:
 		case WM_MBUTTONUP:
 		case WM_RBUTTONUP:
 			return 0;
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
-		//Event delegation here
 	}
 
 	std::pair<uint32_t, uint32_t> WindowsWindow::GetDimensions() const {
