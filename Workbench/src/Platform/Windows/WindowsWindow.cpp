@@ -27,11 +27,11 @@ namespace Workbench {
 			0,
 			L"IDK",
 			s2ws(m_props->windowTitle).c_str(),
-			m_props->isFullScreen ? WS_POPUP : WS_OVERLAPPEDWINDOW,
+			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			m_props->isFullScreen ? GetSystemMetrics(SM_CXSCREEN) : m_props->windowWidth,
-			m_props->isFullScreen ? GetSystemMetrics(SM_CYSCREEN) : m_props->windowHeight,
+			m_props->windowWidth,
+			m_props->windowHeight,
 			NULL,
 			NULL,
 			m_hInstance,
@@ -42,10 +42,12 @@ namespace Workbench {
 		if (m_hWnd) {
 			ShowWindow(m_hWnd, SW_SHOW);
 			m_assocForWindowsProc.insert({ m_hWnd, this });
-			//POST_EVENT(new WindowCreatedEvent(this));
+			if (m_props->isFullScreen)
+				ToggleFullscreen();
+			POST_EVENT(new WindowCreatedEvent(this));
 		}
 		else
-			WB_CORE_ERROR("Failed to create window, failed HWND: {0}", m_hWnd);
+			WB_CORE_ERROR("Failed to create window, failed HWND: {}", m_hWnd);
 	}
 
 	bool WindowsWindow::checkForButtonPress(WB_KEYCODES button) {
@@ -57,7 +59,7 @@ namespace Workbench {
 		//process messages from Windows
 		MSG msg = {};
 		while (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
-			//GetMessage(&msg, m_hWnd, 0, 0);
+			//GetMessage(&msg, m_hWnd, 0, 0);					//Will be possible when window class will have its on thread
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}

@@ -10,6 +10,7 @@ int main(int argc, char** argv) {
 	{
 		auto pEngParams = new Workbench::Engine::EngineProps;
 		pEngParams->windowTitle = "Sandbox";
+		//pEngParams->isFullScreen = true;
 		Workbench::Engine mEngine(pEngParams);
 		result = mEngine.Run();
 	}
