@@ -186,6 +186,32 @@ namespace Workbench {
 		m_props->isVsync = enabled;
 	}
 
+	void WindowsWindow::ToggleFullscreen() {
+		DWORD dwStyle = GetWindowLong(m_hWnd, GWL_STYLE);
+		if (dwStyle & WS_OVERLAPPEDWINDOW) {
+			MONITORINFO mi = { sizeof(mi) };
+			if (GetWindowPlacement(m_hWnd, &m_wpPrev) &&
+				GetMonitorInfo(MonitorFromWindow(m_hWnd,
+					MONITOR_DEFAULTTOPRIMARY), &mi)) {
+				SetWindowLong(m_hWnd, GWL_STYLE,
+					dwStyle & ~WS_OVERLAPPEDWINDOW);
+				SetWindowPos(m_hWnd, HWND_TOP,
+					mi.rcMonitor.left, mi.rcMonitor.top,
+					mi.rcMonitor.right - mi.rcMonitor.left,
+					mi.rcMonitor.bottom - mi.rcMonitor.top,
+					SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+			}
+		}
+		else {
+			SetWindowLong(m_hWnd, GWL_STYLE,
+				dwStyle | WS_OVERLAPPEDWINDOW);
+			SetWindowPlacement(m_hWnd, &m_wpPrev);
+			SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0,
+				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER |
+				SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		}
+	};
+
 	bool WindowsWindow::IsFullscreen() const {
 		return m_props->isFullScreen;
 	}

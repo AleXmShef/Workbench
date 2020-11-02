@@ -17,6 +17,8 @@ namespace Workbench {
 
 		virtual void SetVSync(bool enabled) override;
 		virtual bool IsVSync() const override;
+
+		virtual void ToggleFullscreen();
 		virtual bool IsFullscreen() const override;
 
 		virtual void* GetNativeWindow() override;
@@ -30,6 +32,7 @@ namespace Workbench {
 		HINSTANCE m_hInstance = NULL;
 		WNDCLASS m_wndClass;
 		HWND m_hWnd;
+		WINDOWPLACEMENT m_wpPrev = { sizeof(m_wpPrev) };
 
 		bool _wasResizing = false;
 

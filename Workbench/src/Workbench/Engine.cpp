@@ -92,13 +92,13 @@ namespace Workbench {
 			auto button = ((Window::WindowMouseButtonPressedEvent*)event)->getButton();
 			switch (button) {
 			case WB_KEYCODES::LMB:
-				WB_CORE_LOG("Left mouse button pressed");
+				WB_CORE_TRACE("Left mouse button pressed");
 				break;
 			case WB_KEYCODES::MMB:
-				WB_CORE_LOG("Middle mouse button pressed");
+				WB_CORE_TRACE("Middle mouse button pressed");
 				break;
 			case WB_KEYCODES::RMB:
-				WB_CORE_LOG("Right mouse button pressed");
+				WB_CORE_TRACE("Right mouse button pressed");
 				break;
 			}
 			break;
@@ -109,6 +109,8 @@ namespace Workbench {
 			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
 			if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
 				WB_CORE_TRACE("Button pressed: {}", (char)key);
+			if (key == WB_KEYCODES::WB_VK_F)
+				m_BaseWindow->ToggleFullscreen();
 			break;
 		}
 

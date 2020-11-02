@@ -118,6 +118,8 @@ namespace Workbench {
 
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
+
+		virtual void ToggleFullscreen() = 0;
 		virtual bool IsFullscreen() const = 0;
 
 		virtual void* GetNativeWindow() = 0;
