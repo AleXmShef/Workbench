@@ -1,17 +1,19 @@
 #pragma once
+#pragma warning(disable : 4251)
 #include "wbpch.h"
+#include "Core.h"
 
 namespace Workbench {
-	class AbstractEvent {
+	class WORKBENCH_API AbstractEvent {
 	};
 
 	template<class EventType>
-	class Event : public AbstractEvent {
+	class WORKBENCH_API Event : public AbstractEvent {
 	public:
 		virtual EventType getType() const = 0;
 	};
 
-	class AbstractCallbackHandler {
+	class WORKBENCH_API AbstractCallbackHandler {
 	public:
 		virtual ~AbstractCallbackHandler();
 
@@ -24,7 +26,7 @@ namespace Workbench {
 	};
 
 	template<class Subscriber, class EventType>
-	class MemberCallbackHandler : public AbstractCallbackHandler {
+	class WORKBENCH_API MemberCallbackHandler : public AbstractCallbackHandler {
 	public:
 		typedef void (Subscriber::*Callback)(const Event<EventType>*);
 
@@ -51,7 +53,7 @@ namespace Workbench {
 		Callback		m_callback;
 	};
 
-	class EventBus {
+	class WORKBENCH_API EventBus {
 	public:
 		using SibscribersMap =			std::unordered_map<std::type_index, std::list<AbstractCallbackHandler*>>;
 		using EventQueue =				std::queue<std::pair<std::type_index, AbstractEvent*>>;
@@ -94,7 +96,7 @@ namespace Workbench {
 		EventQueue				m_EventQueue;
 	};
 
-	class MainEventBus : public EventBus {
+	class WORKBENCH_API MainEventBus : public EventBus {
 	public:
 		static MainEventBus* getInstance();
 	protected:

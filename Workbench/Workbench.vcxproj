@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\Layers\LayerStack.cpp" />
+    <ClCompile Include="src\Workbench\Layers\Layer.cpp" />
     <ClCompile Include="src\Platform\DirectX\d3dRenderer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsUtility.cpp" />
     <ClCompile Include="src\Workbench\Events\Event.cpp" />
@@ -26,6 +28,8 @@
     <ClCompile Include="src\Workbench\Renderer\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Layers\LayerStack.h" />
+    <ClInclude Include="src\Workbench\Layers\Layer.h" />
     <ClInclude Include="src\Platform\DirectX\d3dRenderer.h" />
     <ClInclude Include="src\Platform\DirectX\d3dx12.h" />
     <ClInclude Include="src\Workbench\Events\Event.h" />
