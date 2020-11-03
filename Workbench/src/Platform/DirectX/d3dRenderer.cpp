@@ -44,8 +44,8 @@ namespace Workbench {
 		m_currentAdapter = adapters[0];
 
 		//Get current output
-		auto outputs = GetAdapterOutputs(m_currentAdapter);
-		m_currentAdapterOutput = outputs[0];
+		//auto outputs = GetAdapterOutputs(m_currentAdapter);
+		//m_currentAdapterOutput = outputs[0];
 
 		//Create hardware device
 		HRESULT createdHardwareDevice = D3D12CreateDevice(m_currentAdapter, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_d3dDevice));
@@ -59,7 +59,7 @@ namespace Workbench {
 		DXGI_ADAPTER_DESC desc;
 		_adapter->GetDesc(&desc);
 		WB_RENDERER_LOG("Using adapter:");
-		WB_RENDERER_LOG("\t{0}", ws2s(desc.Description));
+		WB_RENDERER_LOG("\t{}", ws2s(desc.Description));
 		
 		//Create fence object
 		m_d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence));

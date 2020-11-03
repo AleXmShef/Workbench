@@ -23,6 +23,9 @@ namespace Workbench {
 		
 		RegisterClass(&m_wndClass);
 
+		RECT windowRect = { 0, 0, static_cast<LONG>(m_props->windowWidth), static_cast<LONG>(m_props->windowHeight) };
+		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+
 		//create Windows window
 		m_hWnd = CreateWindowExW(
 			0,
@@ -31,8 +34,8 @@ namespace Workbench {
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			m_props->windowWidth,
-			m_props->windowHeight,
+			windowRect.right - windowRect.left,
+			windowRect.bottom - windowRect.top,
 			NULL,
 			NULL,
 			m_hInstance,
