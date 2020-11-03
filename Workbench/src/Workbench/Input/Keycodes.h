@@ -71,5 +71,18 @@ namespace Workbench {
 
 		WB_VK_SUPER,
 
+		WB_VK_F1 = 112,
+		WB_VK_F2,
+		WB_VK_F3,
+		WB_VK_F4,
+		WB_VK_F5,
+		WB_VK_F6,
+		WB_VK_F7,
+		WB_VK_F8,
+		WB_VK_F9,
+		WB_VK_F10,
+		WB_VK_F11,
+		WB_VK_F12
+
 	};
 }

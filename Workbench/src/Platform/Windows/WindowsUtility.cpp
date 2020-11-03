@@ -28,6 +28,9 @@ namespace Workbench{
 		else if (code >= (uint32_t)WB_KEYCODES::WB_VK_0 && code <= (uint32_t)WB_KEYCODES::WB_VK_9) {	//numbers
 			return (WB_KEYCODES)code;
 		}
+		else if (code >= (uint32_t)WB_KEYCODES::WB_VK_F1 && code <= (uint32_t)WB_KEYCODES::WB_VK_F11) {	//numbers
+			return (WB_KEYCODES)code;
+		}
 		else if (code == VK_RETURN)
 			return WB_KEYCODES::WB_VK_RETURN;
 		else if (code == VK_SPACE)

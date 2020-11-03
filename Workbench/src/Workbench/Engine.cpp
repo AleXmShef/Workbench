@@ -109,7 +109,7 @@ namespace Workbench {
 			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
 			if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
 				WB_CORE_TRACE("Button pressed: {}", (char)key);
-			if (key == WB_KEYCODES::WB_VK_F)
+			if (key == WB_KEYCODES::WB_VK_F11)
 				m_BaseWindow->ToggleFullscreen();
 			break;
 		}
