@@ -39,16 +39,19 @@ namespace Workbench {
 		}
 
 
-
+		//Get current adapter
 		auto adapters = GetAdapters();
+		m_currentAdapter = adapters[0];
+
+		//Get current output
+		auto outputs = GetAdapterOutputs(m_currentAdapter);
+		m_currentAdapterOutput = outputs[0];
 
 		//Create hardware device
-		HRESULT createdHardwareDevice = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_d3dDevice));
+		HRESULT createdHardwareDevice = D3D12CreateDevice(m_currentAdapter, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_d3dDevice));
 		if (FAILED(createdHardwareDevice)) {
 			WB_RENDERER_CRITICAL("Failed to create hardware device");
 		}
-
-		//Get current adapter
 
 		auto adapterLuid = m_d3dDevice->GetAdapterLuid();
 		IDXGIAdapter4* _adapter;
@@ -154,7 +157,7 @@ namespace Workbench {
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = s_SwapChainBufferCount;									//buffer count (2 or 3)
 		sd.OutputWindow = m_hWnd;													//windows hwnd
-		sd.Windowed = m_window->IsFullscreen() ? false : true;						//is windowed
+		sd.Windowed = true;						//is windowed
 		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -228,7 +231,14 @@ namespace Workbench {
 	}
 
 	void d3dRenderer::onResize() {
+		resizeSwapchain();
+	};
+
+	void d3dRenderer::resizeSwapchain() {
+
 		auto [newWidth, newHeight] = m_window->GetDimensions();
+
+
 
 		//flush before changing any resources
 		FlushCommandQueue();
@@ -391,5 +401,28 @@ namespace Workbench {
 		}
 
 		return adapterList;
-	};
+	}
+	std::vector<IDXGIOutput*> d3dRenderer::GetAdapterOutputs(IDXGIAdapter* adapter) {
+		std::vector<IDXGIOutput*> output_vec;
+		
+		UINT i = 0;
+		IDXGIOutput* output = nullptr;
+		WB_RENDERER_LOG("Available outputs:");
+
+		while (adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND) {
+			DXGI_OUTPUT_DESC desc;
+			output->GetDesc(&desc);
+
+			std::wstring desc_ = L"";
+			desc_ += desc.DeviceName;
+
+			WB_RENDERER_LOG("\t{}", ws2s(desc_));
+
+			output_vec.push_back(output);
+
+			++i;
+		}
+		
+		return output_vec;
+	}
 }

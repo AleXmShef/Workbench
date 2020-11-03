@@ -2,6 +2,8 @@
 #include "Layer.h"
 
 namespace Workbench {
+	uint32_t Layer::s_numLayers = 0;
+
 	Layer::Layer() {
 		s_numLayers++;
 	}

@@ -113,16 +113,19 @@ namespace Workbench {
 				m_BaseWindow->ToggleFullscreen();
 			break;
 		}
-
 		}
 	}
 
 	int Engine::Run() {
+
+		m_BaseWindow->OnUpdate();
+		FLUSH_EVENTS();
+
 		m_Renderer = std::unique_ptr<d3dRenderer>(new d3dRenderer);
 		m_Renderer->Init(m_BaseWindow);
+		//if (m_props->isFullScreen)
+		//	m_Renderer->toggleFullscreen(true);
 
-		FLUSH_EVENTS();
-		m_BaseWindow->OnUpdate();
 		while (m_mainLoopFlag) {
 			m_BaseWindow->OnUpdate();
 			if (!m_onPause) {

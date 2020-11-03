@@ -6,6 +6,7 @@
 #include "WindowsUtility.h"
 
 namespace Workbench {
+
 	std::unordered_map<HWND, WindowsWindow*>WindowsWindow::m_assocForWindowsProc = {};
 
 	WindowsWindow::WindowsWindow(Window::WindowProps* props) : m_props(props) {
@@ -104,18 +105,20 @@ namespace Workbench {
 			break;
 		}
 		case WM_SIZE: {
+			auto __width = LOWORD(lParam);
+			auto __height = HIWORD(lParam);
+
 			switch (wParam) {
 			case SIZE_MINIMIZED: {
 				SEND_EVENT(new WindowLostFocusEvent());
 				return 0;
 				break;
 			}
+			case SIZE_MAXIMIZED:
 			case SIZE_RESTORED: {
 				UINT width = LOWORD(lParam);
 				UINT height = HIWORD(lParam);
 				if (width != m_props->windowWidth || height != m_props->windowHeight) {
-					UINT width = LOWORD(lParam);
-					UINT height = HIWORD(lParam);
 					m_props->windowWidth = width;
 					m_props->windowHeight = height;
 					if (!_wasResizing)
@@ -191,26 +194,19 @@ namespace Workbench {
 	void WindowsWindow::ToggleFullscreen() {
 		DWORD dwStyle = GetWindowLong(m_hWnd, GWL_STYLE);
 		if (dwStyle & WS_OVERLAPPEDWINDOW) {
+			m_wndStyle = dwStyle;
 			MONITORINFO mi = { sizeof(mi) };
-			if (GetWindowPlacement(m_hWnd, &m_wpPrev) &&
-				GetMonitorInfo(MonitorFromWindow(m_hWnd,
-					MONITOR_DEFAULTTOPRIMARY), &mi)) {
+			if (GetWindowPlacement(m_hWnd, &m_wpPrev)) {
 				SetWindowLong(m_hWnd, GWL_STYLE,
-					dwStyle & ~WS_OVERLAPPEDWINDOW);
-				SetWindowPos(m_hWnd, HWND_TOP,
-					mi.rcMonitor.left, mi.rcMonitor.top,
-					mi.rcMonitor.right - mi.rcMonitor.left,
-					mi.rcMonitor.bottom - mi.rcMonitor.top,
-					SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+					dwStyle & ~WS_OVERLAPPEDWINDOW | WS_POPUP);
+				ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
 			}
 		}
 		else {
 			SetWindowLong(m_hWnd, GWL_STYLE,
-				dwStyle | WS_OVERLAPPEDWINDOW);
+				m_wndStyle);
 			SetWindowPlacement(m_hWnd, &m_wpPrev);
-			SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0,
-				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER |
-				SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+			//ShowWindow(m_hWnd, SW_SHOW);
 		}
 	};
 

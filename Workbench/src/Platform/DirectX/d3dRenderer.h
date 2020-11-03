@@ -35,6 +35,8 @@ namespace Workbench {
 		//window event callbacks
 		void onResize() override;
 
+		void resizeSwapchain();
+
 		std::vector<IDXGIAdapter*> GetAdapters();
 		std::vector<IDXGIOutput*> GetAdapterOutputs(IDXGIAdapter* adapter);
 		std::vector<DXGI_MODE_DESC> GetOutputDisplayMode(IDXGIOutput* output, DXGI_FORMAT format);
@@ -44,6 +46,9 @@ namespace Workbench {
 
 		HINSTANCE m_hInstance;
 		HWND m_hWnd;
+
+		IDXGIAdapter* m_currentAdapter;
+		IDXGIOutput* m_currentAdapterOutput;
 
 		bool      m_4xMsaaState = false;    // 4X MSAA enabled
 		UINT      m_4xMsaaQuality = 0;      // quality level of 4X MSAA

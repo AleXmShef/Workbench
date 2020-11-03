@@ -33,7 +33,9 @@ namespace Workbench {
 		WNDCLASS m_wndClass;
 		HWND m_hWnd;
 		WINDOWPLACEMENT m_wpPrev = { sizeof(m_wpPrev) };
+		DWORD m_wndStyle;
 
+		//bool _wastChangingToFullscreen = false;
 		bool _wasResizing = false;
 
 		std::unique_ptr<WindowProps> m_props;
