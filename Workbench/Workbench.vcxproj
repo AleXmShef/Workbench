@@ -11,6 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\ECS\ECS.cpp" />
+    <ClCompile Include="src\Workbench\Random\RandomGenerator.cpp" />
+    <ClCompile Include="src\Workbench\ECS\ECSComponent.cpp" />
+    <ClCompile Include="src\Workbench\ECS\ECSEntity.cpp" />
     <ClCompile Include="src\Workbench\Layers\LayerStack.cpp" />
     <ClCompile Include="src\Workbench\Layers\Layer.cpp" />
     <ClCompile Include="src\Platform\DirectX\d3dRenderer.cpp" />
@@ -26,8 +30,14 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">wbpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\Workbench\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Workbench\ECS\ECSSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Utils\UUID.h" />
+    <ClInclude Include="src\Workbench\ECS\ECS.h" />
+    <ClInclude Include="src\Workbench\Random\RandomGenerator.h" />
+    <ClInclude Include="src\Workbench\ECS\ECSComponent.h" />
+    <ClInclude Include="src\Workbench\ECS\ECSEntity.h" />
     <ClInclude Include="src\Workbench\Layers\LayerStack.h" />
     <ClInclude Include="src\Workbench\Layers\Layer.h" />
     <ClInclude Include="src\Platform\DirectX\d3dRenderer.h" />
@@ -43,6 +53,7 @@
     <ClInclude Include="src\Workbench\Window.h" />
     <ClInclude Include="src\wbpch.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="src\Workbench\ECS\ECSSystem.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -5,10 +5,12 @@ namespace Workbench {
 	class WORKBENCH_API Layer {
 	public:
 		Layer();
-		virtual void OnAttach() = 0;
-		virtual void OnUpdate() = 0;
-		virtual void OnDetach() = 0;
+		virtual void OnAttach() {};
+		virtual void OnUpdate() {};
+		virtual void OnDetach() {};
 		virtual ~Layer();
+
+		static uint32_t GetNumberOfLayers();
 
 	protected:
 		static uint32_t s_numLayers;

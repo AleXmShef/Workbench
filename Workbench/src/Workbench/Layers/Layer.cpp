@@ -11,4 +11,8 @@ namespace Workbench {
 	Layer::~Layer() {
 		s_numLayers--;
 	}
+	uint32_t Layer::GetNumberOfLayers()
+	{
+		return s_numLayers;
+	}
 }

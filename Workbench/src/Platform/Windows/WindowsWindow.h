@@ -29,11 +29,13 @@ namespace Workbench {
 
 		LRESULT CALLBACK CallBackDelegate(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	protected:
+
 		HINSTANCE m_hInstance = NULL;
 		WNDCLASS m_wndClass;
 		HWND m_hWnd;
 		WINDOWPLACEMENT m_wpPrev = { sizeof(m_wpPrev) };
 		DWORD m_wndStyle;
+		RECT m_wndRect;
 
 		//bool _wastChangingToFullscreen = false;
 		bool _wasResizing = false;

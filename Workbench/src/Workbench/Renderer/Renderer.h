@@ -5,7 +5,9 @@ namespace Workbench {
 	class Renderer {
 	public:
 		virtual void Init(std::shared_ptr<Window> window);
+		//virtual void Begin() = 0;
 		virtual void Draw() = 0;
+		//virtual void End() = 0;
 		virtual ~Renderer();
 	protected:
 		Renderer();

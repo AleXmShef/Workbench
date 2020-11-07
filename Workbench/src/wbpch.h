@@ -12,13 +12,16 @@
 #include <functional>
 #include <atomic>
 #include <mutex>
+#include <random>
 
 #include <string>
 #include <regex>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
+#include <stack>
 #include <queue>
 #include <list>
 

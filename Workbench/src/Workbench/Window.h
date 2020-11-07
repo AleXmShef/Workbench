@@ -2,10 +2,11 @@
 #include "Core.h"
 #include "Events/Event.h"
 #include "Input/Keycodes.h"
+#include "Layers/Layer.h"
 #include "Logger.h"
 
 namespace Workbench {
-	class WORKBENCH_API Window {
+	class WORKBENCH_API Window : public Layer {
 	public:
 
 		EMITS_EVENTS {

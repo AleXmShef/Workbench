@@ -1,7 +1,15 @@
 #include "wbpch.h"
 #include "Engine.h"
 
+#include "ECS/ECS.h"
+
 namespace Workbench {
+
+	class Test {
+		int a = 5;
+	public:
+		int b = 10;
+	};
 
 	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
 		Logger::Init();
@@ -12,6 +20,10 @@ namespace Workbench {
 
 		BIND_EVENT(this, Engine::onWindowEventCallback);
 
+		auto _t = new LayerStack();
+
+		//m_LayerStack = (new LayerStack());
+
 		auto windowProps = new Window::WindowProps;
 		*windowProps = {
 			m_props->windowTitle,
@@ -21,7 +33,7 @@ namespace Workbench {
 			m_props->isVsync
 		};
 
-		m_BaseWindow = std::unique_ptr<Window>(WB_CREATE_NATIVE_WINDOW(windowProps));
+		m_BaseWindow = std::shared_ptr<Window>(WB_CREATE_NATIVE_WINDOW(windowProps));
 
 		WB_CORE_INFO("Workbench successfuly initialized, main thread_id: {0}", std::this_thread::get_id());
 	}
@@ -123,8 +135,18 @@ namespace Workbench {
 
 		m_Renderer = std::unique_ptr<d3dRenderer>(new d3dRenderer);
 		m_Renderer->Init(m_BaseWindow);
-		//if (m_props->isFullScreen)
-		//	m_Renderer->toggleFullscreen(true);
+
+		auto m_ecs = new ECS;
+
+		auto entity1 = m_ecs->CreateEntity();
+		auto entity2 = m_ecs->CreateEntity();
+
+		auto m_component = CREATE_ECS_COMPONENT(ECSComponent);
+
+		m_ecs->AddComponent(entity1, m_component);
+		m_ecs->AddComponent(entity2, m_component);
+
+		m_ecs->Test<ECSComponent>(entity1);
 
 		while (m_mainLoopFlag) {
 			m_BaseWindow->OnUpdate();

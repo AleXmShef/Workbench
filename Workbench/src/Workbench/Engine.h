@@ -4,6 +4,7 @@
 #include "Core.h"
 #include "Logger.h"
 #include "Events/Event.h"
+#include "Layers/LayerStack.h"
 
 #ifdef WB_PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsWindow.h"
@@ -32,7 +33,7 @@ namespace Workbench {
 		int Run();
 
 	private:
-		void onWindowEventCallback(const Event < Window::Events>* event);
+		void onWindowEventCallback(const Event<Window::Events>* event);
 	private:
 		bool m_mainLoopFlag = true;
 		bool m_onPause = false;
@@ -40,8 +41,9 @@ namespace Workbench {
 		std::unique_ptr<EngineProps> m_props = nullptr;
 
 		std::shared_ptr<Window> m_BaseWindow = nullptr;
-		std::vector<Window*> m_SecondaryWindows;
 
 		std::unique_ptr<Renderer> m_Renderer = nullptr;
+
+		std::unique_ptr<LayerStack> m_LayerStack = nullptr;
 	};
 }

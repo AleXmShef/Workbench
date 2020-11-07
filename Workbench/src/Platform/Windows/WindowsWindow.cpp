@@ -198,18 +198,26 @@ namespace Workbench {
 		DWORD dwStyle = GetWindowLong(m_hWnd, GWL_STYLE);
 		if (dwStyle & WS_OVERLAPPEDWINDOW) {
 			m_wndStyle = dwStyle;
-			MONITORINFO mi = { sizeof(mi) };
+			GetWindowRect(m_hWnd, &m_wndRect);
 			if (GetWindowPlacement(m_hWnd, &m_wpPrev)) {
 				SetWindowLong(m_hWnd, GWL_STYLE,
-					dwStyle & ~WS_OVERLAPPEDWINDOW | WS_POPUP);
-				ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
+					dwStyle & ~WS_OVERLAPPEDWINDOW);
+				ShowWindow(m_hWnd, SW_MAXIMIZE);
 			}
 		}
 		else {
 			SetWindowLong(m_hWnd, GWL_STYLE,
 				m_wndStyle);
-			SetWindowPlacement(m_hWnd, &m_wpPrev);
-			//ShowWindow(m_hWnd, SW_SHOW);
+			SetWindowPos(
+				m_hWnd, 
+				HWND_NOTOPMOST, 
+				m_wndRect.left, m_wndRect.top,
+				m_wndRect.right - m_wndRect.left,
+				m_wndRect.bottom - m_wndRect.top,
+				SWP_FRAMECHANGED | SWP_NOACTIVATE
+			);
+			//AdjustWindowRect(&m_wndRect, WS_OVERLAPPEDWINDOW, FALSE);
+			ShowWindow(m_hWnd, SW_NORMAL);
 		}
 	};
 
