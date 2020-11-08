@@ -1,15 +1,9 @@
 #include "wbpch.h"
 #include "Engine.h"
-
-#include "ECS/ECS.h"
+#include "Physics/PhysicsComponent.h"
+#include "Physics/PhysicsSystem.h"
 
 namespace Workbench {
-
-	class Test {
-		int a = 5;
-	public:
-		int b = 10;
-	};
 
 	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
 		Logger::Init();
@@ -34,6 +28,10 @@ namespace Workbench {
 		};
 
 		m_BaseWindow = std::shared_ptr<Window>(WB_CREATE_NATIVE_WINDOW(windowProps));
+
+		m_World = ECS::getInstance();
+
+		m_LayerStack = std::make_unique<LayerStack>();
 
 		WB_CORE_INFO("Workbench successfuly initialized, main thread_id: {0}", std::this_thread::get_id());
 	}
@@ -136,21 +134,28 @@ namespace Workbench {
 		m_Renderer = std::unique_ptr<d3dRenderer>(new d3dRenderer);
 		m_Renderer->Init(m_BaseWindow);
 
-		auto m_ecs = new ECS;
+		m_LayerStack->PushLayer(std::make_shared<PhysicsSystem>());
 
-		auto entity1 = m_ecs->CreateEntity();
-		auto entity2 = m_ecs->CreateEntity();
+		auto entity1 = m_World->CreateEntity();
+		auto entity2 = m_World->CreateEntity();
 
-		auto m_component = CREATE_ECS_COMPONENT(ECSComponent);
+		auto m_component1 = new PhysicsComponent;
+		auto m_component2 = new PhysicsComponent;
 
-		m_ecs->AddComponent(entity1, m_component);
-		m_ecs->AddComponent(entity2, m_component);
+		m_component1->data.x = 5;
+		m_component2->data.x = 10;
 
-		m_ecs->Test<ECSComponent>(entity1);
+		m_component1->data.acc = 2;
+		m_component2->data.acc = 9.8;
+
+		m_World->AddComponent(entity1, m_component1);
+		m_World->AddComponent(entity2, m_component2);
+
 
 		while (m_mainLoopFlag) {
 			m_BaseWindow->OnUpdate();
 			if (!m_onPause) {
+				m_LayerStack->OnUpdate();
 				m_Renderer->Draw();
 				FLUSH_EVENTS();
 			}

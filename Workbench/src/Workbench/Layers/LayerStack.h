@@ -10,8 +10,12 @@ namespace Workbench {
 
 		virtual void PushLayer(std::shared_ptr<Layer> layer);
 		virtual void PushOverlay(std::shared_ptr<Layer> layer);
+		virtual void InsertLayer(std::shared_ptr<Layer> layer, size_t pos) {};
+		virtual void InsertOverlay(std::shared_ptr<Layer> layer, size_t pos) {};
 		virtual void PopLayer();
 		virtual void PopOverlay();
+		virtual void RemoveLayer() {};
+		virtual void RemoveOverlay() {};
 
 		virtual void OnUpdate() override;
 		virtual void OnDetach() override;

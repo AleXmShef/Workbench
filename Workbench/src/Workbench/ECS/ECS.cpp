@@ -2,6 +2,14 @@
 #include "ECS.h"
 
 namespace Workbench {
+	ECS* ECS::m_instance = nullptr;
+
+	ECS* ECS::getInstance() {
+		if (m_instance == nullptr)
+			m_instance = new ECS;
+		return m_instance;
+	}
+
 	const UUID* ECS::CreateEntity() {
 		auto new_entity = new ECSEntity();
 		auto new_entity_id = new_entity->getUuid();

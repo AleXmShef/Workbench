@@ -12,7 +12,7 @@ namespace Workbench {
 		s_numComponents--;
 	}
 
-	const UUID* ECSComponent::getUuid() { 
+	const UUID* ECSComponent::getUuid() const { 
 		return &m_uuid; 
 	}
 }

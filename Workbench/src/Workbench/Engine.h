@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include "Events/Event.h"
 #include "Layers/LayerStack.h"
+#include "ECS/ECS.h"
 
 #ifdef WB_PLATFORM_WINDOWS
 #include "Platform/Windows/WindowsWindow.h"
@@ -37,6 +38,8 @@ namespace Workbench {
 	private:
 		bool m_mainLoopFlag = true;
 		bool m_onPause = false;
+
+		ECS* m_World = nullptr;
 
 		std::unique_ptr<EngineProps> m_props = nullptr;
 

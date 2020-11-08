@@ -7,11 +7,11 @@ namespace Workbench {
 		ECSComponent();
 		virtual ~ECSComponent();
 
-		const UUID* getUuid();
-	protected:
+		const UUID* getUuid() const;
+	private:
 		UUID m_uuid;
 
-	protected:
+	private:
 		static uint32_t s_numComponents;
 	};
 }

@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Workbench\Physics\PhysicsComponent.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECS.cpp" />
     <ClCompile Include="src\Workbench\Random\RandomGenerator.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECSComponent.cpp" />
@@ -33,6 +35,8 @@
     <ClCompile Include="src\Workbench\ECS\ECSSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Physics\PhysicsSystem.h" />
+    <ClInclude Include="src\Workbench\Physics\PhysicsComponent.h" />
     <ClInclude Include="src\Workbench\Utils\UUID.h" />
     <ClInclude Include="src\Workbench\ECS\ECS.h" />
     <ClInclude Include="src\Workbench\Random\RandomGenerator.h" />

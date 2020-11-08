@@ -7,6 +7,52 @@
 #include "Logger.h"
 
 namespace Workbench {
+
+	class AbstractComponentContainer {};
+
+	template<class Component>
+	class ComponentContainer : public AbstractComponentContainer {
+	public:
+
+		const UUID* AddComponent(Component* component) {
+			for (auto ex_component : m_Components)
+				if (ex_component == component) {
+					auto _ptr = static_cast<ECSComponent*>(ex_component);
+					return _ptr->getUuid();
+				}
+			m_Components.push_back(component);
+			auto _ptr = static_cast<ECSComponent*>(component);
+			return _ptr->getUuid();
+		}
+
+		bool RemoveComponent(Component* component) {
+			auto it = m_Components.begin();
+			auto end = m_Components.end();
+			for (; it != end; ++it) {
+				if ((*it) == component) {
+					m_Components.erase(it);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		std::pair<typename std::vector<Component*>::iterator, typename std::vector<Component*>::iterator> getComponents() {
+			return { m_Components.begin(), m_Components.end() };
+		}
+
+		const Component* getComponentById(const UUID* componentId) {
+			for (auto component : m_Components) {
+				if (static_cast<ECSComponent*>(component)->getUuid() == componentId)
+					return component;
+			}
+			return nullptr;
+		}
+
+	protected:
+		std::vector<Component*> m_Components;
+	};
+
 	class ECS {
 	public:
 		EMITS_EVENTS {
@@ -33,99 +79,74 @@ namespace Workbench {
 			const UUID* m_EntityId;
 		};
 
+		static ECS* getInstance();
+
 		const UUID* CreateEntity();
 		void DestroyEntity(const UUID* entityId);
 
 		template<class Component>
-		void AddComponent(const UUID* entityId, std::shared_ptr<const Component> component) {
+		void AddComponent(const UUID* entityId, Component* component) {
+			//Check for component validity
+			static_assert(std::is_base_of<ECSComponent, Component>::value, "Component class should be derived from ECSComponent!");
+
+			//If there is no container yet, create one
 			if (m_ComponentContainers[typeid(Component)] == nullptr)
 				m_ComponentContainers[typeid(Component)] = static_cast<AbstractComponentContainer*>(new ComponentContainer<Component>);
+
+			//Type cast to desired container
 			ComponentContainer<Component>* componentContainer = (ComponentContainer<Component>*)(m_ComponentContainers[typeid(Component)]);
 
+			//Add component
 			auto component_id = componentContainer->AddComponent(component);
 			m_EntityToComponentsMap[entityId][typeid(Component)].push_back(component_id);
 		};
 
 		template<class Component>
-		void RemoveComponent(const UUID* entityId, std::shared_ptr<const Component> component) {
+		void RemoveComponent(const UUID* entityId, Component* component) {
+			//type cast to desired container
 			ComponentContainer<Component>* componentContainer = (ComponentContainer<Component>*)(m_ComponentContainers[typeid(Component)]);
+
 			if (componentContainer->RemoveComponent(component)) {
 				auto it = m_EntityToComponentsMap[entityId][typeid(Component)].begin();
 				auto end = m_EntityToComponentsMap[entityId][typeid(Component)].end();
 				for (; it != end; it++) {
-					if ((*it) == (std::static_pointer_cast<const ECSComponent>(component))->getUuid())
+					if ((*it) == (static_cast<ECSComponent*>(component))->getUuid()) {
 						m_EntityToComponentsMap[entityId][typeid(Component)].erase(it);
+						break;
+					}
 				}
-				
 			}
 		};
-
-		template<class Component>
-		void Test(const UUID* entityId) {
-			ComponentContainer<Component>* componentContainer = (ComponentContainer<Component>*)(m_ComponentContainers[typeid(Component)]);
-
-			auto [begin, end] = componentContainer->getComponents();
-
-			WB_CORE_INFO("sharead_ptr test: {}", (*begin).use_count());
-		}
 		
 		template<class ...Components>
 		std::vector<const UUID*>::iterator GetEntities();
 		
 		template<class Component>
-		typename std::vector<const Component*>::iterator GetEntityComponent(const UUID* entityId);
+		const Component* GetEntityComponent(const UUID* entityId) const {
+			ComponentContainer<Component>* compContainer = static_cast<ComponentContainer<Component>*>(m_ComponentContainers[typeid(Component)]);
+			if (m_EntityToComponentsMap[entityId][typeid(Component)].empty())
+				return nullptr;
+			else
+				return compContainer->getComponentById(m_EntityToComponentsMap[entityId][typeid(Component)][0]);
+		};
 		
 		template<class Component>
-		typename std::vector<const Component*>::iterator GetComponents() {
-			//return 
+		std::pair<typename std::vector<Component*>::iterator, typename std::vector<Component*>::iterator> GetComponents() {
+			ComponentContainer<Component>* compContainer = static_cast<ComponentContainer<Component>*>(m_ComponentContainers[typeid(Component)]);
+			return compContainer->getComponents();
 		};
 	protected:
 
-		class AbstractComponentContainer {};
-
-		template<class Component>
-		class ComponentContainer : public AbstractComponentContainer {
-		public:
-			typedef std::shared_ptr<const Component> ComponentPtr;
-
-			const UUID* AddComponent(ComponentPtr component) {
-				for (auto ex_component : m_Components)
-					if (ex_component == component) {
-						std::shared_ptr<const ECSComponent> _ptr = std::static_pointer_cast<const ECSComponent>(ex_component);
-						return _ptr->getUuid();
-					}
-				m_Components.push_back(component);
-				std::shared_ptr<const ECSComponent> _ptr = std::static_pointer_cast<const ECSComponent>(component);
-				return _ptr->getUuid();
-			}
-
-			bool RemoveComponent(ComponentPtr component) {
-				auto it = m_Components.end();
-				auto begin = m_Components.begin();
-				for (; it != begin; it--) {
-					if ((*it) == component) {
-						m_Components.erase(it);
-						return true;
-					}
-				}
-				return false;
-			}
-
-			std::pair<typename std::vector<ComponentPtr>::iterator, typename std::vector<ComponentPtr>::iterator> getComponents() { 
-				return { m_Components.begin(), m_Components.end() }; 
-			}
-
-		protected:
-			std::vector<ComponentPtr> m_Components;
-		};
+		ECS() = default;
 
 		std::vector<std::unique_ptr<ECSEntity>> m_Entities;
 
 		std::map<std::type_index, AbstractComponentContainer*> m_ComponentContainers;
 
 		std::map<const UUID*, std::map<std::type_index, std::vector<const UUID*>>> m_EntityToComponentsMap;
+
+	protected:
+		static ECS* m_instance;
 	};
 }
-
-#define CREATE_ECS_COMPONENT(ComponentType, ...) std::shared_ptr<const ComponentType>(new ComponentType(__VA_ARGS__))
 
