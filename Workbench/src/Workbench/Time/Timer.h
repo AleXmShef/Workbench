@@ -18,7 +18,7 @@ namespace Workbench {
 			return (std::chrono::duration_cast<std::chrono::duration<float, Type>>(m_TimeSinceStart)).count();
 		};
 
-		template<typename Type>
+		template<typename Type = std::ratio<1>>
 		float GetTickTime() {
 			return (std::chrono::duration_cast<std::chrono::duration<float, Type>>(m_TimeSinceLastTick)).count();
 		};

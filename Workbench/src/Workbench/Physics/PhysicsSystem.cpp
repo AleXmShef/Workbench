@@ -15,7 +15,7 @@ namespace Workbench {
 			WB_CORE_TRACE("\tvel: {}", vel);
 			WB_CORE_TRACE("\tacc: {}", acc);
 
-			component->data = { x, y + vel * 0.1f, z, vel + acc * 0.1f, acc };
+			component->data = { x, y + vel * timer->GetTickTime(), z, vel + acc * timer->GetTickTime(), acc };
 		}
 	}
 }
