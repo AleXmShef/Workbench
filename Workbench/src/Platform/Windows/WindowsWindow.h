@@ -10,7 +10,7 @@ namespace Workbench {
 
 		virtual bool checkForButtonPress(WB_KEYCODES button) override;
 
-		virtual void OnUpdate() override;
+		virtual void OnUpdate(WB_GAME_TIMER* timer) override;
 		virtual void OnClose() override;
 
 		virtual std::pair<uint32_t, uint32_t> GetDimensions() const override;

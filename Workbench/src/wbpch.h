@@ -13,6 +13,7 @@
 #include <atomic>
 #include <mutex>
 #include <random>
+#include <chrono>
 
 #include <string>
 #include <regex>

@@ -5,7 +5,7 @@
 namespace Workbench {
 	class PhysicsSystem : public Layer {
 	public:
-		void OnUpdate() override;
+		void OnUpdate(WB_GAME_TIMER* timer) override;
 	protected:
 
 	};

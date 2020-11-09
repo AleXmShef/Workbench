@@ -1,7 +1,6 @@
 #pragma once
 #include "wbpch.h"
 #include "Renderer/Renderer.h"
-#include "Platform/Windows/WindowsWindow.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -24,7 +23,10 @@ namespace Workbench {
 		virtual void Init(std::shared_ptr<Window> window) override;
 		~d3dRenderer();
 
+		virtual void Begin() override;
 		virtual void Draw() override;
+		virtual void End() override;
+
 	protected:
 		HRESULT CreateCommandObjects();
 		HRESULT CreateSwapChain();
@@ -32,10 +34,10 @@ namespace Workbench {
 
 		void FlushCommandQueue();
 
-		//window event callbacks
-		void onResize() override;
+		//window event callback
+		void OnResize() override;
 
-		void resizeSwapchain();
+		void ResizeSwapchain();
 
 		std::vector<IDXGIAdapter*> GetAdapters();
 		std::vector<IDXGIOutput*> GetAdapterOutputs(IDXGIAdapter* adapter);
@@ -44,41 +46,63 @@ namespace Workbench {
 		template<typename T>
 		using pCom = Microsoft::WRL::ComPtr<T>;
 
+
+		//Window
 		HINSTANCE m_hInstance;
 		HWND m_hWnd;
 
+
+		//Adapter and assotiated output
 		IDXGIAdapter* m_currentAdapter;
 		IDXGIOutput* m_currentAdapterOutput;
 
+
+		//AA settings
 		bool      m_4xMsaaState = false;    // 4X MSAA enabled
 		UINT      m_4xMsaaQuality = 0;      // quality level of 4X MSAA
 
+
+		//D3D Essentials
 		pCom<IDXGIFactory4> m_dxgiFactory;
 		pCom<IDXGISwapChain> m_SwapChain;
 		pCom<ID3D12Device> m_d3dDevice;
 
+
+		//GPU Fence
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence;
 		uint64_t m_CurrentFence = 0;
 
+
+		//Command objects
 		pCom<ID3D12CommandQueue> m_CommandQueue;
 		pCom<ID3D12CommandAllocator> m_DirectCmdListAlloc;
 		pCom<ID3D12GraphicsCommandList> m_CommandList;
 
+
+		//Swapchain buffers
 		static const int s_SwapChainBufferCount = 2;
 		int m_CurrentBackBuffer = 0;
 		pCom<ID3D12Resource> m_SwapChainBuffer[s_SwapChainBufferCount];
 		pCom<ID3D12Resource> m_DepthStencilBuffer;
 
+
+		//RTV and DSV Heaps
 		pCom<ID3D12DescriptorHeap> m_RtvHeap;
 		pCom<ID3D12DescriptorHeap> m_DsvHeap;
 
+
+		//viewport and scissor rect
 		D3D12_VIEWPORT m_ScreenViewport;
 		D3D12_RECT m_ScissorRect;
 
+
+		//Descriptor sizes
 		UINT m_RtvDescriptorSize = 0;
 		UINT m_DsvDescriptorSize = 0;
 		UINT m_CbvSrvUavDescriptorSize = 0;
 
+
+		//Formats specifications
 		D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 		DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;

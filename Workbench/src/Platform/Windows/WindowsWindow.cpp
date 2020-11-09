@@ -1,6 +1,7 @@
 #include "wbpch.h"
-#include "Logger.h"
-#include "Events/Event.h"
+#include "Logger/Logger.h"
+#include "Events/EventBus.h"
+#include "Utils/Utils.h"
 
 #include "WindowsWindow.h"
 #include "WindowsUtility.h"
@@ -59,7 +60,18 @@ namespace Workbench {
 		return state < 0;
 	}
 
-	void WindowsWindow::OnUpdate() {
+	void WindowsWindow::OnUpdate(WB_GAME_TIMER* timer) {
+
+		auto mspf = timer->GetTickTime<std::milli>();
+		float fps = 1000.0f / mspf;
+
+		std::wstring windowText = s2ws(m_props->windowTitle);
+		windowText +=
+			L"	 fps: " + std::to_wstring(fps) +
+			L", mspf: " + std::to_wstring(mspf);
+
+		SetWindowText(m_hWnd, windowText.c_str());
+
 		//process messages from Windows
 		MSG msg = {};
 		while (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
@@ -72,6 +84,8 @@ namespace Workbench {
 	void WindowsWindow::OnClose()
 	{
 		m_assocForWindowsProc.erase(m_hWnd);
+		DestroyWindow(m_hWnd);
+		UnregisterClassW(m_wndClass.lpszClassName, m_hInstance);
 	}
 
 	LRESULT CALLBACK WindowsWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

@@ -1,9 +1,10 @@
 #pragma once
 #include "Core.h"
-#include "Events/Event.h"
+#include "Events/EventBus.h"
 #include "Input/Keycodes.h"
 #include "Layers/Layer.h"
-#include "Logger.h"
+#include "Logger/Logger.h"
+#include "Time/Timer.h"
 
 namespace Workbench {
 	class WORKBENCH_API Window : public Layer {
@@ -112,7 +113,7 @@ namespace Workbench {
 
 		virtual bool checkForButtonPress(WB_KEYCODES button) = 0;
 
-		virtual void OnUpdate() = 0;
+		virtual void OnUpdate(WB_GAME_TIMER* timer) override = 0;
 		virtual void OnClose() = 0;
 
 		virtual std::pair<uint32_t, uint32_t> GetDimensions() const = 0;
@@ -126,3 +127,8 @@ namespace Workbench {
 		virtual void* GetNativeWindow() = 0;
 	};
 }
+
+#ifdef WB_PLATFORM_WINDOWS
+#include "Platform/Windows/WindowsWindow.h"
+#define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
+#endif

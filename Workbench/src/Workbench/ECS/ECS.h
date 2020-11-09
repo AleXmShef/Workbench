@@ -3,8 +3,8 @@
 #include "ECSEntity.h"
 #include "ECSComponent.h"
 
-#include "Events/Event.h"
-#include "Logger.h"
+#include "Events/EventBus.h"
+#include "Logger/Logger.h"
 
 namespace Workbench {
 

@@ -24,9 +24,9 @@ namespace Workbench {
 		m_LayerStack.pop_back();
 	}
 
-	void LayerStack::OnUpdate() {
+	void LayerStack::OnUpdate(WB_GAME_TIMER* timer) {
 		for (int i = (int)m_LayerStack.size() - 1; i >= 0; --i) {
-			m_LayerStack[i]->OnUpdate();
+			m_LayerStack[i]->OnUpdate(timer);
 		}
 	}
 
@@ -35,5 +35,9 @@ namespace Workbench {
 			m_LayerStack[i]->OnDetach();
 			m_LayerStack.pop_back();
 		}
+	}
+
+	LayerStack::~LayerStack() {
+		OnDetach();
 	}
 }

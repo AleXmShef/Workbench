@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Physics/PhysicsComponent.h"
 #include "Physics/PhysicsSystem.h"
+#include "Renderer/RenderSystem.h"
 
 namespace Workbench {
 
@@ -37,7 +38,7 @@ namespace Workbench {
 	}
 
 	Engine::~Engine() {
-		UNBIND(this, Engine::onWindowEventCallback);
+		UNBIND_EVENT(this, Engine::onWindowEventCallback);
 	}
 
 	void Engine::onWindowEventCallback(const Event<Window::Events>* event) {
@@ -56,7 +57,6 @@ namespace Workbench {
 			WB_CORE_LOG("Window destroyed event");
 			if (((Window::WindowDestroyedEvent*)event)->getWindow() == m_BaseWindow.get()) {
 				WB_CORE_LOG("Base window closed, terminating.");
-				m_Renderer.reset();
 				m_BaseWindow.reset();
 				m_mainLoopFlag = false;
 			}
@@ -128,13 +128,13 @@ namespace Workbench {
 
 	int Engine::Run() {
 
-		m_BaseWindow->OnUpdate();
+		m_GameTimer.Start();
+
+		m_BaseWindow->OnUpdate(&m_GameTimer);
 		FLUSH_EVENTS();
 
-		m_Renderer = std::unique_ptr<d3dRenderer>(new d3dRenderer);
-		m_Renderer->Init(m_BaseWindow);
-
-		m_LayerStack->PushLayer(std::make_shared<PhysicsSystem>());
+		m_LayerStack->PushLayer(std::make_shared<RenderSystem>(m_BaseWindow));
+		//m_LayerStack->PushLayer(std::make_shared<PhysicsSystem>());
 
 		auto entity1 = m_World->CreateEntity();
 		auto entity2 = m_World->CreateEntity();
@@ -145,18 +145,18 @@ namespace Workbench {
 		m_component1->data.x = 5;
 		m_component2->data.x = 10;
 
-		m_component1->data.acc = 2;
-		m_component2->data.acc = 9.8;
+		m_component1->data.acc = 2.0f;
+		m_component2->data.acc = 9.8f;
 
 		m_World->AddComponent(entity1, m_component1);
 		m_World->AddComponent(entity2, m_component2);
 
-
 		while (m_mainLoopFlag) {
-			m_BaseWindow->OnUpdate();
+			m_GameTimer.Tick();
+			m_BaseWindow->OnUpdate(&m_GameTimer);
+
 			if (!m_onPause) {
-				m_LayerStack->OnUpdate();
-				m_Renderer->Draw();
+				m_LayerStack->OnUpdate(&m_GameTimer);
 				FLUSH_EVENTS();
 			}
 			else

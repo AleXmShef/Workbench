@@ -4,7 +4,7 @@
 #include "ECS/ECS.h"
 
 namespace Workbench {
-	void PhysicsSystem::OnUpdate() {
+	void PhysicsSystem::OnUpdate(WB_GAME_TIMER* timer) {
 		auto [it, end] = ECS::getInstance()->GetComponents<PhysicsComponent>();
 		for (; it != end; ++it) {
 			auto component = *it;

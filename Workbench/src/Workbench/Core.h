@@ -8,10 +8,6 @@
 #endif
 
 
-//Utility & helper macros
-#define CHECK_BIT(var, pos) ((var) & (1<<(pos)))
-
-
 //Logging macros
 #ifndef LOG_LEVEL
 	#define LOG_LEVEL Logger::log_level::regular

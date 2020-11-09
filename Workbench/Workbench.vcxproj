@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\Events\EventBus.cpp" />
+    <ClCompile Include="src\Workbench\Events\CallbackHandler.cpp" />
+    <ClCompile Include="src\Workbench\Renderer\RenderSystem.cpp" />
     <ClCompile Include="src\Workbench\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Workbench\Physics\PhysicsComponent.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECS.cpp" />
@@ -22,7 +25,7 @@
     <ClCompile Include="src\Platform\DirectX\d3dRenderer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsUtility.cpp" />
     <ClCompile Include="src\Workbench\Events\Event.cpp" />
-    <ClCompile Include="src\Workbench\Logger.cpp" />
+    <ClCompile Include="src\Workbench\Logger\Logger.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Workbench\Engine.cpp" />
     <ClCompile Include="src\wbpch.cpp">
@@ -33,10 +36,16 @@
     </ClCompile>
     <ClCompile Include="src\Workbench\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECSSystem.cpp" />
+    <ClCompile Include="src\Workbench\Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Events\EventBus.h" />
+    <ClInclude Include="src\Workbench\Events\CallbackHandler.h" />
+    <ClInclude Include="src\Workbench\Renderer\RenderSystem.h" />
     <ClInclude Include="src\Workbench\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\Workbench\Physics\PhysicsComponent.h" />
+    <ClInclude Include="src\Workbench\Utils\Utils.h" />
+    <ClInclude Include="src\Workbench\Utils\ServiceLocator.h" />
     <ClInclude Include="src\Workbench\Utils\UUID.h" />
     <ClInclude Include="src\Workbench\ECS\ECS.h" />
     <ClInclude Include="src\Workbench\Random\RandomGenerator.h" />
@@ -48,7 +57,7 @@
     <ClInclude Include="src\Platform\DirectX\d3dx12.h" />
     <ClInclude Include="src\Workbench\Events\Event.h" />
     <ClInclude Include="src\Workbench\Input\Keycodes.h" />
-    <ClInclude Include="src\Workbench\Logger.h" />
+    <ClInclude Include="src\Workbench\Logger\Logger.h" />
     <ClInclude Include="src\Platform\Windows\WindowsUtility.h" />
     <ClInclude Include="src\Workbench.h" />
     <ClInclude Include="src\Workbench\Core.h" />
@@ -58,6 +67,7 @@
     <ClInclude Include="src\wbpch.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Workbench\ECS\ECSSystem.h" />
+    <ClInclude Include="src\Workbench\Time\Timer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

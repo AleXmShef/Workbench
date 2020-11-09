@@ -7,6 +7,7 @@ namespace Workbench {
 	class LayerStack : public Layer {
 	public:
 		//LayerStack();
+		virtual ~LayerStack();
 
 		virtual void PushLayer(std::shared_ptr<Layer> layer);
 		virtual void PushOverlay(std::shared_ptr<Layer> layer);
@@ -17,7 +18,7 @@ namespace Workbench {
 		virtual void RemoveLayer() {};
 		virtual void RemoveOverlay() {};
 
-		virtual void OnUpdate() override;
+		virtual void OnUpdate(WB_GAME_TIMER* timer) override;
 		virtual void OnDetach() override;
 
 	protected:

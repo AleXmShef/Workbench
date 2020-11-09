@@ -2,17 +2,12 @@
 #pragma warning(disable : 4251)
 
 #include "Core.h"
-#include "Logger.h"
-#include "Events/Event.h"
+#include "Logger/Logger.h"
+#include "Events/EventBus.h"
 #include "Layers/LayerStack.h"
 #include "ECS/ECS.h"
-
-#ifdef WB_PLATFORM_WINDOWS
-#include "Platform/Windows/WindowsWindow.h"
-#define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
-
-#include "Platform/DirectX/d3dRenderer.h"
-#endif
+#include "Time/Timer.h"
+#include "Window.h"
 
 namespace Workbench {
 	class WORKBENCH_API Engine
@@ -41,11 +36,11 @@ namespace Workbench {
 
 		ECS* m_World = nullptr;
 
+		WB_GAME_TIMER m_GameTimer;
+
 		std::unique_ptr<EngineProps> m_props = nullptr;
 
 		std::shared_ptr<Window> m_BaseWindow = nullptr;
-
-		std::unique_ptr<Renderer> m_Renderer = nullptr;
 
 		std::unique_ptr<LayerStack> m_LayerStack = nullptr;
 	};
