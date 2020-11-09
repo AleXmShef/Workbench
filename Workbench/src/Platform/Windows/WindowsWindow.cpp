@@ -62,8 +62,9 @@ namespace Workbench {
 
 	void WindowsWindow::OnUpdate(WB_GAME_TIMER* timer) {
 
-		auto mspf = timer->GetTickTime<std::milli>();
-		float fps = 1000.0f / mspf;
+#ifdef WB_DEBUG
+		auto mspf = timer->GetMsPerFrame();
+		float fps = timer->GetFps();
 
 		std::wstring windowText = s2ws(m_props->windowTitle);
 		windowText +=
@@ -71,6 +72,7 @@ namespace Workbench {
 			L", mspf: " + std::to_wstring(mspf);
 
 		SetWindowText(m_hWnd, windowText.c_str());
+#endif
 
 		//process messages from Windows
 		MSG msg = {};

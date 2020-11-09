@@ -39,4 +39,12 @@ namespace Workbench {
 		m_isOnPause = false;
 		Tick();
 	}
+
+	float GameTimer::GetFps() {
+		return 1000.0f / GetTickTime<std::milli>();
+	}
+
+	float GameTimer::GetMsPerFrame() {
+		return GetTickTime<std::milli>();
+	}
 }

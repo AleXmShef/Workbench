@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\Renderer\Mesh.cpp" />
+    <ClCompile Include="src\Workbench\Renderer\GeometryComponent.cpp" />
     <ClCompile Include="src\Workbench\Events\EventBus.cpp" />
     <ClCompile Include="src\Workbench\Events\CallbackHandler.cpp" />
     <ClCompile Include="src\Workbench\Renderer\RenderSystem.cpp" />
@@ -39,6 +41,8 @@
     <ClCompile Include="src\Workbench\Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Renderer\Mesh.h" />
+    <ClInclude Include="src\Workbench\Renderer\GeometryComponent.h" />
     <ClInclude Include="src\Workbench\Events\EventBus.h" />
     <ClInclude Include="src\Workbench\Events\CallbackHandler.h" />
     <ClInclude Include="src\Workbench\Renderer\RenderSystem.h" />
@@ -120,7 +124,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>wbpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\src;$(SolutionDir)$(ProjectName)\src\$(ProjectName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\src;$(SolutionDir)$(ProjectName)\src\$(ProjectName);$(SolutionDir)$(ProjectName)\src\Vendor\mathfu\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,7 +147,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>wbpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\src;$(SolutionDir)$(ProjectName)\src\$(ProjectName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\src;$(SolutionDir)$(ProjectName)\src\$(ProjectName);$(SolutionDir)$(ProjectName)\src\Vendor\mathfu\include\</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

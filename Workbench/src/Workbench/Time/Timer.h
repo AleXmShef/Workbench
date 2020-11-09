@@ -36,7 +36,13 @@ namespace Workbench {
 		std::chrono::duration<int64_t, std::nano> m_TimeSinceLastTick;
 
 	};
+
+	class GameTimer : public Timer {
+	public:
+		float GetFps();
+		float GetMsPerFrame();
+	};
 }
 
-#define WB_GAME_TIMER Timer
+#define WB_GAME_TIMER GameTimer
 

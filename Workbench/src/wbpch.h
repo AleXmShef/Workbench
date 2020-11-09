@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef WB_PLATFORM_WINDOWS
+	#define NOMINMAX
 	#include <Windows.h>
 	#include <windowsx.h>
 #endif

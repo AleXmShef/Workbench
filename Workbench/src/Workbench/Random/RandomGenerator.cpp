@@ -18,7 +18,7 @@ namespace Workbench {
 		for (i = 0; i < 4; i++) {
 			ss << s_uuid_unorm_dist1(s_uuid_gen);
 		}
-		ss << "-4";
+		ss << "-";
 		for (i = 0; i < 3; i++) {
 			ss << s_uuid_unorm_dist1(s_uuid_gen);
 		}

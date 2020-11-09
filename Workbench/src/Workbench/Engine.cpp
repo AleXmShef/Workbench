@@ -85,7 +85,7 @@ namespace Workbench {
 		case E::WindowResizedEvent :
 		{
 			auto [width, height] = ((Window::WindowResizedEvent*)event)->dimensions;
-			WB_CORE_LOG("Window resized event: width: {0}, height : {1}", width, height);
+			//WB_CORE_LOG("Window resized event: width: {0}, height : {1}", width, height);
 			m_onPause = false;
 			break;
 		}
@@ -102,13 +102,13 @@ namespace Workbench {
 			auto button = ((Window::WindowMouseButtonPressedEvent*)event)->getButton();
 			switch (button) {
 			case WB_KEYCODES::LMB:
-				WB_CORE_TRACE("Left mouse button pressed");
+				WB_CORE_LOG("Left mouse button pressed");
 				break;
 			case WB_KEYCODES::MMB:
-				WB_CORE_TRACE("Middle mouse button pressed");
+				WB_CORE_LOG("Middle mouse button pressed");
 				break;
 			case WB_KEYCODES::RMB:
-				WB_CORE_TRACE("Right mouse button pressed");
+				WB_CORE_LOG("Right mouse button pressed");
 				break;
 			}
 			break;
@@ -118,7 +118,7 @@ namespace Workbench {
 		{
 			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
 			if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
-				WB_CORE_TRACE("Button pressed: {}", (char)key);
+				WB_CORE_LOG("Button pressed: {}", (char)key);
 			if (key == WB_KEYCODES::WB_VK_F11)
 				m_BaseWindow->ToggleFullscreen();
 			break;
@@ -134,7 +134,7 @@ namespace Workbench {
 		FLUSH_EVENTS();
 
 		m_LayerStack->PushLayer(std::make_shared<RenderSystem>(m_BaseWindow));
-		//m_LayerStack->PushLayer(std::make_shared<PhysicsSystem>());
+		m_LayerStack->PushLayer(std::make_shared<PhysicsSystem>());
 
 		auto entity1 = m_World->CreateEntity();
 		auto entity2 = m_World->CreateEntity();
