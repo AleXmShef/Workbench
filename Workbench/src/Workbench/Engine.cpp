@@ -1,6 +1,7 @@
 #include "wbpch.h"
 #include "Engine.h"
 #include "Physics/PhysicsComponent.h"
+#include "Physics/TransformComponent.h"
 #include "Physics/PhysicsSystem.h"
 #include "Renderer/RenderSystem.h"
 
@@ -35,6 +36,8 @@ namespace Workbench {
 		m_LayerStack = std::make_unique<LayerStack>();
 
 		WB_CORE_INFO("Workbench successfuly initialized, main thread_id: {0}", std::this_thread::get_id());
+
+		WB_CORE_INFO("SIMD Support: {}", (MATHFU_BUILD_OPTIONS_SIMD == "[simd]" ? "yes" : "no"));
 	}
 
 	Engine::~Engine() {
@@ -139,17 +142,16 @@ namespace Workbench {
 		auto entity1 = m_World->CreateEntity();
 		auto entity2 = m_World->CreateEntity();
 
-		auto m_component1 = new PhysicsComponent;
-		auto m_component2 = new PhysicsComponent;
+		auto m_component1 = new TransformComponent(entity1);
+		auto m_component2 = new TransformComponent(entity2);
 
-		m_component1->data.x = 5;
-		m_component2->data.x = 10;
-
-		m_component1->data.acc = 2.0f;
-		m_component2->data.acc = 9.8f;
+		auto m_component3 = new PhysicsComponent(entity1, 10, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(0, 0, 0, 0));
+		auto m_component4 = new PhysicsComponent(entity2, 10, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(0, 0, 0, 0));
 
 		m_World->AddComponent(entity1, m_component1);
 		m_World->AddComponent(entity2, m_component2);
+		m_World->AddComponent(entity1, m_component3);
+		m_World->AddComponent(entity2, m_component4);
 
 		while (m_mainLoopFlag) {
 			m_GameTimer.Tick();

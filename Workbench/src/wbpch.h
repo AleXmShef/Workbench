@@ -31,3 +31,9 @@
 #include <typeindex>
 #include <type_traits>
 
+#include <mathfu/vector.h>
+#include <mathfu/matrix.h>
+#include <mathfu/quaternion.h>
+#include <mathfu/glsl_mappings.h>
+//#include <mathfu/hlsl_mappings.h>
+

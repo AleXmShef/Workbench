@@ -1,6 +1,7 @@
 #pragma once
 #include "wbpch.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/Mesh.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -17,6 +18,8 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
 
+#define WB_HANDEDNESS "left"
+
 namespace Workbench {
 	class d3dRenderer : public Renderer {
 	public:
@@ -25,6 +28,7 @@ namespace Workbench {
 
 		virtual void Begin() override;
 		virtual void Draw() override;
+		virtual void DrawMesh(Mesh* mesh);
 		virtual void End() override;
 
 	protected:

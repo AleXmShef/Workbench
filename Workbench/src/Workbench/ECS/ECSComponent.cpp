@@ -4,12 +4,16 @@
 namespace Workbench {
 	uint32_t ECSComponent::s_numComponents = 0;
 
-	ECSComponent::ECSComponent() {
+	ECSComponent::ECSComponent(const UUID* entity) : m_Entity(entity) {
 		s_numComponents++;
 	}
 
 	ECSComponent::~ECSComponent() {
 		s_numComponents--;
+	}
+
+	const UUID* ECSComponent::getEntityId() const {
+		return m_Entity;
 	}
 
 	const UUID* ECSComponent::getUuid() const { 

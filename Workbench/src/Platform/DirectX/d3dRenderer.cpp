@@ -363,6 +363,10 @@ namespace Workbench {
 		
 	}
 
+	void d3dRenderer::DrawMesh(Mesh* mesh) {
+
+	}
+
 	void d3dRenderer::End() {
 		// Indicate a state transition on the resource usage.
 		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_SwapChainBuffer[m_CurrentBackBuffer].Get(),

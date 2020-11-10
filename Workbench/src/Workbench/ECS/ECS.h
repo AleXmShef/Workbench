@@ -41,7 +41,7 @@ namespace Workbench {
 			return { m_Components.begin(), m_Components.end() };
 		}
 
-		const Component* getComponentById(const UUID* componentId) {
+		Component* getComponentById(const UUID* componentId) {
 			for (auto component : m_Components) {
 				if (static_cast<ECSComponent*>(component)->getUuid() == componentId)
 					return component;
@@ -98,7 +98,7 @@ namespace Workbench {
 
 			//Add component
 			auto component_id = componentContainer->AddComponent(component);
-			m_EntityToComponentsMap[entityId][typeid(Component)].push_back(component_id);
+			m_EntityToComponentsMap[entityId][typeid(Component)]= component_id;
 		};
 
 		template<class Component>
@@ -122,17 +122,21 @@ namespace Workbench {
 		std::vector<const UUID*>::iterator GetEntities();
 		
 		template<class Component>
-		const Component* GetEntityComponent(const UUID* entityId) const {
-			ComponentContainer<Component>* compContainer = static_cast<ComponentContainer<Component>*>(m_ComponentContainers[typeid(Component)]);
-			if (m_EntityToComponentsMap[entityId][typeid(Component)].empty())
+		Component* GetEntityComponent(const UUID* entityId) {
+			ComponentContainer<Component>* compContainer = (ComponentContainer<Component>*)(m_ComponentContainers[typeid(Component)]);
+			if (!m_EntityToComponentsMap[entityId][typeid(Component)])
 				return nullptr;
 			else
-				return compContainer->getComponentById(m_EntityToComponentsMap[entityId][typeid(Component)][0]);
+				return compContainer->getComponentById(m_EntityToComponentsMap[entityId][typeid(Component)]);
 		};
 		
 		template<class Component>
 		std::pair<typename std::vector<Component*>::iterator, typename std::vector<Component*>::iterator> GetComponents() {
-			ComponentContainer<Component>* compContainer = static_cast<ComponentContainer<Component>*>(m_ComponentContainers[typeid(Component)]);
+			//If there is no container yet, create one
+			if (m_ComponentContainers[typeid(Component)] == nullptr)
+				m_ComponentContainers[typeid(Component)] = static_cast<AbstractComponentContainer*>(new ComponentContainer<Component>);
+
+			ComponentContainer<Component>* compContainer = (ComponentContainer<Component>*)(m_ComponentContainers[typeid(Component)]);
 			return compContainer->getComponents();
 		};
 	protected:
@@ -143,7 +147,7 @@ namespace Workbench {
 
 		std::map<std::type_index, AbstractComponentContainer*> m_ComponentContainers;
 
-		std::map<const UUID*, std::map<std::type_index, std::vector<const UUID*>>> m_EntityToComponentsMap;
+		std::map<const UUID*, std::map<std::type_index, const UUID*>> m_EntityToComponentsMap;
 
 	protected:
 		static ECS* m_instance;

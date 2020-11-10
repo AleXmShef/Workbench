@@ -4,14 +4,15 @@
 namespace Workbench {
 	class ECSComponent {
 	public:
-		ECSComponent();
+		ECSComponent(const UUID* entity);
 		virtual ~ECSComponent();
-
+		const UUID* getEntityId() const;
 		const UUID* getUuid() const;
-	private:
+	protected:
 		UUID m_uuid;
+		const UUID* m_Entity;
 
-	private:
+	protected:
 		static uint32_t s_numComponents;
 	};
 }

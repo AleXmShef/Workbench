@@ -7,6 +7,7 @@
 #define MSG_RVALUE(x) std::forward<std::string>(x)
 
 namespace Workbench {
+
 	template<class T>
 	std::ostream& operator <<(std::ostream& os, const std::vector<T>& vec) {
 		os << "{";

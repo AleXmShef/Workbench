@@ -12,12 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Workbench\Renderer\Mesh.cpp" />
-    <ClCompile Include="src\Workbench\Renderer\GeometryComponent.cpp" />
     <ClCompile Include="src\Workbench\Events\EventBus.cpp" />
     <ClCompile Include="src\Workbench\Events\CallbackHandler.cpp" />
     <ClCompile Include="src\Workbench\Renderer\RenderSystem.cpp" />
     <ClCompile Include="src\Workbench\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="src\Workbench\Physics\PhysicsComponent.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECS.cpp" />
     <ClCompile Include="src\Workbench\Random\RandomGenerator.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECSComponent.cpp" />
@@ -41,6 +39,8 @@
     <ClCompile Include="src\Workbench\Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Physics\TransformComponent.h" />
+    <ClInclude Include="src\Workbench\Renderer\CameraComponent.h" />
     <ClInclude Include="src\Workbench\Renderer\Mesh.h" />
     <ClInclude Include="src\Workbench\Renderer\GeometryComponent.h" />
     <ClInclude Include="src\Workbench\Events\EventBus.h" />
@@ -148,7 +148,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>wbpch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)$(ProjectName)\src;$(SolutionDir)$(ProjectName)\src\$(ProjectName);$(SolutionDir)$(ProjectName)\src\Vendor\mathfu\include\</AdditionalIncludeDirectories>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>
+      </FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

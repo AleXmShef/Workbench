@@ -57,9 +57,6 @@
     <ClCompile Include="src\Workbench\ECS\ECSSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Workbench\Physics\PhysicsComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Workbench\Physics\PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Workbench\Time\Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Workbench\Renderer\GeometryComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Workbench\Renderer\Mesh.cpp">
@@ -177,6 +171,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Workbench\Renderer\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Workbench\Renderer\CameraComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Workbench\Physics\TransformComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

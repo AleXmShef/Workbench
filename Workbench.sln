@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Workbench", "Workbench\Workbench.vcxproj", "{166D1957-31FA-4900-BC05-80E795D64AAB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sanbox", "Sanbox\Sanbox.vcxproj", "{44D3556A-E22A-4173-9F53-241155548AF8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sanbox\Sanbox.vcxproj", "{44D3556A-E22A-4173-9F53-241155548AF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

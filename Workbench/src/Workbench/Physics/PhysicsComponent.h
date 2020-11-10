@@ -4,15 +4,19 @@
 
 namespace Workbench {
 	struct PhysicsComponent : ECSComponent {
-		struct Data {
-			float x = 0;
-			float y = 0;
-			float z = 0;
-
-			float vel = 0;
-			float acc = 0;
+		PhysicsComponent(const UUID* entity, float mass, mathfu::vec4 vel, mathfu::vec4 acc) : 
+			ECSComponent(entity), 
+			velocity(vel), 
+			acceleration(acc) 
+		{
+			invertMass = 1.0f / mass;
 		};
-		Data data;
+
+
+		float invertMass;
+
+		mathfu::vec4 velocity;
+		mathfu::vec4 acceleration;
 	};
 }
 
