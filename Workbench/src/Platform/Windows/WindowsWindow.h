@@ -6,7 +6,7 @@ namespace Workbench {
 	class WindowsWindow : public Window
 	{
 	public:
-		WindowsWindow(Window::WindowProps* props);
+		WindowsWindow(Window::WindowProps props);
 
 		virtual bool checkForButtonPress(WB_KEYCODES button) override;
 
@@ -40,7 +40,7 @@ namespace Workbench {
 		//bool _wastChangingToFullscreen = false;
 		bool _wasResizing = false;
 
-		std::unique_ptr<WindowProps> m_props;
+		WindowProps m_props;
 	};
 }
 

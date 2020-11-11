@@ -10,7 +10,7 @@ namespace Workbench {
 
 	std::unordered_map<HWND, WindowsWindow*>WindowsWindow::m_assocForWindowsProc = {};
 
-	WindowsWindow::WindowsWindow(Window::WindowProps* props) : m_props(props) {
+	WindowsWindow::WindowsWindow(Window::WindowProps props) : m_props(props) {
 		//get Windows module handle
 		m_hInstance = GetModuleHandle(NULL);
 
@@ -24,14 +24,14 @@ namespace Workbench {
 		
 		RegisterClass(&m_wndClass);
 
-		RECT windowRect = { 0, 0, static_cast<LONG>(m_props->windowWidth), static_cast<LONG>(m_props->windowHeight) };
+		RECT windowRect = { 0, 0, static_cast<LONG>(m_props.windowWidth), static_cast<LONG>(m_props.windowHeight) };
 		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
 		//create Windows window
 		m_hWnd = CreateWindowExW(
 			0,
 			L"IDK",
-			s2ws(m_props->windowTitle).c_str(),
+			s2ws(m_props.windowTitle).c_str(),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -47,7 +47,7 @@ namespace Workbench {
 		if (m_hWnd) {
 			ShowWindow(m_hWnd, SW_SHOW);
 			m_assocForWindowsProc.insert({ m_hWnd, this });
-			if (m_props->isFullScreen)
+			if (m_props.isFullScreen)
 				ToggleFullscreen();
 			POST_EVENT(new WindowCreatedEvent(this));
 		}
@@ -62,17 +62,17 @@ namespace Workbench {
 
 	void WindowsWindow::OnUpdate(WB_GAME_TIMER* timer) {
 
-#ifdef WB_DEBUG
+//#ifdef WB_DEBUG
 		auto mspf = timer->GetMsPerFrame();
 		float fps = timer->GetFps();
 
-		std::wstring windowText = s2ws(m_props->windowTitle);
+		std::wstring windowText = s2ws(m_props.windowTitle);
 		windowText +=
 			L"	 fps: " + std::to_wstring(fps) +
 			L", mspf: " + std::to_wstring(mspf);
 
 		SetWindowText(m_hWnd, windowText.c_str());
-#endif
+//#endif
 
 		//process messages from Windows
 		MSG msg = {};
@@ -117,7 +117,7 @@ namespace Workbench {
 		}
 		case WM_EXITSIZEMOVE: {
 			if (_wasResizing) {
-				SEND_EVENT(new WindowResizedEvent(m_props->windowWidth, m_props->windowHeight));
+				SEND_EVENT(new WindowResizedEvent(m_props.windowWidth, m_props.windowHeight));
 				_wasResizing = false;
 			}
 			return 0;
@@ -137,11 +137,11 @@ namespace Workbench {
 			case SIZE_RESTORED: {
 				UINT width = LOWORD(lParam);
 				UINT height = HIWORD(lParam);
-				if (width != m_props->windowWidth || height != m_props->windowHeight) {
-					m_props->windowWidth = width;
-					m_props->windowHeight = height;
+				if (width != m_props.windowWidth || height != m_props.windowHeight) {
+					m_props.windowWidth = width;
+					m_props.windowHeight = height;
 					if (!_wasResizing)
-						SEND_EVENT(new WindowResizedEvent(m_props->windowWidth, m_props->windowHeight));
+						SEND_EVENT(new WindowResizedEvent(m_props.windowWidth, m_props.windowHeight));
 				}
 				else {
 					SEND_EVENT(new WindowGainedFocusEvent());
@@ -199,15 +199,15 @@ namespace Workbench {
 	}
 
 	std::pair<uint32_t, uint32_t> WindowsWindow::GetDimensions() const {
-		return { m_props->windowWidth, m_props->windowHeight };
+		return { m_props.windowWidth, m_props.windowHeight };
 	}
 
 	bool WindowsWindow::IsVSync() const {
-		return m_props->isVsync;
+		return m_props.isVsync;
 	}
 
 	void WindowsWindow::SetVSync(bool enabled) {
-		m_props->isVsync = enabled;
+		m_props.isVsync = enabled;
 	}
 
 	void WindowsWindow::ToggleFullscreen() {
@@ -238,7 +238,7 @@ namespace Workbench {
 	};
 
 	bool WindowsWindow::IsFullscreen() const {
-		return m_props->isFullScreen;
+		return m_props.isFullScreen;
 	}
 
 	void* WindowsWindow::GetNativeWindow() {

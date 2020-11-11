@@ -1,6 +1,7 @@
 #pragma once
 #include "wbpch.h"
 #include "ECS/ECSComponent.h"
+#include "Logger/Logger.h"
 
 namespace Workbench {
 	struct TransformComponent : public ECSComponent {
@@ -15,7 +16,7 @@ namespace Workbench {
 			worldMatrix =
 				mathfu::mat4::FromTranslationVector(position.xyz()) *
 				mathfu::mat4::FromRotationMatrix(rotationMatrix) *
-				mathfu::mat4::FromScaleVector(_scale.xyz());
+				mathfu::mat4::FromScaleVector(scale.xyz());
 		};
 
 		mathfu::vec4 position;

@@ -8,10 +8,13 @@ int main(int argc, char** argv) {
 	
 	int result;
 	{
-		auto pEngParams = new Workbench::Engine::EngineProps;
-		pEngParams->windowTitle = "Sandbox";
-		//pEngParams->isFullScreen = true;
-		Workbench::Engine mEngine(pEngParams);
+		Workbench::Engine::EngineProps engParams;
+		Workbench::Window::WindowProps windowProps;
+
+		windowProps.windowTitle = "Sandbox";
+		//windowProps.isFullScreen = true;
+		engParams.windowProps = windowProps;
+		Workbench::Engine mEngine(engParams);
 		result = mEngine.Run();
 	}
 #if defined(WB_DEBUG)

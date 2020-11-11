@@ -8,6 +8,26 @@
 
 namespace Workbench {
 
+	template<typename Type, int X, int Y>
+	std::ostream& operator <<(std::ostream& os, const mathfu::Matrix<Type, X, Y>& mat) {
+		os << "\n[\n";
+		for (int i = 0; i < X; i++) {
+			os << "\t[";
+			for (int j = 0; j < Y; j++) {
+				if (j != 0)
+					os << ", ";
+				os << mat.GetColumn(j)[i];
+			}
+			if (i != X - 1)
+				os << "],\n";
+			else
+				os << "]\n";
+		}
+		os << "]\n";
+
+		return os;
+	}
+
 	template<class T>
 	std::ostream& operator <<(std::ostream& os, const std::vector<T>& vec) {
 		os << "{";

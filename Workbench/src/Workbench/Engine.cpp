@@ -7,7 +7,7 @@
 
 namespace Workbench {
 
-	Engine::Engine(EngineProps* pParams) : m_props(pParams) {
+	Engine::Engine(EngineProps pParams) : m_props(pParams) {
 		Logger::Init();
 
 #ifndef WB_DEBUG
@@ -16,20 +16,9 @@ namespace Workbench {
 
 		BIND_EVENT(this, Engine::onWindowEventCallback);
 
-		auto _t = new LayerStack();
-
 		//m_LayerStack = (new LayerStack());
 
-		auto windowProps = new Window::WindowProps;
-		*windowProps = {
-			m_props->windowTitle,
-			m_props->windowWidth,
-			m_props->windowHeight,
-			m_props->isFullScreen,
-			m_props->isVsync
-		};
-
-		m_BaseWindow = std::shared_ptr<Window>(WB_CREATE_NATIVE_WINDOW(windowProps));
+		m_BaseWindow = std::shared_ptr<Window>(WB_CREATE_NATIVE_WINDOW(pParams.windowProps));
 
 		m_World = ECS::getInstance();
 
@@ -142,7 +131,7 @@ namespace Workbench {
 		auto entity1 = m_World->CreateEntity();
 		auto entity2 = m_World->CreateEntity();
 
-		auto m_component1 = new TransformComponent(entity1);
+		auto m_component1 = new TransformComponent(entity1, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(10, 15, 5, 0));
 		auto m_component2 = new TransformComponent(entity2);
 
 		auto m_component3 = new PhysicsComponent(entity1, 10, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(0, 0, 0, 0));

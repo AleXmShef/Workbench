@@ -106,15 +106,8 @@ namespace Workbench {
 			//type cast to desired container
 			ComponentContainer<Component>* componentContainer = (ComponentContainer<Component>*)(m_ComponentContainers[typeid(Component)]);
 
-			if (componentContainer->RemoveComponent(component)) {
-				auto it = m_EntityToComponentsMap[entityId][typeid(Component)].begin();
-				auto end = m_EntityToComponentsMap[entityId][typeid(Component)].end();
-				for (; it != end; it++) {
-					if ((*it) == (static_cast<ECSComponent*>(component))->getUuid()) {
-						m_EntityToComponentsMap[entityId][typeid(Component)].erase(it);
-						break;
-					}
-				}
+			if (componentContainer && componentContainer->RemoveComponent(component)) {
+				m_EntityToComponentsMap[entityId].erase(typeid(Component));
 			}
 		};
 		

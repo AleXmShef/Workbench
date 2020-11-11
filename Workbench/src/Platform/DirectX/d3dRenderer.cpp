@@ -380,7 +380,7 @@ namespace Workbench {
 		m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
 		// swap the back and front buffers
-		m_SwapChain->Present(0, 0);
+		m_SwapChain->Present(m_window->IsVSync(), 0);
 		m_CurrentBackBuffer = (m_CurrentBackBuffer + 1) % s_SwapChainBufferCount;
 
 		// Wait until frame commands are complete.  This waiting is inefficient and is

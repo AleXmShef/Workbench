@@ -11,8 +11,15 @@ namespace Workbench {
 			auto physics = *it;
 			auto transform = ECS::getInstance()->GetEntityComponent<TransformComponent>(physics->getEntityId());
 
-			transform->position += physics->velocity;
-			physics->velocity += physics->acceleration + m_GravityAcc;
+			if (transform == nullptr) {
+				WB_CORE_WARN("PhysicsComponent requires TransformComponent!");
+				ECS::getInstance()->RemoveComponent(physics->getEntityId(), physics);
+				return;
+			}
+			else {
+				transform->position += physics->velocity;
+				physics->velocity += physics->acceleration + m_GravityAcc;
+			}
 		}
 	}
 }

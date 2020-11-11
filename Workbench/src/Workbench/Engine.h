@@ -14,16 +14,11 @@ namespace Workbench {
 	{
 	public:
 		struct EngineProps {
-			bool showWindow = false;
-			std::string windowTitle = "Your title here";
-			uint32_t windowWidth = 1280;
-			uint32_t windowHeight = 720;
-			bool isFullScreen = false;
-			bool isVsync = true;
+			Window::WindowProps windowProps;
 		};
 
 	public:
-		Engine(EngineProps* pParams);
+		Engine(EngineProps pParams);
 		~Engine();
 
 		int Run();
@@ -38,7 +33,7 @@ namespace Workbench {
 
 		WB_GAME_TIMER m_GameTimer;
 
-		std::unique_ptr<EngineProps> m_props = nullptr;
+		EngineProps m_props;
 
 		std::shared_ptr<Window> m_BaseWindow = nullptr;
 
