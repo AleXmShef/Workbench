@@ -14,7 +14,9 @@ int main(int argc, char** argv) {
 		windowProps.windowTitle = "Sandbox";
 		//windowProps.isFullScreen = true;
 		engParams.windowProps = windowProps;
+
 		Workbench::Engine mEngine(engParams);
+		
 		result = mEngine.Run();
 	}
 #if defined(WB_DEBUG)

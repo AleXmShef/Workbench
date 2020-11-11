@@ -104,7 +104,7 @@ namespace Workbench {
 			uint32_t windowWidth = 1280;
 			uint32_t windowHeight = 720;
 			bool isFullScreen = false;
-			bool isVsync = true;
+			bool isVsync = false;
 		};
 	public:
 		virtual ~Window() {
