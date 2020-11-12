@@ -19,7 +19,7 @@ namespace Workbench {
 }
 
 
-#ifdef WB_PLATFORM_WINDOWS
+#if defined(WB_PLATFORM_WINDOWS) and defined(WB_BUILD_DLL)
 	#include "Platform/DirectX/d3dRenderer.h"
 	#define WB_CREATE_RENDERER() new d3dRenderer()
 #endif

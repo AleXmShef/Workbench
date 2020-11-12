@@ -133,6 +133,7 @@ namespace Workbench {
 				return 0;
 				break;
 			}
+			default:
 			case SIZE_MAXIMIZED:
 			case SIZE_RESTORED: {
 				UINT width = LOWORD(lParam);
@@ -219,6 +220,7 @@ namespace Workbench {
 				SetWindowLong(m_hWnd, GWL_STYLE,
 					dwStyle & ~WS_OVERLAPPEDWINDOW);
 				ShowWindow(m_hWnd, SW_MAXIMIZE);
+				m_props.isFullScreen = true;
 			}
 		}
 		else {
@@ -234,6 +236,7 @@ namespace Workbench {
 			);
 			//AdjustWindowRect(&m_wndRect, WS_OVERLAPPEDWINDOW, FALSE);
 			ShowWindow(m_hWnd, SW_NORMAL);
+			m_props.isFullScreen = false;
 		}
 	};
 

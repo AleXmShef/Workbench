@@ -128,7 +128,7 @@ namespace Workbench {
 	};
 }
 
-#ifdef WB_PLATFORM_WINDOWS
+#if defined(WB_PLATFORM_WINDOWS) and defined(WB_BUILD_DLL)
 #include "Platform/Windows/WindowsWindow.h"
 #define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
 #endif

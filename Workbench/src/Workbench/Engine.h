@@ -2,8 +2,6 @@
 #pragma warning(disable : 4251)
 
 #include "Core.h"
-#include "Logger/Logger.h"
-#include "Events/EventBus.h"
 #include "Layers/LayerStack.h"
 #include "ECS/ECS.h"
 #include "Time/Timer.h"

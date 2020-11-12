@@ -7,6 +7,7 @@ namespace Workbench {
 	d3dRenderer::~d3dRenderer() {
 		if (m_d3dDevice != nullptr)
 			FlushCommandQueue();
+		//m_Allocator->Release();
 	}
 
 	void d3dRenderer::Init(std::shared_ptr<Window> window) {
@@ -21,6 +22,8 @@ namespace Workbench {
 			WB_RENDERER_CRITICAL("Trying to initialize DirectX with non-WIN32 API window");
 			return;
 		}
+
+		m_isFullScreen = m_window->IsFullscreen();
 
 		//initialize DirectX debug layer when in debug build
 #ifdef WB_DEBUG
@@ -53,14 +56,25 @@ namespace Workbench {
 			WB_RENDERER_CRITICAL("Failed to create hardware device");
 		}
 
-		auto adapterLuid = m_d3dDevice->GetAdapterLuid();
-		IDXGIAdapter4* _adapter;
-		m_dxgiFactory->EnumAdapterByLuid(adapterLuid, IID_PPV_ARGS(&_adapter));
 		DXGI_ADAPTER_DESC desc;
-		_adapter->GetDesc(&desc);
+		m_currentAdapter->GetDesc(&desc);
 		WB_RENDERER_LOG("Using adapter:");
 		WB_RENDERER_LOG("\t{}", ws2s(desc.Description));
+
+		//Create D3D12 Memory Allocator
+		D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
+		allocatorDesc.pDevice = m_d3dDevice.Get();
+		allocatorDesc.pAdapter = m_currentAdapter;
+
+		D3D12MA::Allocator* _alloc;
 		
+		HRESULT createdMemotyAllocator = D3D12MA::CreateAllocator(&allocatorDesc, &_alloc);
+		if (FAILED(createdMemotyAllocator)) {
+			WB_RENDERER_CRITICAL("Failed to create D3D12 Memory Allocator");
+		}
+
+		m_Allocator.reset(_alloc);
+
 		//Create fence object
 		m_d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence));
 
@@ -147,8 +161,8 @@ namespace Workbench {
 		DXGI_SWAP_CHAIN_DESC sd;
 		sd.BufferDesc.Width = windowWidth;											//window width
 		sd.BufferDesc.Height = windowHeight;										//window height
-		sd.BufferDesc.RefreshRate.Numerator = 60;									//monitor refresh rate
-		sd.BufferDesc.RefreshRate.Denominator = 1;									//
+		sd.BufferDesc.RefreshRate.Numerator = 0;									//monitor refresh rate
+		sd.BufferDesc.RefreshRate.Denominator = 0;									//
 		sd.BufferDesc.Format = m_BackBufferFormat;
 		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -157,7 +171,7 @@ namespace Workbench {
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = s_SwapChainBufferCount;									//buffer count (2 or 3)
 		sd.OutputWindow = m_hWnd;													//windows hwnd
-		sd.Windowed = true;						//is windowed
+		sd.Windowed = true;															//is windowed
 		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -230,6 +244,7 @@ namespace Workbench {
 		}
 	}
 
+
 	void d3dRenderer::OnResize() {
 		ResizeSwapchain();
 	};
@@ -237,8 +252,6 @@ namespace Workbench {
 	void d3dRenderer::ResizeSwapchain() {
 
 		auto [newWidth, newHeight] = m_window->GetDimensions();
-
-
 
 		//flush before changing any resources
 		FlushCommandQueue();
@@ -297,13 +310,32 @@ namespace Workbench {
 		optClear.Format = m_DepthStencilFormat;
 		optClear.DepthStencil.Depth = 1.0f;
 		optClear.DepthStencil.Stencil = 0;
-		m_d3dDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
+
+		//<-- legacy memory allocation -->
+		//m_d3dDevice->CreateCommittedResource(
+		//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		//	D3D12_HEAP_FLAG_NONE,
+		//	&depthStencilDesc,
+		//	D3D12_RESOURCE_STATE_COMMON,
+		//	&optClear,
+		//	IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf()));
+
+		//<-- D3D12 Memory Allocator allocation
+		D3D12MA::ALLOCATION_DESC desc = {};
+		desc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+
+		D3D12MA::Allocation* alloc;
+
+		m_Allocator->CreateResource(
+			&desc,
 			&depthStencilDesc,
 			D3D12_RESOURCE_STATE_COMMON,
 			&optClear,
-			IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf()));
+			&alloc,
+			IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf())
+		);
+
+		m_DepthStencilBufferAllocation.reset(alloc);
 
 		//create depth/stencil view
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
@@ -363,9 +395,9 @@ namespace Workbench {
 		
 	}
 
-	void d3dRenderer::DrawMesh(Mesh* mesh) {
-
-	}
+	//void d3dRenderer::DrawMesh(Mesh* mesh) {
+	//
+	//}
 
 	void d3dRenderer::End() {
 		// Indicate a state transition on the resource usage.

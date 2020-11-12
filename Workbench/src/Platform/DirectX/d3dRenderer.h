@@ -2,7 +2,10 @@
 #include "wbpch.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Mesh.h"
+#include "Utils/Utils.h"
 
+
+//<-- DirectX specific includes -->
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <D3Dcompiler.h>
@@ -12,6 +15,7 @@
 #include <DirectXCollision.h>
 #include <wrl.h>
 #include "d3dx12.h"
+#include "D3D12MemoryAllocator/D3D12MemAlloc.h"
 
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -28,8 +32,10 @@ namespace Workbench {
 
 		virtual void Begin() override;
 		virtual void Draw() override;
-		virtual void DrawMesh(Mesh* mesh);
+		//virtual void DrawMesh(Mesh* mesh);
 		virtual void End() override;
+
+		void test();
 
 	protected:
 		HRESULT CreateCommandObjects();
@@ -49,11 +55,15 @@ namespace Workbench {
 	protected:
 		template<typename T>
 		using pCom = Microsoft::WRL::ComPtr<T>;
+		template<typename T>
+		using paCom = shared_ptr_with_custom_deleter < T, D3D12MA::Deleter>;
 
 
 		//Window
 		HINSTANCE m_hInstance;
 		HWND m_hWnd;
+
+		bool m_isFullScreen;
 
 
 		//Adapter and assotiated output
@@ -71,6 +81,8 @@ namespace Workbench {
 		pCom<IDXGISwapChain> m_SwapChain;
 		pCom<ID3D12Device> m_d3dDevice;
 
+		paCom<D3D12MA::Allocator> m_Allocator;
+
 
 		//GPU Fence
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence;
@@ -87,7 +99,10 @@ namespace Workbench {
 		static const int s_SwapChainBufferCount = 2;
 		int m_CurrentBackBuffer = 0;
 		pCom<ID3D12Resource> m_SwapChainBuffer[s_SwapChainBufferCount];
+
+		paCom<D3D12MA::Allocation> m_DepthStencilBufferAllocation;
 		pCom<ID3D12Resource> m_DepthStencilBuffer;
+
 
 
 		//RTV and DSV Heaps

@@ -21,6 +21,8 @@ namespace Workbench {
 		virtual void OnUpdate(WB_GAME_TIMER* timer) override;
 		virtual void OnDetach() override;
 
+		virtual std::shared_ptr<Layer> operator[](const int index);
+
 	protected:
 		uint32_t m_LayerInsertIndex = 0;
 		std::vector<std::shared_ptr<Layer>> m_LayerStack;

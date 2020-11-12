@@ -2,12 +2,14 @@
 #include "wbpch.h"
 
 namespace Workbench {
-	struct Vertex {
-		mathfu::vec4 pos;
-		mathfu::vec4 color;
+	struct VertexColoredBasic {
+		mathfu::VectorPacked<float, 3> Pos;
+		mathfu::VectorPacked<float, 4> Color;
 	};
+
+	template<class VertexType>
 	struct Mesh {
-		std::vector<Vertex> m_Verticies;
+		std::vector<VertexType> m_Verticies;
 		std::vector<int> m_Indicies;
 	};
 }

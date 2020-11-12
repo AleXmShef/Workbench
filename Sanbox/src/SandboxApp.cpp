@@ -1,5 +1,4 @@
 #include <Workbench.h>
-#include <Windows.h>
 
 int main(int argc, char** argv) {
 	for (int i = 1; i < argc; i++) {
@@ -8,8 +7,8 @@ int main(int argc, char** argv) {
 	
 	int result;
 	{
-		Workbench::Engine::EngineProps engParams;
-		Workbench::Window::WindowProps windowProps;
+		Workbench::Engine::EngineProps engParams = {};
+		Workbench::Window::WindowProps windowProps = {};
 
 		windowProps.windowTitle = "Sandbox";
 		//windowProps.isFullScreen = true;

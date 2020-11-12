@@ -40,4 +40,8 @@ namespace Workbench {
 	LayerStack::~LayerStack() {
 		OnDetach();
 	}
+
+	std::shared_ptr<Layer> LayerStack::operator[](const int index) {
+		return m_LayerStack[index];
+	}
 }

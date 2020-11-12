@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\DirectX\D3D12MemoryAllocator\D3D12MemAlloc.cpp" />
     <ClCompile Include="src\Workbench\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Workbench\Events\EventBus.cpp" />
     <ClCompile Include="src\Workbench\Events\CallbackHandler.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="src\Workbench\Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\DirectX\D3D12MemoryAllocator\D3D12MemAlloc.h" />
     <ClInclude Include="src\Workbench\Physics\TransformComponent.h" />
     <ClInclude Include="src\Workbench\Renderer\CameraComponent.h" />
     <ClInclude Include="src\Workbench\Renderer\Mesh.h" />
