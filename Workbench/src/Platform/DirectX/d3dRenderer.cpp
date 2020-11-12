@@ -320,22 +320,19 @@ namespace Workbench {
 		//	&optClear,
 		//	IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf()));
 
-		//<-- D3D12 Memory Allocator allocation
+		//<-- D3D12 Memory Allocator allocation -->
 		D3D12MA::ALLOCATION_DESC desc = {};
 		desc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 
-		D3D12MA::Allocation* alloc;
-
-		m_Allocator->CreateResource(
+		D3D12MA_CREATE_RESOURCE(
+			m_Allocator,
 			&desc,
 			&depthStencilDesc,
 			D3D12_RESOURCE_STATE_COMMON,
 			&optClear,
-			&alloc,
-			IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf())
+			m_DepthStencilBufferAllocation,
+			m_DepthStencilBuffer
 		);
-
-		m_DepthStencilBufferAllocation.reset(alloc);
 
 		//create depth/stencil view
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;

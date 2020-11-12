@@ -128,3 +128,13 @@ namespace Workbench {
 	};
 }
 
+#define D3D12MA_CREATE_RESOURCE(allocator, allocDesc, bufferDesc, resourceState, optClear, bufferAlloc, buffer)\
+D3D12MA::Allocation* _alloc;\
+allocator->CreateResource(\
+	allocDesc,\
+	bufferDesc,\
+	resourceState,\
+	optClear,\
+	&_alloc,\
+	IID_PPV_ARGS(buffer.GetAddressOf()));\
+bufferAlloc.reset(_alloc);
