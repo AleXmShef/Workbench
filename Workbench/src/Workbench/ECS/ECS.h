@@ -57,6 +57,7 @@ namespace Workbench {
 	public:
 		EMITS_EVENTS {
 			EntityCreatedEvent = 0,
+			EntityComponentsChangedEvent,
 			EntityDestroyedEvent
 
 		};
@@ -65,7 +66,7 @@ namespace Workbench {
 			SET_EVENT_TYPE(EntityCreatedEvent)
 		public:
 			EntityCreatedEvent(const UUID* entitiId) : m_EntityId(entitiId) {};
-			const UUID* Entity() { return m_EntityId; };
+			const UUID* Entity() const { return m_EntityId; };
 		protected:
 			const UUID* m_EntityId;
 		};
@@ -74,9 +75,18 @@ namespace Workbench {
 			SET_EVENT_TYPE(EntityDestroyedEvent)
 		public:
 			EntityDestroyedEvent(const UUID* entitiId) : m_EntityId(entitiId) {};
-			const UUID* Entity() { return m_EntityId; };
+			const UUID* Entity() const { return m_EntityId; };
 		protected:
 			const UUID* m_EntityId;
+		};
+
+		class EntityComponentsChangedEvent EVENT {
+		SET_EVENT_TYPE(EntityComponentsChangedEvent);
+		public:
+			EntityComponentsChangedEvent(const UUID* entity) : m_entity(entity) {};
+			const UUID* Entity() const { return m_entity; };
+		protected:
+			const UUID* m_entity;
 		};
 
 		static ECS* getInstance();
@@ -99,6 +109,7 @@ namespace Workbench {
 			//Add component
 			auto component_id = componentContainer->AddComponent(component);
 			m_EntityToComponentsMap[entityId][typeid(Component)]= component_id;
+			POST_EVENT(new EntityComponentsChangedEvent(entityId));
 		};
 
 		template<class Component>
@@ -108,6 +119,7 @@ namespace Workbench {
 
 			if (componentContainer && componentContainer->RemoveComponent(component)) {
 				m_EntityToComponentsMap[entityId].erase(typeid(Component));
+				POST_EVENT(new EntityComponentsChangedEvent(entityId));
 			}
 		};
 		
@@ -136,7 +148,7 @@ namespace Workbench {
 
 		ECS() = default;
 
-		std::vector<std::unique_ptr<ECSEntity>> m_Entities;
+		std::vector<std::shared_ptr<ECSEntity>> m_Entities;
 
 		std::map<std::type_index, AbstractComponentContainer*> m_ComponentContainers;
 

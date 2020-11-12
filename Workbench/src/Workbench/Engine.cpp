@@ -16,7 +16,24 @@ namespace Workbench {
 
 		BIND_EVENT(this, Engine::onWindowEventCallback);
 
-		//m_LayerStack = (new LayerStack());
+		BIND_EVENT_TO_LAMBDA(ECS::Events, 
+			{
+				switch (event->getType()) {
+				case ECS::Events::EntityCreatedEvent: {
+					WB_CORE_LOG("Entity created: {}", (static_cast<const ECS::EntityCreatedEvent*>(event))->Entity()->str());
+					break;
+				}
+				case ECS::Events::EntityDestroyedEvent: {
+					WB_CORE_LOG("Entity destroyed: {}", (static_cast<const ECS::EntityDestroyedEvent*>(event))->Entity()->str());
+					break;
+				}
+				case ECS::Events::EntityComponentsChangedEvent: {
+					WB_CORE_LOG("Entity components changed: {}", (static_cast<const ECS::EntityComponentsChangedEvent*>(event))->Entity()->str());
+					break;
+				}
+				}
+			}
+		);
 
 		m_BaseWindow = std::shared_ptr<Window>(WB_CREATE_NATIVE_WINDOW(pParams.windowProps));
 

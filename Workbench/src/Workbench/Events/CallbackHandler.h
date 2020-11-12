@@ -24,7 +24,7 @@ namespace Workbench {
 		MemberCallbackHandler(Subscriber* consumer_instance, Callback member_function)
 			: m_subscriber(consumer_instance), m_callback(member_function) {};
 
-		virtual bool operator==(const AbstractCallbackHandler& another) {
+		virtual bool operator==(const AbstractCallbackHandler& another) override {
 			auto _another = static_cast<const MemberCallbackHandler<Subscriber, EventType>*>(&another);
 
 			if (_another != nullptr) {
@@ -44,5 +44,23 @@ namespace Workbench {
 		Callback		m_callback;
 	};
 
+	template<class EventType>
+	class WORKBENCH_API LambdaCallbackHandler : public AbstractCallbackHandler {
+	public:
+		//typedef Callback = std::function<void (const Event<EventType>*) >;
+
+		LambdaCallbackHandler(std::function<void(const Event<EventType>*)> callback) : m_callback(callback) {};
+
+		virtual bool operator==(const AbstractCallbackHandler& another) override {
+			return false;
+		};
+	protected:
+		virtual void call(const AbstractEvent* event) override {
+			m_callback(static_cast<const Event<EventType>*>(event));
+		}
+	protected:
+		std::function<void(const Event<EventType>*)> m_callback;
+	};
+ 
 }
 

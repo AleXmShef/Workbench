@@ -15,6 +15,11 @@ namespace Workbench {
 			m_SubscribersMap[typeid(EventType)].push_back(new MemberCallbackHandler<EventConsumer, EventType>(consumer, callback));
 		};
 
+		template<class EventType>
+		void subscribe(std::function<void (const Event<EventType>*)> callback) {
+			m_SubscribersMap[typeid(EventType)].push_back(new LambdaCallbackHandler<EventType>(callback));
+		};
+
 		template<class EventConsumer, class EventType>
 		void unsubscribe(EventConsumer* consumer, void (EventConsumer::* callback)(const Event<EventType>*)) {
 			AbstractCallbackHandler* comp = new MemberCallbackHandler<EventConsumer, EventType>(consumer, callback);
