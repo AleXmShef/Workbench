@@ -1,7 +1,7 @@
 #pragma once
 #include "wbpch.h"
-#include "Event.h"
-#include "CallbackHandler.h"
+#include "Events/Event.h"
+#include "Events/CallbackHandler.h"
 
 namespace Workbench {
 	class WORKBENCH_API EventBus {

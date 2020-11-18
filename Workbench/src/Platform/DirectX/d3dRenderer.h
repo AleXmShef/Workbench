@@ -17,11 +17,14 @@
 #include "d3dx12.h"
 #include "D3D12MemoryAllocator/D3D12MemAlloc.h"
 
+//<-- DirectX specific linking -->
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
 
+
+//<-- define left-hand coordinate system -->
 #define WB_HANDEDNESS "left"
 
 namespace Workbench {
@@ -34,8 +37,6 @@ namespace Workbench {
 		virtual void Draw() override;
 		//virtual void DrawMesh(Mesh* mesh);
 		virtual void End() override;
-
-		void test();
 
 	protected:
 		HRESULT CreateCommandObjects();
@@ -99,7 +100,6 @@ namespace Workbench {
 		static const int s_SwapChainBufferCount = 2;
 		int m_CurrentBackBuffer = 0;
 		pCom<ID3D12Resource> m_SwapChainBuffer[s_SwapChainBufferCount];
-
 		paCom<D3D12MA::Allocation> m_DepthStencilBufferAllocation;
 		pCom<ID3D12Resource> m_DepthStencilBuffer;
 

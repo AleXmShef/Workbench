@@ -1,6 +1,6 @@
 #pragma once
 #include "wbpch.h"
-#include "Event.h"
+#include "Events/Event.h"
 
 namespace Workbench {
 

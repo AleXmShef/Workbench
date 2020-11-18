@@ -1,5 +1,7 @@
 #include <Workbench.h>
 
+#include "ExampleLayer.h"
+
 int main(int argc, char** argv) {
 	for (int i = 1; i < argc; i++) {
 		std::cout << argv[i] << "\n";
@@ -16,6 +18,8 @@ int main(int argc, char** argv) {
 
 		Workbench::Engine mEngine(engParams);
 		
+		mEngine.PushLayer(std::make_shared<ExampleLayer>(&mEngine));
+
 		result = mEngine.Run();
 	}
 #if defined(WB_DEBUG)

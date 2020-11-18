@@ -7,7 +7,6 @@ namespace Workbench {
 	d3dRenderer::~d3dRenderer() {
 		if (m_d3dDevice != nullptr)
 			FlushCommandQueue();
-		//m_Allocator->Release();
 	}
 
 	void d3dRenderer::Init(std::shared_ptr<Window> window) {
@@ -15,23 +14,28 @@ namespace Workbench {
 		Renderer::Init(window);
 
 		if (m_window != nullptr) {
-			m_hInstance = (HINSTANCE)m_window->GetNativeWindow();
+			HINSTANCE hInstance = static_cast<HINSTANCE>(m_window->GetNativeWindow());
+			if (!hInstance) {
+				WB_RENDERER_CRITICAL("Trying to initialize DirectX with non-WIN32 API window");
+				return;
+			}
+			m_hInstance = hInstance;
 			m_hWnd = ((WindowsWindow*)m_window.get())->GetHWND();
 		}
 		else {
-			WB_RENDERER_CRITICAL("Trying to initialize DirectX with non-WIN32 API window");
+			WB_RENDERER_CRITICAL("Trying to initialize DirectX with non-initialized window");
 			return;
 		}
 
 		m_isFullScreen = m_window->IsFullscreen();
 
 		//initialize DirectX debug layer when in debug build
-#ifdef WB_DEBUG
+//#ifdef WB_DEBUG
 		pCom<ID3D12Debug> debugController;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 			debugController->EnableDebugLayer();
 		}
-#endif // DEBUG
+//#endif // DEBUG
 
 		//Begin Initialization
 		//Create DXGI Factory

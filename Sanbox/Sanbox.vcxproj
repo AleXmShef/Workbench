@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WB_PLATFORM_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Workbench\src\Vendor\mathfu\include\;$(SolutionDir)Workbench\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Workbench\src;$(SolutionDir)Workbench\src\Workbench;$(SolutionDir)Workbench\src\Vendor\mathfu\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>wbpch.h</PrecompiledHeaderFile>
@@ -77,7 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WB_PLATFORM_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Workbench\src;$(SolutionDir)Workbench\src\Vendor\mathfu\include\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Workbench\src;$(SolutionDir)Workbench\src\Workbench;$(SolutionDir)Workbench\src\Vendor\mathfu\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>wbpch.h</PrecompiledHeaderFile>
@@ -97,6 +97,9 @@
     <ProjectReference Include="..\Workbench\Workbench.vcxproj">
       <Project>{166d1957-31fa-4900-bc05-80e795d64aab}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ExampleLayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

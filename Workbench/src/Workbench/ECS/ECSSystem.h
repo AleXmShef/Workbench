@@ -1,7 +1,7 @@
 #pragma once
 #include "wbpch.h"
-#include "ECSEntity.h"
-#include "ECSComponent.h"
+#include "ECS/ECSEntity.h"
+#include "ECS/ECSComponent.h"
 
 namespace Workbench {
 	class ECSSystem {

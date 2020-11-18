@@ -8,7 +8,7 @@
 #include "Window.h"
 
 namespace Workbench {
-	class WORKBENCH_API Engine
+	class WORKBENCH_API Engine : public LayerStack
 	{
 	public:
 		struct EngineProps {
@@ -18,6 +18,8 @@ namespace Workbench {
 	public:
 		Engine(EngineProps pParams);
 		~Engine();
+
+		ECS* GetWorld();
 
 		int Run();
 
@@ -34,7 +36,5 @@ namespace Workbench {
 		EngineProps m_props;
 
 		std::shared_ptr<Window> m_BaseWindow = nullptr;
-
-		std::unique_ptr<LayerStack> m_LayerStack = nullptr;
 	};
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "wbpch.h"
 #include "ECS/ECSComponent.h"
-#include "Mesh.h"
+#include "Renderer/Mesh.h"
 
 namespace Workbench {
 	struct GeometryComponent : public ECSComponent {

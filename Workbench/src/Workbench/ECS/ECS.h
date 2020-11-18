@@ -1,14 +1,15 @@
 #pragma once
 #include "wbpch.h"
-#include "ECSEntity.h"
-#include "ECSComponent.h"
+#include "Core.h"
+#include "ECS/ECSEntity.h"
+#include "ECS/ECSComponent.h"
 
 #include "Events/EventBus.h"
 #include "Logger/Logger.h"
 
 namespace Workbench {
 
-	class AbstractComponentContainer {};
+	class WORKBENCH_API AbstractComponentContainer {};
 
 	template<class Component>
 	class ComponentContainer : public AbstractComponentContainer {
@@ -53,7 +54,7 @@ namespace Workbench {
 		std::vector<Component*> m_Components;
 	};
 
-	class ECS {
+	class WORKBENCH_API ECS {
 	public:
 		EMITS_EVENTS {
 			EntityCreatedEvent = 0,

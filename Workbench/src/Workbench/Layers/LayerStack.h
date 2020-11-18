@@ -1,10 +1,10 @@
 #pragma once
 #include "wbpch.h"
 #include "Core.h"
-#include "Layer.h"
+#include "LAyers/Layer.h"
 
 namespace Workbench {
-	class LayerStack : public Layer {
+	class WORKBENCH_API LayerStack : public Layer {
 	public:
 		//LayerStack();
 		virtual ~LayerStack();

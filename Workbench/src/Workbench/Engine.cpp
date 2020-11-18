@@ -39,7 +39,8 @@ namespace Workbench {
 
 		m_World = ECS::getInstance();
 
-		m_LayerStack = std::make_unique<LayerStack>();
+		PushLayer(std::make_shared<RenderSystem>(m_BaseWindow));
+		PushLayer(std::make_shared<PhysicsSystem>());
 
 		WB_CORE_INFO("Workbench successfuly initialized, main thread_id: {0}", std::this_thread::get_id());
 
@@ -74,12 +75,14 @@ namespace Workbench {
 
 		case E::WindowLostFocusEvent :
 		{
+			WB_CORE_LOG("Window lost focus, pausing");
 			m_onPause = true;
 			break;
 		}
 
 		case E::WindowGainedFocusEvent :
 		{
+			WB_CORE_LOG("Window gained focus back, unpausing");
 			m_onPause = false;
 			break;
 		}
@@ -142,35 +145,20 @@ namespace Workbench {
 		m_BaseWindow->OnUpdate(&m_GameTimer);
 		FLUSH_EVENTS();
 
-		m_LayerStack->PushLayer(std::make_shared<RenderSystem>(m_BaseWindow));
-		m_LayerStack->PushLayer(std::make_shared<PhysicsSystem>());
-
-		auto entity1 = m_World->CreateEntity();
-		auto entity2 = m_World->CreateEntity();
-
-		auto m_component1 = new TransformComponent(entity1, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(10, 15, 5, 0));
-		auto m_component2 = new TransformComponent(entity2);
-
-		auto m_component3 = new PhysicsComponent(entity1, 10, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(0, 0, 0, 0));
-		auto m_component4 = new PhysicsComponent(entity2, 10, mathfu::vec4(0, 0, 0, 0), mathfu::vec4(0, 0, 0, 0));
-
-		m_World->AddComponent(entity1, m_component1);
-		m_World->AddComponent(entity2, m_component2);
-		m_World->AddComponent(entity1, m_component3);
-		m_World->AddComponent(entity2, m_component4);
-
 		while (m_mainLoopFlag) {
 			m_GameTimer.Tick();
 			m_BaseWindow->OnUpdate(&m_GameTimer);
 
 			if (!m_onPause) {
-				m_LayerStack->OnUpdate(&m_GameTimer);
+				OnUpdate(&m_GameTimer);
 				FLUSH_EVENTS();
 			}
 			else
-				Sleep(5);
+				Sleep(100);
 		}
 		WB_CORE_INFO("Program ended normally.");
 		return 0;
 	}
+
+	ECS* Engine::GetWorld() { return m_World; };
 }

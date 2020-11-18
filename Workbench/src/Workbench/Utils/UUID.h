@@ -1,9 +1,11 @@
 #pragma once
+#pragma warning(disable : 4251)
 #include "wbpch.h"
+#include "Core.h"
 #include "Random/RandomGenerator.h"
 
 namespace Workbench {
-	struct UUID {
+	struct WORKBENCH_API UUID {
 	public:
 		UUID() : string_uuid(RandomGenerator::generate_uuid_v4()), hashed_uuid((int32_t)std::hash<std::string>{}(string_uuid)) {};
 

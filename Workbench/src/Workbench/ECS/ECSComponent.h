@@ -1,8 +1,9 @@
 #pragma once
+#include "Core.h"
 #include "Utils/UUID.h"
 
 namespace Workbench {
-	class ECSComponent {
+	class WORKBENCH_API ECSComponent {
 	public:
 		ECSComponent(const UUID* entity);
 		virtual ~ECSComponent();
