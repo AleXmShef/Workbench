@@ -172,6 +172,11 @@ namespace Workbench {
 			return 0;
 			break;
 		}
+		case WM_KEYUP: {
+			POST_EVENT(new WindowButtonReleasedEvent(WinToWbKeycode(wParam)));
+			return 0;
+			break;
+		}
 		case WM_MOUSEMOVE: {
 			UINT x = GET_X_LPARAM(lParam);
 			UINT y = GET_Y_LPARAM(lParam);
@@ -195,6 +200,12 @@ namespace Workbench {
 		case WM_MBUTTONUP:
 		case WM_RBUTTONUP:
 			return 0;
+			break;
+		case WM_MOUSEWHEEL: {
+			POST_EVENT(new WindowMouseWheelRotatedEvent(GET_WHEEL_DELTA_WPARAM(wParam)));
+			return 0;
+			break;
+		}
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}

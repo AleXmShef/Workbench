@@ -131,8 +131,21 @@ namespace Workbench {
 			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
 			if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
 				WB_CORE_LOG("Button pressed: {}", (char)key);
+			else if(key >= WB_KEYCODES::WB_VK_F1 && key <= WB_KEYCODES::WB_VK_F12)
+				WB_CORE_LOG("Button pressed: F{}", (int)key - ((int)WB_KEYCODES::WB_VK_F1 - 1));
 			if (key == WB_KEYCODES::WB_VK_F11)
 				m_BaseWindow->ToggleFullscreen();
+			break;
+		}
+		case E::WindowButtonReleasedEvent :
+		{
+			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
+			break;
+		}
+		case E::WindowMouseWheelRotatedEvent:
+		{
+			auto delta = ((Window::WindowMouseWheelRotatedEvent*)event)->getDelta();
+			WB_CORE_LOG("Mouse wheel rotated: {}", delta);
 			break;
 		}
 		}

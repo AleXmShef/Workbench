@@ -21,6 +21,7 @@ namespace Workbench {
 			WindowMouseMovedEvent,
 			WindowMouseButtonPressedEvent,
 			WindowMouseButtonReleasedEvent,
+			WindowMouseWheelRotatedEvent,
 
 			WindowButtonPressedEvent,
 			WindowButtonReleasedEvent
@@ -97,6 +98,15 @@ namespace Workbench {
 			inline WB_KEYCODES getButton() { return m_button; };
 		protected:
 			WB_KEYCODES m_button;
+		};
+
+		class WindowMouseWheelRotatedEvent EVENT {
+			SET_EVENT_TYPE(WindowMouseWheelRotatedEvent)
+		public:
+			WindowMouseWheelRotatedEvent(float delta) : m_delta(delta) {};
+			inline float getDelta() { return m_delta; };
+		protected:
+			float m_delta;
 		};
 
 		struct WindowProps {
