@@ -197,8 +197,15 @@ namespace Workbench {
 			return 0;
 			break;
 		case WM_LBUTTONUP:
+			POST_EVENT(new WindowMouseButtonReleasedEvent(WinToWbKeycode(VK_LBUTTON)));
+			return 0;
+			break;
 		case WM_MBUTTONUP:
+			POST_EVENT(new WindowMouseButtonReleasedEvent(WinToWbKeycode(VK_MBUTTON)));
+			return 0;
+			break;
 		case WM_RBUTTONUP:
+			POST_EVENT(new WindowMouseButtonReleasedEvent(WinToWbKeycode(VK_RBUTTON)));
 			return 0;
 			break;
 		case WM_MOUSEWHEEL: {

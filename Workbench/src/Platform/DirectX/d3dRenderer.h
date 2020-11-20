@@ -1,21 +1,16 @@
 #pragma once
 #include "wbpch.h"
+#include "Utils.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Mesh.h"
+#include "Renderer/Primitives/Mesh.h"
+#include "Renderer/Primitives/ConstantResource.h"
+#include "Renderer/Primitives/DynamicResource.h"
 #include "Utils/Utils.h"
+#include "Platform/DirectX/Utils.h"
 
 
-//<-- DirectX specific includes -->
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <D3Dcompiler.h>
-#include <DirectXMath.h>
-#include <DirectXPackedVector.h>
-#include <DirectXColors.h>
-#include <DirectXCollision.h>
-#include <wrl.h>
-#include "d3dx12.h"
-#include "D3D12MemoryAllocator/D3D12MemAlloc.h"
+
+
 
 //<-- DirectX specific linking -->
 #pragma comment(lib,"d3dcompiler.lib")
@@ -37,6 +32,9 @@ namespace Workbench {
 		virtual void Draw() override;
 		//virtual void DrawMesh(Mesh* mesh);
 		virtual void End() override;
+
+		virtual ConstantResource* CreateConstantResource() override;
+		virtual DynamicResource* CreateDynamicResource(bool isConstantBuffer) override;
 
 	protected:
 		HRESULT CreateCommandObjects();
@@ -127,14 +125,3 @@ namespace Workbench {
 		DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	};
 }
-
-#define D3D12MA_CREATE_RESOURCE(allocator, allocDesc, bufferDesc, resourceState, optClear, bufferAlloc, buffer)\
-D3D12MA::Allocation* _alloc;\
-allocator->CreateResource(\
-	allocDesc,\
-	bufferDesc,\
-	resourceState,\
-	optClear,\
-	&_alloc,\
-	IID_PPV_ARGS(buffer.GetAddressOf()));\
-bufferAlloc.reset(_alloc);

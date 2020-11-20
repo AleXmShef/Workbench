@@ -7,6 +7,7 @@ namespace Workbench {
 		while (!m_EventQueue.empty()) {
 			auto [type, event] = m_EventQueue.front();
 			propagateEvent(event, type);
+			delete event;
 			m_EventQueue.pop();
 		}
 	}

@@ -5,12 +5,15 @@
 
 namespace Workbench {
 	class WORKBENCH_API AbstractEvent {
+	public:
+		virtual ~AbstractEvent() {};
 	};
 
 	template<class EventType>
 	class WORKBENCH_API Event : public AbstractEvent {
 	public:
 		virtual EventType getType() const = 0;
+		virtual ~Event() {};
 	};
 
 	

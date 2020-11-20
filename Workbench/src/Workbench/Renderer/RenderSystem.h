@@ -3,6 +3,8 @@
 #include "Layers/Layer.h"
 #include "Renderer/Renderer.h"
 
+#include "Primitives/MeshResource.h"
+
 namespace Workbench {
 	class RenderSystem : public Layer {
 	public:
@@ -17,6 +19,8 @@ namespace Workbench {
 	protected:
 		Renderer* m_Renderer = nullptr;
 		std::shared_ptr<Window> m_Window = nullptr;
+
+		std::vector<MeshResource> m_MeshResources;
 	};
 }
 

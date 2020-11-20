@@ -1,5 +1,7 @@
 #include "wbpch.h"
 #include "d3dRenderer.h"
+#include "Primitives/d3dConstantResource.h"
+#include "Primitives/d3dDynamicResource.h"
 
 #include "Logger/Logger.h"
 
@@ -420,6 +422,20 @@ namespace Workbench {
 		// done for simplicity.  Later we will show how to organize our rendering code
 		// so we do not have to wait per frame.
 		FlushCommandQueue();
+	}
+
+	ConstantResource* d3dRenderer::CreateConstantResource() 
+	{
+		auto resource = new d3dConstantResource(m_d3dDevice.Get(), m_CommandList.Get(), m_Allocator.get());
+
+		return static_cast<ConstantResource*>(resource);
+	}
+
+	DynamicResource* d3dRenderer::CreateDynamicResource(bool isConstantBuffer)
+	{
+		auto resource = new d3dDynamicResource(m_d3dDevice.Get(), m_Allocator.get(), isConstantBuffer);
+
+		return static_cast<DynamicResource*>(resource);
 	}
 
 	std::vector<IDXGIAdapter*> d3dRenderer::GetAdapters() {

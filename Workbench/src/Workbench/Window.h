@@ -82,6 +82,15 @@ namespace Workbench {
 			WB_KEYCODES m_mouse_button;
 		};
 
+		class WindowMouseButtonReleasedEvent EVENT {
+			SET_EVENT_TYPE(WindowMouseButtonReleasedEvent)
+		public:
+			WindowMouseButtonReleasedEvent(WB_KEYCODES mouse_button) : m_mouse_button(mouse_button) {};
+			WB_KEYCODES getButton() { return m_mouse_button; };
+		protected:
+			WB_KEYCODES m_mouse_button;
+		};
+
 		class WindowButtonPressedEvent EVENT {
 			SET_EVENT_TYPE(WindowButtonPressedEvent)
 		public:

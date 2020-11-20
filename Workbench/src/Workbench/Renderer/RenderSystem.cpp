@@ -10,6 +10,10 @@ namespace Workbench {
 
 	void RenderSystem::OnAttach() {
 		m_Renderer->Init(m_Window);
+		auto VertexBuffer = m_Renderer->CreateConstantResource();
+		auto IndexBuffer = m_Renderer->CreateConstantResource();
+		
+		m_MeshResources.emplace_back(VertexBuffer, IndexBuffer);
 	}
 
 	void RenderSystem::OnUpdate(WB_GAME_TIMER* timer) {

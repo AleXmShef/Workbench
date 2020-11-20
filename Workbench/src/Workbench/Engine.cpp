@@ -129,10 +129,10 @@ namespace Workbench {
 		case E::WindowButtonPressedEvent :
 		{
 			auto key = ((Window::WindowButtonPressedEvent*)event)->getButton();
-			if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
-				WB_CORE_LOG("Button pressed: {}", (char)key);
-			else if(key >= WB_KEYCODES::WB_VK_F1 && key <= WB_KEYCODES::WB_VK_F12)
-				WB_CORE_LOG("Button pressed: F{}", (int)key - ((int)WB_KEYCODES::WB_VK_F1 - 1));
+			//if(key >= WB_KEYCODES::WB_VK_A && key <= WB_KEYCODES::WB_VK_Z)
+			//	WB_CORE_LOG("Button pressed: {}", (char)key);
+			//else if(key >= WB_KEYCODES::WB_VK_F1 && key <= WB_KEYCODES::WB_VK_F12)
+			//	WB_CORE_LOG("Button pressed: F{}", (int)key - ((int)WB_KEYCODES::WB_VK_F1 - 1));
 			if (key == WB_KEYCODES::WB_VK_F11)
 				m_BaseWindow->ToggleFullscreen();
 			break;
