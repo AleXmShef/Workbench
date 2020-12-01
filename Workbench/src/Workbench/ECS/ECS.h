@@ -81,13 +81,22 @@ namespace Workbench {
 			const UUID* m_EntityId;
 		};
 
-		class EntityComponentsChangedEvent EVENT {
-		SET_EVENT_TYPE(EntityComponentsChangedEvent);
+		template<class ComponentClass>
+		class EntityComponentsChangedEvent : public Event<Events> {
 		public:
-			EntityComponentsChangedEvent(const UUID* entity) : m_entity(entity) {};
-			const UUID* Entity() const { return m_entity; };
+			enum class ActionType {
+				ComponentCreated = 0,
+				ComponentChanged,
+				ComponentDestroyed
+			};
+
+			EntityComponentsChangedEvent(ComponentClass* component, ActionType action) : m_Component(component), m_ActionType(action) {};
+			virtual Events getType() const override { return Events::EntityComponentsChangedEvent; };
+			ComponentClass* getEvent() const { return m_Component; };
+			ActionType getActionType() const { return m_ActionType; };
 		protected:
-			const UUID* m_entity;
+			ComponentClass* m_Component = nullptr;
+			ActionType m_ActionType;
 		};
 
 		static ECS* getInstance();
@@ -110,8 +119,8 @@ namespace Workbench {
 			//Add component
 			auto component_id = componentContainer->AddComponent(component);
 			m_EntityToComponentsMap[entityId][typeid(Component)]= component_id;
-			POST_EVENT(new EntityComponentsChangedEvent(entityId));
-		};
+			POST_EVENT(new EntityComponentsChangedEvent<Component>(component, EntityComponentsChangedEvent<Component>::ActionType::ComponentCreated));
+		}; 
 
 		template<class Component>
 		void RemoveComponent(const UUID* entityId, Component* component) {
@@ -120,7 +129,7 @@ namespace Workbench {
 
 			if (componentContainer && componentContainer->RemoveComponent(component)) {
 				m_EntityToComponentsMap[entityId].erase(typeid(Component));
-				POST_EVENT(new EntityComponentsChangedEvent(entityId));
+			POST_EVENT(new EntityComponentsChangedEvent<Component>(component, EntityComponentsChangedEvent<Component>::ActionType::ComponentCreated));
 			}
 		};
 		

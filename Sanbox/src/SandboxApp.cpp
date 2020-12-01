@@ -1,5 +1,4 @@
 #include <Workbench.h>
-
 #include "ExampleLayer.h"
 
 extern "C" {

@@ -15,11 +15,6 @@ namespace Workbench {
 		virtual EventType getType() const = 0;
 		virtual ~Event() {};
 	};
-
-	
-
-	
-
 	
 }
 

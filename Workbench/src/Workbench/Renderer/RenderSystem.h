@@ -1,5 +1,6 @@
 #pragma once
 #include "wbpch.h"
+#include "ECS/ECS.h"
 #include "Layers/Layer.h"
 #include "Renderer/Renderer.h"
 
@@ -15,6 +16,9 @@ namespace Workbench {
 		virtual void OnDetach() override;
 
 		d3dRenderer* getRenderer() { return static_cast<d3dRenderer*>(m_Renderer); }
+
+	protected:
+		
 
 	protected:
 		Renderer* m_Renderer = nullptr;

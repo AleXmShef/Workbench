@@ -27,10 +27,6 @@ namespace Workbench {
 					WB_CORE_LOG("Entity destroyed: {}", (static_cast<const ECS::EntityDestroyedEvent*>(event))->Entity()->str());
 					break;
 				}
-				case ECS::Events::EntityComponentsChangedEvent: {
-					WB_CORE_LOG("Entity components changed: {}", (static_cast<const ECS::EntityComponentsChangedEvent*>(event))->Entity()->str());
-					break;
-				}
 				}
 			}
 		);
