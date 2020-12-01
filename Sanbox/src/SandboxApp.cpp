@@ -2,6 +2,15 @@
 
 #include "ExampleLayer.h"
 
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+
+extern "C"
+  {
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+  }
+
 int main(int argc, char** argv) {
 	for (int i = 1; i < argc; i++) {
 		std::cout << argv[i] << "\n";
