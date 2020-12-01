@@ -1,5 +1,4 @@
 #include <Workbench.h>
-
 #include "ExampleLayer.h"
 
 int main(int argc, char** argv) {
