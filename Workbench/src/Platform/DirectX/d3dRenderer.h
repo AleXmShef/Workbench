@@ -5,8 +5,11 @@
 #include "Renderer/Primitives/Mesh.h"
 #include "Renderer/Primitives/ConstantResource.h"
 #include "Renderer/Primitives/DynamicResource.h"
+#include "Renderer/Primitives/MeshResource.h"
+#include "Renderer/Primitives/Materials.h"
 #include "Utils/Utils.h"
 #include "Platform/DirectX/Utils.h"
+#include "Platform/DirectX/Primitives/d3dPipeline.h"
 
 
 
@@ -30,7 +33,7 @@ namespace Workbench {
 
 		virtual void Begin() override;
 		virtual void Draw() override;
-		//virtual void DrawMesh(Mesh* mesh);
+		virtual void DrawMeshes(MeshResource* mesh) override;
 		virtual void End() override;
 
 		virtual ConstantResource* CreateConstantResource() override;
@@ -47,6 +50,8 @@ namespace Workbench {
 		void OnResize() override;
 
 		void ResizeSwapchain();
+
+		void BuildPipelineForMaterial(Materials material);
 
 		std::vector<IDXGIAdapter*> GetAdapters();
 		std::vector<IDXGIOutput*> GetAdapterOutputs(IDXGIAdapter* adapter);
@@ -123,5 +128,7 @@ namespace Workbench {
 		D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 		DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		std::unordered_map<Materials, d3dPipeline*> m_Pipelines;
 	};
 }

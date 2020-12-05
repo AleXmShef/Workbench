@@ -2,6 +2,8 @@
 #pragma warning(disable : 4251)
 #include "wbpch.h"
 #include "Core.h"
+#include "Utils/UUID.h"
+#include "DirectXMath.h"
 
 #define MSG_TYPE std::string&&
 #define MSG_RVALUE(x) std::forward<std::string>(x)
@@ -28,6 +30,18 @@ namespace Workbench {
 		return os;
 	}
 
+	template<typename Type, int X>
+	std::ostream& operator <<(std::ostream& os, const mathfu::Vector<Type, X>& vec) {
+		os << "{";
+		for (size_t i = 0; i < X; ++i) {
+			os << vec[i];
+			if (i < X - 1)
+				os << ", ";
+		}
+		os << "}\n";
+		return os;
+	}
+
 	template<class T>
 	std::ostream& operator <<(std::ostream& os, const std::vector<T>& vec) {
 		os << "{";
@@ -39,6 +53,10 @@ namespace Workbench {
 		os << "}\n";
 		return os;
 	}
+
+	WORKBENCH_API std::ostream& operator <<(std::ostream& os, const UUID* entity);
+
+	WORKBENCH_API std::ostream& operator <<(std::ostream& os, const DirectX::XMMATRIX& mat);
 
 	class WORKBENCH_API Logger {
 	public:

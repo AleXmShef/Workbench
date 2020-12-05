@@ -151,8 +151,8 @@ namespace Workbench {
 
 		m_GameTimer.Start();
 
-		m_BaseWindow->OnUpdate(&m_GameTimer);
-		FLUSH_EVENTS();
+		//m_BaseWindow->OnUpdate(&m_GameTimer);
+		//FLUSH_EVENTS();
 
 		while (m_mainLoopFlag) {
 			m_GameTimer.Tick();

@@ -11,6 +11,7 @@ namespace Workbench {
 
 		virtual void Begin() = 0;
 		virtual void Draw() = 0;
+		virtual void DrawMeshes(MeshResource* mesh) = 0;
 		virtual void End() = 0;
 
 		//virtual MeshResource* CreateMeshResource() = 0;
@@ -28,7 +29,7 @@ namespace Workbench {
 }
 
 
-#if defined(WB_PLATFORM_WINDOWS) and defined(WB_BUILD_DLL)
+#if defined(WB_PLATFORM_WINDOWS)
 	#include "Platform/DirectX/d3dRenderer.h"
 	#define WB_CREATE_RENDERER() new d3dRenderer()
 #endif

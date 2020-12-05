@@ -81,7 +81,7 @@ namespace Workbench {
 			const UUID* m_EntityId;
 		};
 
-		template<class ComponentClass>
+		template<class ComponentClass = ECSComponent>
 		class EntityComponentsChangedEvent : public Event<Events> {
 		public:
 			enum class ActionType {
@@ -92,7 +92,7 @@ namespace Workbench {
 
 			EntityComponentsChangedEvent(ComponentClass* component, ActionType action) : m_Component(component), m_ActionType(action) {};
 			virtual Events getType() const override { return Events::EntityComponentsChangedEvent; };
-			ComponentClass* getEvent() const { return m_Component; };
+			ComponentClass* getComponent() const { return m_Component; };
 			ActionType getActionType() const { return m_ActionType; };
 		protected:
 			ComponentClass* m_Component = nullptr;

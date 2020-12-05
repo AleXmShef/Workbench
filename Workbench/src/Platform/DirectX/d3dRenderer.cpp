@@ -2,6 +2,7 @@
 #include "d3dRenderer.h"
 #include "Primitives/d3dConstantResource.h"
 #include "Primitives/d3dDynamicResource.h"
+#include "Primitives/d3dConstantBuffer.h"
 
 #include "Logger/Logger.h"
 
@@ -37,10 +38,10 @@ namespace Workbench {
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 			debugController->EnableDebugLayer();
 		}
-//#endif // DEBUG
+		//#endif // DEBUG
 
-		//Begin Initialization
-		//Create DXGI Factory
+				//Begin Initialization
+				//Create DXGI Factory
 		HRESULT createdFactory = CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory));
 		if (FAILED(createdFactory)) {
 			WB_RENDERER_CRITICAL("Failed to create DXGIFactory");
@@ -73,7 +74,7 @@ namespace Workbench {
 		allocatorDesc.pAdapter = m_currentAdapter;
 
 		D3D12MA::Allocator* _alloc;
-		
+
 		HRESULT createdMemotyAllocator = D3D12MA::CreateAllocator(&allocatorDesc, &_alloc);
 		if (FAILED(createdMemotyAllocator)) {
 			WB_RENDERER_CRITICAL("Failed to create D3D12 Memory Allocator");
@@ -108,7 +109,7 @@ namespace Workbench {
 		CreateRtvAndDsvDescriptorHeaps();
 
 		OnResize();
-		
+
 		//temporarily disable Alt+Enter combo for going fullscreen
 		m_dxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
 
@@ -198,7 +199,7 @@ namespace Workbench {
 
 		//create rtv descriptor heap
 		HRESULT createdRtvDescriptorHeap = m_d3dDevice->CreateDescriptorHeap(
-			&rtvHeapDesc, 
+			&rtvHeapDesc,
 			IID_PPV_ARGS(m_RtvHeap.GetAddressOf())
 		);
 		if (FAILED(createdRtvDescriptorHeap)) {
@@ -215,7 +216,7 @@ namespace Workbench {
 
 		//create dsv descriptor heap
 		HRESULT createdDsvDescriptorHeap = m_d3dDevice->CreateDescriptorHeap(
-			&dsvHeapDesc, 
+			&dsvHeapDesc,
 			IID_PPV_ARGS(m_DsvHeap.GetAddressOf())
 		);
 		if (FAILED(createdDsvDescriptorHeap)) {
@@ -395,12 +396,143 @@ namespace Workbench {
 	}
 
 	void d3dRenderer::Draw() {
-		
+
 	}
 
-	//void d3dRenderer::DrawMesh(Mesh* mesh) {
-	//
-	//}
+	void d3dRenderer::DrawMeshes(MeshResource* mesh) {
+		if (m_Pipelines[mesh->GetMaterial()] == nullptr) {
+			BuildPipelineForMaterial(mesh->GetMaterial());
+		}
+
+
+		//prepare pipline state
+		auto pipeline = m_Pipelines[mesh->GetMaterial()];
+
+		auto constantBuffer = std::static_pointer_cast<d3dConstantBuffer>(mesh->GetConstantBuffer());
+
+		m_CommandList->SetPipelineState(pipeline->pso.Get());
+
+		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBuffer->GetHeap() };
+		m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		m_CommandList->SetGraphicsRootSignature(pipeline->rootSignature.Get());
+
+		//auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBuffer->GetHeap()->GetGPUDescriptorHandleForHeapStart());
+
+		//m_CommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+
+		//draw objects
+		D3D12_VERTEX_BUFFER_VIEW vbv;
+		vbv.BufferLocation = std::static_pointer_cast<d3dConstantResource>(mesh->GetVertexBuffer())->GetResource()->GetGPUVirtualAddress();
+		vbv.StrideInBytes = sizeof(VertexColoredBasic);
+		vbv.SizeInBytes = mesh->GetVertexArray()->size() * vbv.StrideInBytes;
+
+		m_CommandList->IASetVertexBuffers(0, 1, &vbv);
+
+		D3D12_INDEX_BUFFER_VIEW ibv;
+		ibv.BufferLocation = std::static_pointer_cast<d3dConstantResource>(mesh->GetIndexBuffer())->GetResource()->GetGPUVirtualAddress();
+		ibv.Format = DXGI_FORMAT_R16_UINT;
+		ibv.SizeInBytes = mesh->GetIndexArray()->size() * sizeof(uint32_t);
+
+		m_CommandList->IASetIndexBuffer(&ibv);
+
+		m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+		int i = 0;
+		auto submeshes = mesh->GetSubmeshes();
+		for (auto it = submeshes->begin(); it != submeshes->end(); ++it) {
+			const auto& [uuid, submesh] = (*it);
+
+			auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBuffer->GetHeap()->GetGPUDescriptorHandleForHeapStart());
+			//cbvHandle.Offset(i, m_CbvSrvUavDescriptorSize);
+
+			m_CommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+
+			m_CommandList->DrawIndexedInstanced(submesh.IndexCount, 1, submesh.StartIndexLocation, submesh.BaseVertexLocation, 0);
+
+			++i;
+		}
+
+	}
+
+	void d3dRenderer::BuildPipelineForMaterial(Materials material) {
+		if (material == Materials::GenericFlat) {
+			WB_RENDERER_INFO("Building pipeline for material \"GenericFlat\"");
+
+			auto pipeline = new d3dPipeline;
+
+			//create root signature
+			CD3DX12_DESCRIPTOR_RANGE cbvTable;
+			cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+
+			CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+			slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+
+			CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
+				D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+			pCom<ID3DBlob> serializedRootSig = nullptr;
+			pCom<ID3DBlob> errorBlob = nullptr;
+			HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+				serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+			if (errorBlob != nullptr)
+			{
+				WB_RENDERER_CRITICAL((char*)errorBlob->GetBufferPointer());
+			}
+
+			HRESULT hr2 = m_d3dDevice->CreateRootSignature(
+				0,
+				serializedRootSig->GetBufferPointer(),
+				serializedRootSig->GetBufferSize(),
+				IID_PPV_ARGS(pipeline->rootSignature.GetAddressOf())
+			);
+
+
+			//build shaders and input layout
+			pipeline->shaders["standardVS"] = CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_1");
+			pipeline->shaders["defaultPS"] = CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_1");
+
+			pipeline->inputLayout = {
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+			};
+
+			//build PSO
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
+			ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+			psoDesc.InputLayout = { pipeline->inputLayout.data(), (UINT)pipeline->inputLayout.size() };
+			psoDesc.pRootSignature = pipeline->rootSignature.Get();
+			psoDesc.VS =
+			{
+				reinterpret_cast<BYTE*>(pipeline->shaders["standardVS"]->GetBufferPointer()),
+				pipeline->shaders["standardVS"]->GetBufferSize()
+			};
+			psoDesc.PS =
+			{
+				reinterpret_cast<BYTE*>(pipeline->shaders["defaultPS"]->GetBufferPointer()),
+				pipeline->shaders["defaultPS"]->GetBufferSize()
+			};
+
+			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+			psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+			psoDesc.SampleMask = UINT_MAX;
+			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			psoDesc.NumRenderTargets = 1;
+			psoDesc.RTVFormats[0] = m_BackBufferFormat;
+			psoDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
+			psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
+			psoDesc.DSVFormat = m_DepthStencilFormat;
+			pipeline->pso = nullptr;
+			HRESULT result = m_d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&(pipeline->pso)));
+			if (result != S_OK)
+				WB_RENDERER_CRITICAL("FAIED TO CREATE PIPELINE");
+			WB_RENDERER_INFO("Success!");
+			m_Pipelines[material] = pipeline;
+		}
+	}
 
 	void d3dRenderer::End() {
 		// Indicate a state transition on the resource usage.
@@ -424,7 +556,7 @@ namespace Workbench {
 		FlushCommandQueue();
 	}
 
-	ConstantResource* d3dRenderer::CreateConstantResource() 
+	ConstantResource* d3dRenderer::CreateConstantResource()
 	{
 		auto resource = new d3dConstantResource(m_d3dDevice.Get(), m_CommandList.Get(), m_Allocator.get());
 
@@ -433,8 +565,11 @@ namespace Workbench {
 
 	DynamicResource* d3dRenderer::CreateDynamicResource(bool isConstantBuffer)
 	{
-		auto resource = new d3dDynamicResource(m_d3dDevice.Get(), m_Allocator.get(), isConstantBuffer);
-
+		DynamicResource* resource;
+		if (isConstantBuffer)
+			resource = new d3dConstantBuffer(m_d3dDevice.Get(), m_Allocator.get());
+		else
+			resource = new d3dDynamicResource(m_d3dDevice.Get(), m_Allocator.get());
 		return static_cast<DynamicResource*>(resource);
 	}
 
@@ -460,7 +595,7 @@ namespace Workbench {
 	}
 	std::vector<IDXGIOutput*> d3dRenderer::GetAdapterOutputs(IDXGIAdapter* adapter) {
 		std::vector<IDXGIOutput*> output_vec;
-		
+
 		UINT i = 0;
 		IDXGIOutput* output = nullptr;
 		WB_RENDERER_LOG("Available outputs:");
@@ -478,7 +613,7 @@ namespace Workbench {
 
 			++i;
 		}
-		
+
 		return output_vec;
 	}
 }

@@ -4,35 +4,37 @@
 namespace Workbench {
 	d3dDynamicResource::d3dDynamicResource(
 		ID3D12Device* device,
-		D3D12MA::Allocator* allocator,
-		bool isConstantBuffer
+		D3D12MA::Allocator* allocator
 	) :
 		m_Device(device),
-		m_Allocator(allocator),
-		m_IsConstantBuffer(isConstantBuffer)
+		m_Allocator(allocator)
 	{};
 
 	void d3dDynamicResource::UpdateResource(const void* data, uint64_t size, uint64_t elementSize, uint64_t elementCount) {
 
-		auto trueElementSize = elementSize;
+		if (m_Size != size || m_ElementSize != elementSize || m_ElementCount != elementCount) {
 
-		if (m_IsConstantBuffer)
-			trueElementSize = CalcConstantBufferByteSize(elementSize);
+			m_Size = size;
+			m_ElementSize = elementSize;
+			m_ElementCount = elementCount;
 
-		D3D12MA::ALLOCATION_DESC uploaderDesc = {};
-		uploaderDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
+			auto trueElementSize = elementSize;
 
-		D3D12MA_CREATE_RESOURCE(
-			m_Allocator,
-			&uploaderDesc,
-			&CD3DX12_RESOURCE_DESC::Buffer(trueElementSize * elementCount),
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			m_BufferAllocation,
-			m_Buffer
-		);
+			D3D12MA::ALLOCATION_DESC uploaderDesc = {};
+			uploaderDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
 
-		m_Buffer->Map(0, nullptr, reinterpret_cast<void**>(&m_MappedData));
+			D3D12MA_CREATE_RESOURCE(
+				m_Allocator,
+				&uploaderDesc,
+				&CD3DX12_RESOURCE_DESC::Buffer(trueElementSize * elementCount),
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				m_BufferAllocation,
+				m_Buffer
+			);
+
+			m_Buffer->Map(0, nullptr, reinterpret_cast<void**>(&m_MappedData));
+		}
 
 		memcpy(&m_MappedData[0], data, size);
 	}

@@ -12,12 +12,16 @@ namespace Workbench {
 			mathfu::vec4 _scale	   = mathfu::vec4(1, 1, 1, 0)
 		) : ECSComponent(entity), position(_position), rotation(_rotation), scale(_scale) 
 		{
+			rebuildWorldMatrix();
+		};
+
+		void rebuildWorldMatrix() {
 			auto rotationMatrix = mathfu::mat3::RotationX(rotation.x) * mathfu::mat3::RotationY(rotation.y) * mathfu::mat3::RotationZ(rotation.z);
 			worldMatrix =
 				mathfu::mat4::FromTranslationVector(position.xyz()) *
 				mathfu::mat4::FromRotationMatrix(rotationMatrix) *
 				mathfu::mat4::FromScaleVector(scale.xyz());
-		};
+		}
 
 		mathfu::vec4 position;
 		mathfu::vec4 rotation;

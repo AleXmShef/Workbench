@@ -78,4 +78,8 @@ namespace Workbench {
 		if(m_Buffer != nullptr)
 			m_Buffer = nullptr;
 	}
+	pCom<ID3D12Resource> d3dConstantResource::GetResource()
+	{
+		return m_Buffer;
+	}
 }

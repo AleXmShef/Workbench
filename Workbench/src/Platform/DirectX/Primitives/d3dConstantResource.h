@@ -21,12 +21,9 @@ namespace Workbench {
 
 		void ReleaseResource() override;
 
-	protected:
-		template<typename T>
-		using pCom = Microsoft::WRL::ComPtr<T>;
-		template<typename T>
-		using paCom = shared_ptr_with_custom_deleter < T, D3D12MA::Deleter>;
+		pCom<ID3D12Resource> GetResource();
 
+	protected:
 		ID3D12Device* m_Device = nullptr;
 		ID3D12GraphicsCommandList* m_CmdList;
 		D3D12MA::Allocator* m_Allocator = nullptr;

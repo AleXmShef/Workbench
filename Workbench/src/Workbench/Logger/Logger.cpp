@@ -3,6 +3,29 @@
 
 namespace Workbench {
 
+	std::ostream& operator <<(std::ostream& os, const UUID* entity) {
+		os << entity->str();
+		return os;
+	}
+
+	std::ostream& operator <<(std::ostream& os, const DirectX::XMMATRIX& mat) {
+		os << "\n[\n";
+		for (int i = 0; i < 4; i++) {
+			os << "\t[";
+			for (int j = 0; j < 4; j++) {
+				if (j != 0)
+					os << ", ";
+				os << mat.r[j].m128_f32[i];
+			}
+			if (i != 4 - 1)
+				os << "],\n";
+			else
+				os << "]\n";
+		}
+		os << "]\n";
+		return os;
+	}
+
 	std::mutex Logger::s_write_mutex;
 
 	std::shared_ptr<Logger> Logger::s_CoreLogger;

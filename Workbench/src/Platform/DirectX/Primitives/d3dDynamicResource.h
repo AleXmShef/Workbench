@@ -10,18 +10,13 @@ namespace Workbench {
 	public:
 		d3dDynamicResource(
 			ID3D12Device* device,
-			D3D12MA::Allocator* allocator,
-			bool isConstantBuffer
+			D3D12MA::Allocator* allocator
 		);
 
-		void UpdateResource(const void* data, uint64_t size, uint64_t elementSize, uint64_t elementCount) override;
-		void ReleaseResource() override;
+		virtual void UpdateResource(const void* data, uint64_t size, uint64_t elementSize, uint64_t elementCount) override;
+		virtual void ReleaseResource() override;
 
 	protected:
-		template<typename T>
-		using pCom = Microsoft::WRL::ComPtr<T>;
-		template<typename T>
-		using paCom = shared_ptr_with_custom_deleter < T, D3D12MA::Deleter>;
 
 		ID3D12Device* m_Device = nullptr;
 		D3D12MA::Allocator* m_Allocator = nullptr;
@@ -31,7 +26,9 @@ namespace Workbench {
 
 		BYTE* m_MappedData = nullptr;
 
-		bool m_IsConstantBuffer = false;
+		uint32_t m_Size = 0;
+		uint32_t m_ElementSize = 0;
+		uint32_t m_ElementCount = 0;
 	};
 }
 

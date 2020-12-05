@@ -1,15 +1,16 @@
 #pragma once
 #include "wbpch.h"
 #include "ECS/ECSComponent.h"
+#include "Renderer/Primitives/Mesh.h"
 
 namespace Workbench {
 	struct MeshComponent : public ECSComponent {
 	public:
-		MeshComponent(const UUID* entity, std::string& mesh) : ECSComponent(entity) {};
+		MeshComponent(const UUID* entity, Mesh* mesh) : ECSComponent(entity), m_Mesh(mesh) {};
 		
-		std::string GetMeshName() { return m_MeshName; }
+		Mesh* GetMesh() { return m_Mesh; }
 	protected:
-		std::string m_MeshName;
+		Mesh* m_Mesh;
 	};
 }
 

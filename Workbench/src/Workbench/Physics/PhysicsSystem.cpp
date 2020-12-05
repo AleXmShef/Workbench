@@ -2,6 +2,7 @@
 #include "PhysicsSystem.h"
 #include "PhysicsComponent.h"
 #include "TransformComponent.h"
+#include "Renderer/Components/CameraComponent.h"
 #include "ECS/ECS.h"
 
 namespace Workbench {
@@ -11,26 +12,27 @@ namespace Workbench {
 	}
 
 	void PhysicsSystem::OnUpdate(WB_GAME_TIMER* timer) {
-		auto [it, end] = ECS::getInstance()->GetComponents<PhysicsComponent>();
+		auto [it, end] = ECS::getInstance()->GetComponents<TransformComponent>();
 		for (; it != end; ++it) {
-			auto physics = *it;
-			auto transform = ECS::getInstance()->GetEntityComponent<TransformComponent>(physics->getEntityId());
-
-			if (transform == nullptr) {
-				WB_CORE_WARN("PhysicsComponent requires TransformComponent!");
-				ECS::getInstance()->RemoveComponent(physics->getEntityId(), physics);
-				return;
-			}
-			else {
-				transform->position += physics->velocity;
-				physics->velocity += physics->acceleration + m_GravityAcc;
+			auto temp = *it;
+			auto transform = ECS::getInstance()->GetEntityComponent<TransformComponent>(temp->getEntityId());
+			auto camera = ECS::getInstance()->GetEntityComponent<CameraComponent>(temp->getEntityId());
+			
+			if (camera == nullptr) {
+				//transform->rotation = mathfu::vec4(
+				//	(float)transform->rotation.x,
+				//	(float)transform->rotation.y + 0.02,
+				//	(float)transform->rotation.z,
+				//	(float)transform->rotation.w
+				//);
+				//transform->rebuildWorldMatrix();
 			}
 		}
 	}
 
 	void PhysicsSystem::OnPhysicsComponentChanged(const Event<ECS::Events>* event) {
 		if (event->getType() == ECS::Events::EntityComponentsChangedEvent) {
-			auto _event = static_cast<const ECS::EntityComponentsChangedEvent<PhysicsComponent>*>(event);
+			auto _event = dynamic_cast<const ECS::EntityComponentsChangedEvent<PhysicsComponent>*>(event);
 			if (_event) {
 				switch (_event->getActionType()) {
 				case ECS::EntityComponentsChangedEvent<PhysicsComponent>::ActionType::ComponentCreated:
