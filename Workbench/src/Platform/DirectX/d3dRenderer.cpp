@@ -424,14 +424,14 @@ namespace Workbench {
 		D3D12_VERTEX_BUFFER_VIEW vbv;
 		vbv.BufferLocation = std::static_pointer_cast<d3dConstantResource>(mesh->GetVertexBuffer())->GetResource()->GetGPUVirtualAddress();
 		vbv.StrideInBytes = sizeof(VertexColoredBasic);
-		vbv.SizeInBytes = mesh->GetVertexArray()->size() * vbv.StrideInBytes;
+		vbv.SizeInBytes = UINT(mesh->GetVertexArray()->size() * vbv.StrideInBytes);
 
 		m_CommandList->IASetVertexBuffers(0, 1, &vbv);
 
 		D3D12_INDEX_BUFFER_VIEW ibv;
 		ibv.BufferLocation = std::static_pointer_cast<d3dConstantResource>(mesh->GetIndexBuffer())->GetResource()->GetGPUVirtualAddress();
 		ibv.Format = DXGI_FORMAT_R16_UINT;
-		ibv.SizeInBytes = mesh->GetIndexArray()->size() * sizeof(uint16_t);
+		ibv.SizeInBytes = UINT(mesh->GetIndexArray()->size() * sizeof(uint16_t));
 
 		m_CommandList->IASetIndexBuffer(&ibv);
 

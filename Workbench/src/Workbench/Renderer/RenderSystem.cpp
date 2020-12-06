@@ -64,6 +64,8 @@ namespace Workbench {
 			mathfu::mat4 worldViewProj = (camera->projMatrix * camera->viewMatrix * entity_pos->worldMatrix).Transpose();
 
 			worldViewProj.Pack(constants[i].WorldViewProj);
+
+			++i;
 		}
 		
 		m_MeshResources[0]->GetConstantBuffer()->UpdateResource(

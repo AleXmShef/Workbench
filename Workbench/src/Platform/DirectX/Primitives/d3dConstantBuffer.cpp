@@ -32,7 +32,7 @@ namespace Workbench {
 
 	void d3dConstantBuffer::buildHeap() {
 		D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
-		heapDesc.NumDescriptors = m_ElementCount;
+		heapDesc.NumDescriptors = (UINT)m_ElementCount;
 		heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		heapDesc.NodeMask = 0;
@@ -44,19 +44,22 @@ namespace Workbench {
 
 	void d3dConstantBuffer::buildDescriptors() {
 		//auto trueElementSize = CalcConstantBufferByteSize(m_ElementSize);
-		for (int i = 0; i < m_ElementCount; ++i) {
+		for (uint32_t i = 0; i < m_ElementCount; ++i) {
 			//WB_RENDERER_LOG("Creating constant buffer view {}", i);
 			D3D12_GPU_VIRTUAL_ADDRESS cbAddress = m_Buffer->GetGPUVirtualAddress();
 
-			cbAddress += (int)m_ElementSize * i;
+			cbAddress += m_ElementSize * i;
+			auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(m_Heap->GetCPUDescriptorHandleForHeapStart());
+			handle.Offset(i, m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+
 
 			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 			cbvDesc.BufferLocation = cbAddress;
-			cbvDesc.SizeInBytes = m_ElementSize;
+			cbvDesc.SizeInBytes = (UINT)m_ElementSize;
 
 			m_Device->CreateConstantBufferView(
 				&cbvDesc,
-				m_Heap->GetCPUDescriptorHandleForHeapStart()
+				handle
 			);
 		}
 	}

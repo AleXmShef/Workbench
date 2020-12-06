@@ -18,9 +18,9 @@ namespace Workbench {
 		void rebuildWorldMatrix() {
 			auto rotationMatrix = mathfu::mat3::RotationX(rotation.x) * mathfu::mat3::RotationY(rotation.y) * mathfu::mat3::RotationZ(rotation.z);
 			worldMatrix =
-				mathfu::mat4::FromScaleVector(scale.xyz()) *
+				mathfu::mat4::FromTranslationVector(position.xyz()) *
 				mathfu::mat4::FromRotationMatrix(rotationMatrix) *
-				mathfu::mat4::FromTranslationVector(position.xyz());
+				mathfu::mat4::FromScaleVector(scale.xyz());
 				
 		}
 

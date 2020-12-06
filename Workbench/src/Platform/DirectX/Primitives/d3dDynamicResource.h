@@ -26,9 +26,9 @@ namespace Workbench {
 
 		void* m_MappedData = nullptr;
 
-		uint32_t m_Size = 0;
-		uint32_t m_ElementSize = 0;
-		uint32_t m_ElementCount = 0;
+		uint64_t m_Size = 0;
+		uint64_t m_ElementSize = 0;
+		uint64_t m_ElementCount = 0;
 	};
 }
 

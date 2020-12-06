@@ -16,7 +16,7 @@
 using namespace Workbench;
 
 float deg2rad(float deg) {
-	return deg * (M_PI / 180);
+	return (float)(deg * (M_PI / 180));
 }
 
 class OrbitCamera {
@@ -70,8 +70,8 @@ protected:
 			}
 
 			//else {
-				last_x = x;
-				last_y = y;
+				last_x = (float)x;
+				last_y = (float)y;
 			//}
 		}
 
@@ -101,8 +101,8 @@ protected:
 	float last_x = 0;
 	float last_y = 0;
 
-	float mPhi = 0.25f * M_PI;
-	float mTheta = 0.25f * M_PI;
+	float mPhi = (float)(0.25f * M_PI);
+	float mTheta = (float)(0.25f * M_PI);
 	float r = 4;
 
 	Engine* m_Engine;

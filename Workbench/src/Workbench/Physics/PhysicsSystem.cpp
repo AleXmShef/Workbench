@@ -20,10 +20,10 @@ namespace Workbench {
 
 			if (camera == nullptr) {
 				transform->rotation = mathfu::vec4(
-					(float)transform->rotation.x,
-					(float)transform->rotation.y + 1 * timer->GetTickTime(),
-					(float)transform->rotation.z,
-					(float)transform->rotation.w
+					transform->rotation.x,
+					transform->rotation.y + 1 * timer->GetTickTime(),
+					transform->rotation.z,
+					transform->rotation.w
 				);
 				transform->rebuildWorldMatrix();
 			}

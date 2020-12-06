@@ -1,5 +1,6 @@
 #include "wbpch.h"
 #include "d3dDynamicResource.h"
+#include "Renderer/Primitives/Mesh.h"
 
 namespace Workbench {
 	d3dDynamicResource::d3dDynamicResource(
@@ -39,7 +40,7 @@ namespace Workbench {
 		auto nonPaddedElementSize = m_Size / m_ElementCount;
 
 		for (int i = 0; i < m_ElementCount; i++) {
-			memcpy((char*)m_MappedData + i*m_ElementSize, (const char*)data + i*nonPaddedElementSize, nonPaddedElementSize);
+			memcpy((char*)m_MappedData + (size_t)i*m_ElementSize, (const char*)data + (size_t)i*nonPaddedElementSize, nonPaddedElementSize);
 		}
 	}
 
