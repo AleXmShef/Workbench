@@ -17,7 +17,7 @@ namespace Workbench {
 	};
 
 	template<class Subscriber, class EventType>
-	class WORKBENCH_API MemberCallbackHandler : public AbstractCallbackHandler {
+	class MemberCallbackHandler : public AbstractCallbackHandler {
 	public:
 		typedef void (Subscriber::* Callback)(const Event<EventType>*);
 
@@ -45,7 +45,7 @@ namespace Workbench {
 	};
 
 	template<class EventType>
-	class WORKBENCH_API LambdaCallbackHandler : public AbstractCallbackHandler {
+	class LambdaCallbackHandler : public AbstractCallbackHandler {
 	public:
 		//typedef Callback = std::function<void (const Event<EventType>*) >;
 

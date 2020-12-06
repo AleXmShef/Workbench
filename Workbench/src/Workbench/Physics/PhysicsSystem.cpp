@@ -17,15 +17,15 @@ namespace Workbench {
 			auto temp = *it;
 			auto transform = ECS::getInstance()->GetEntityComponent<TransformComponent>(temp->getEntityId());
 			auto camera = ECS::getInstance()->GetEntityComponent<CameraComponent>(temp->getEntityId());
-			
+
 			if (camera == nullptr) {
-				//transform->rotation = mathfu::vec4(
-				//	(float)transform->rotation.x,
-				//	(float)transform->rotation.y + 0.02,
-				//	(float)transform->rotation.z,
-				//	(float)transform->rotation.w
-				//);
-				//transform->rebuildWorldMatrix();
+				transform->rotation = mathfu::vec4(
+					(float)transform->rotation.x,
+					(float)transform->rotation.y + 1 * timer->GetTickTime(),
+					(float)transform->rotation.z,
+					(float)transform->rotation.w
+				);
+				transform->rebuildWorldMatrix();
 			}
 		}
 	}

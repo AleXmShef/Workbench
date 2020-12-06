@@ -8,22 +8,19 @@ namespace Workbench {
 		CameraComponent
 		(
 			const UUID* entity,
-			std::pair<float, float> _fov, 
+			float _fov, 
+			float _aspect,
 			std::pair<float, float> _planes
-		) : ECSComponent(entity), fov(_fov), planes(_planes) 
+		) : ECSComponent(entity), yFov(_fov), aspect(_aspect), planes(_planes) 
 		{
-			DirectX::XMMATRIX _projMatrix = DirectX::XMMatrixPerspectiveFovLH(fov.first, fov.second / fov.first, planes.first, planes.second);
-			WB_CORE_INFO("DirectX projection matrix: {}", _projMatrix);
-			DirectX::XMFLOAT4X4 __projMatrix;
-			DirectX::XMStoreFloat4x4(&__projMatrix, _projMatrix);
-			projMatrix = mathfu::mat4::Perspective(fov.first, fov.second / fov.first, planes.first, planes.second, -1.0f);
-			WB_CORE_INFO("Mathfu projection matrix: {}", projMatrix);
+			projMatrix = mathfu::mat4::Perspective(yFov, aspect, planes.first, planes.second, -1.0f);
 		};
 
 		mathfu::mat4 viewMatrix;
 		mathfu::mat4 projMatrix;
 
-		std::pair<float, float> fov;
+		float yFov;
+		float aspect;
 		std::pair<float, float> planes;
 	};
 }

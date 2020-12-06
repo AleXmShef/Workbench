@@ -32,11 +32,15 @@ namespace Workbench {
 				m_BufferAllocation,
 				m_Buffer
 			);
-
-			m_Buffer->Map(0, nullptr, reinterpret_cast<void**>(&m_MappedData));
+			m_MappedData = nullptr;
+			m_Buffer->Map(0, NULL, &m_MappedData);
 		}
 
-		memcpy(&m_MappedData[0], data, size);
+		auto nonPaddedElementSize = m_Size / m_ElementCount;
+
+		for (int i = 0; i < m_ElementCount; i++) {
+			memcpy((char*)m_MappedData + i*m_ElementSize, (const char*)data + i*nonPaddedElementSize, nonPaddedElementSize);
+		}
 	}
 
 	void d3dDynamicResource::ReleaseResource() {

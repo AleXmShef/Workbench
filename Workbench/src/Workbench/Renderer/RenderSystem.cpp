@@ -43,27 +43,13 @@ namespace Workbench {
 		auto camera = ECS::getInstance()->GetEntityComponent<CameraComponent>(m_ActiveCamera);
 		auto camera_pos = ECS::getInstance()->GetEntityComponent<TransformComponent>(m_ActiveCamera);
 		
-		camera->viewMatrix = mathfu::Matrix<float, 4, 4>::LookAt(
+		camera->viewMatrix = mathfu::mat4::LookAt(
 			mathfu::vec3(0.0f, 0.0f, 0.0f),
 			camera_pos->position.xyz(),
 			mathfu::vec3(0, 1, 0),
-			WB_HANDEDNESS == "right" ? 1.0f : -1.0f
+			-1.0f
 		);
 
-		WB_RENDERER_INFO("Camera position: {}", camera_pos->position);
-
-		DirectX::XMVECTOR pos = DirectX::XMVectorSet(camera_pos->position.x, camera_pos->position.y, camera_pos->position.z, 0.0f);
-		DirectX::XMVECTOR target = DirectX::XMVectorZero();
-		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-		DirectX::XMMATRIX _viewMatrix = DirectX::XMMatrixLookAtLH(pos, target, up);
-
-		WB_RENDERER_INFO("DirectX view matrix: {}", _viewMatrix);
-
-		WB_RENDERER_INFO("Mathfu view matrix: {}", camera->viewMatrix);
-		
-		
-		
 		auto submeshes = m_MeshResources[0]->GetSubmeshes();
 		
 		ObjectConstants* constants = new ObjectConstants[submeshes->size()];
@@ -75,21 +61,9 @@ namespace Workbench {
 			Workbench::MeshResource::SubMesh& submesh = something.second;
 			auto entity_pos = ECS::getInstance()->GetEntityComponent<TransformComponent>(entity);
 
-			//WB_RENDERER_LOG("Object world matrix: {}", entity_pos->worldMatrix);
-		
-			mathfu::mat4 worldViewProj = entity_pos->worldMatrix * camera->viewMatrix * camera->projMatrix;
+			mathfu::mat4 worldViewProj = (camera->projMatrix * camera->viewMatrix * entity_pos->worldMatrix).Transpose();
 
-			auto verticies = m_MeshResources[0]->GetVertexArray();
-			mathfu::vec3 __vec((*verticies)[0].Pos);
-			auto aftPos = mathfu::vec4(__vec, 1.0f) * worldViewProj;
-
-			WB_CORE_INFO("Vertex position: {}", aftPos);
-		
-			ObjectConstants _constants;
-			
-			worldViewProj.Transpose().Pack(_constants.WorldViewProj);
-		
-			constants[i] = _constants;
+			worldViewProj.Pack(constants[i].WorldViewProj);
 		}
 		
 		m_MeshResources[0]->GetConstantBuffer()->UpdateResource(

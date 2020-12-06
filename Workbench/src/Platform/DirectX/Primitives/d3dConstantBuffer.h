@@ -13,6 +13,7 @@ namespace Workbench {
 		);
 
 		virtual void UpdateResource(const void* data, uint64_t size, uint64_t elementSize, uint64_t elementCount) override;
+		virtual void ReleaseResource() override;
 		ID3D12DescriptorHeap* GetHeap();
 
 	protected:

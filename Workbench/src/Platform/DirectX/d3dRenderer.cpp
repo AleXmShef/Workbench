@@ -431,7 +431,7 @@ namespace Workbench {
 		D3D12_INDEX_BUFFER_VIEW ibv;
 		ibv.BufferLocation = std::static_pointer_cast<d3dConstantResource>(mesh->GetIndexBuffer())->GetResource()->GetGPUVirtualAddress();
 		ibv.Format = DXGI_FORMAT_R16_UINT;
-		ibv.SizeInBytes = mesh->GetIndexArray()->size() * sizeof(uint32_t);
+		ibv.SizeInBytes = mesh->GetIndexArray()->size() * sizeof(uint16_t);
 
 		m_CommandList->IASetIndexBuffer(&ibv);
 
@@ -444,7 +444,7 @@ namespace Workbench {
 			const auto& [uuid, submesh] = (*it);
 
 			auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBuffer->GetHeap()->GetGPUDescriptorHandleForHeapStart());
-			//cbvHandle.Offset(i, m_CbvSrvUavDescriptorSize);
+			cbvHandle.Offset(i, m_CbvSrvUavDescriptorSize);
 
 			m_CommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
 

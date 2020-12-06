@@ -10,6 +10,7 @@ namespace Workbench {
 	class WORKBENCH_API Window : public Layer {
 	public:
 
+		//Events
 		EMITS_EVENTS {
 			WindowCreatedEvent = 0,
 			WindowBeganResizeEvent,
@@ -68,7 +69,7 @@ namespace Workbench {
 		SET_EVENT_TYPE(WindowMouseMovedEvent)
 		public:
 			WindowMouseMovedEvent(uint32_t _xPos, uint32_t _yPos) : xPos(_xPos), yPos(_yPos) {};
-			std::pair<uint32_t, uint32_t> getCoords() { return { xPos, yPos }; };
+			std::pair<uint32_t, uint32_t> getCoords() const { return { xPos, yPos }; };
 		protected:
 			uint32_t xPos, yPos;
 		};
@@ -77,7 +78,7 @@ namespace Workbench {
 		SET_EVENT_TYPE(WindowMouseButtonPressedEvent)
 		public:
 			WindowMouseButtonPressedEvent(WB_KEYCODES mouse_button) : m_mouse_button(mouse_button) {};
-			WB_KEYCODES getButton() { return m_mouse_button; };
+			WB_KEYCODES getButton() const { return m_mouse_button; };
 		protected:
 			WB_KEYCODES m_mouse_button;
 		};
@@ -86,7 +87,7 @@ namespace Workbench {
 			SET_EVENT_TYPE(WindowMouseButtonReleasedEvent)
 		public:
 			WindowMouseButtonReleasedEvent(WB_KEYCODES mouse_button) : m_mouse_button(mouse_button) {};
-			WB_KEYCODES getButton() { return m_mouse_button; };
+			WB_KEYCODES getButton() const { return m_mouse_button; };
 		protected:
 			WB_KEYCODES m_mouse_button;
 		};
@@ -95,7 +96,7 @@ namespace Workbench {
 			SET_EVENT_TYPE(WindowButtonPressedEvent)
 		public:
 			WindowButtonPressedEvent(WB_KEYCODES button) : m_button(button) {};
-			inline WB_KEYCODES getButton() { return m_button; };
+			inline WB_KEYCODES getButton() const { return m_button; };
 		protected:
 			WB_KEYCODES m_button;
 		};
@@ -113,10 +114,11 @@ namespace Workbench {
 			SET_EVENT_TYPE(WindowMouseWheelRotatedEvent)
 		public:
 			WindowMouseWheelRotatedEvent(float delta) : m_delta(delta) {};
-			inline float getDelta() { return m_delta; };
+			inline float getDelta() const { return m_delta; };
 		protected:
 			float m_delta;
 		};
+
 
 		struct WindowProps {
 			std::string windowTitle = "Workbench Sandbox";
@@ -125,7 +127,9 @@ namespace Workbench {
 			bool isFullScreen = false;
 			bool isVsync = false;
 		};
+
 	public:
+
 		virtual ~Window() {
 			
 		};
@@ -149,5 +153,5 @@ namespace Workbench {
 
 #if defined(WB_PLATFORM_WINDOWS) and defined(WB_BUILD_DLL)
 #include "Platform/Windows/WindowsWindow.h"
-#define WB_CREATE_NATIVE_WINDOW(x) new WindowsWindow(x)
+#define WB_CREATE_NATIVE_WINDOW(props) new WindowsWindow(props)
 #endif

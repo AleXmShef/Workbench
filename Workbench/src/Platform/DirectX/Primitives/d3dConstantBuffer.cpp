@@ -1,5 +1,6 @@
 #include "wbpch.h"
 #include "d3dConstantBuffer.h"
+#include "Logger/Logger.h"
 
 namespace Workbench {
 	d3dConstantBuffer::d3dConstantBuffer(
@@ -12,14 +13,21 @@ namespace Workbench {
 
 	void d3dConstantBuffer::UpdateResource(const void* data, uint64_t size, uint64_t elementSize, uint64_t elementCount) {
 		auto trueElementSize = CalcConstantBufferByteSize(elementSize);
-		bool isDirty = (m_Size != size || m_ElementSize != elementSize || m_ElementCount != elementCount);
+		bool isDirty = (m_Size != size || m_ElementSize != trueElementSize || m_ElementCount != elementCount);
 
 		d3dDynamicResource::UpdateResource(data, size, trueElementSize, elementCount);
 
 		if (isDirty) {
+			WB_RENDERER_INFO("HEAP IS DIRTY");
 			buildHeap();
 			buildDescriptors();
 		}
+	}
+
+	void d3dConstantBuffer::ReleaseResource() {
+		d3dDynamicResource::ReleaseResource();
+		WB_RENDERER_INFO("Releasing heap");
+		m_Heap.Reset();
 	}
 
 	void d3dConstantBuffer::buildHeap() {
@@ -35,15 +43,16 @@ namespace Workbench {
 	}
 
 	void d3dConstantBuffer::buildDescriptors() {
-		auto trueElementSize = CalcConstantBufferByteSize(m_ElementSize);
+		//auto trueElementSize = CalcConstantBufferByteSize(m_ElementSize);
 		for (int i = 0; i < m_ElementCount; ++i) {
+			//WB_RENDERER_LOG("Creating constant buffer view {}", i);
 			D3D12_GPU_VIRTUAL_ADDRESS cbAddress = m_Buffer->GetGPUVirtualAddress();
 
-			cbAddress += trueElementSize * i;
+			cbAddress += (int)m_ElementSize * i;
 
 			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 			cbvDesc.BufferLocation = cbAddress;
-			cbvDesc.SizeInBytes = trueElementSize;
+			cbvDesc.SizeInBytes = m_ElementSize;
 
 			m_Device->CreateConstantBufferView(
 				&cbvDesc,

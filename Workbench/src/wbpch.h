@@ -7,6 +7,7 @@
 #endif
 
 #include <iostream>
+#include <iomanip>
 #include <memory>
 #include <algorithm>
 #include <utility>
@@ -15,6 +16,7 @@
 #include <mutex>
 #include <random>
 #include <chrono>
+#include <math.h>
 
 #include <string>
 #include <regex>

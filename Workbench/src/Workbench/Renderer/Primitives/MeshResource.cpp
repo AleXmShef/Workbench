@@ -17,6 +17,7 @@ namespace Workbench {
 	void MeshResource::ReleaseResource() {
 		m_VertexBuffer->ReleaseResource();
 		m_IndexBuffer->ReleaseResource();
+		m_ObjectConstants->ReleaseResource();
 	}
 
 	void MeshResource::AddMesh(const UUID* entityId, const Mesh* mesh) {
@@ -43,7 +44,7 @@ namespace Workbench {
 		);
 
 		m_IndexBuffer->UpdateResource(
-			m_IndexArray.data(), sizeof(uint32_t) * m_IndexArray.size()
+			m_IndexArray.data(), sizeof(uint16_t) * m_IndexArray.size()
 		);
 		isDirty = true;
 	}

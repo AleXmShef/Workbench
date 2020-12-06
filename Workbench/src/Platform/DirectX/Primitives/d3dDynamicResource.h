@@ -24,7 +24,7 @@ namespace Workbench {
 		pCom<ID3D12Resource> m_Buffer = nullptr;
 		paCom<D3D12MA::Allocation> m_BufferAllocation;
 
-		BYTE* m_MappedData = nullptr;
+		void* m_MappedData = nullptr;
 
 		uint32_t m_Size = 0;
 		uint32_t m_ElementSize = 0;

@@ -14,12 +14,9 @@ namespace Workbench {
 
 	void d3dConstantResource::UpdateResource(const void* data, uint64_t size) {
 
-		D3DCreateBlob(size, m_Data.GetAddressOf());
-		CopyMemory(m_Data->GetBufferPointer(), data, size);
-
 		m_SubResourceData = {};
-		m_SubResourceData.pData = m_Data->GetBufferPointer();
-		m_SubResourceData.RowPitch = m_Data->GetBufferSize();
+		m_SubResourceData.pData = data;
+		m_SubResourceData.RowPitch = size;
 		m_SubResourceData.SlicePitch = m_SubResourceData.RowPitch;
 	}
 
@@ -63,8 +60,6 @@ namespace Workbench {
 	}
 
 	void d3dConstantResource::ReleaseResource() {
-
-		m_Data = nullptr;
 		
 		if (m_UploaderAllocation != nullptr) {
 			m_UploaderAllocation.reset();

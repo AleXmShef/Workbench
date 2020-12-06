@@ -34,8 +34,6 @@ namespace Workbench {
 		paCom<D3D12MA::Allocation> m_UploaderAllocation;
 
 		D3D12_SUBRESOURCE_DATA m_SubResourceData = {};
-
-		pCom<ID3DBlob> m_Data = nullptr;
 	};
 }
 

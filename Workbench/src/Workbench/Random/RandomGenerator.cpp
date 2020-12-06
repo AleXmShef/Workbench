@@ -33,4 +33,10 @@ namespace Workbench {
 		};
 		return ss.str();
 	}
+
+	int RandomGenerator::random_in_range(int from, int to) {
+		std::uniform_int_distribution<> unorm_dist(from, to);
+
+		return unorm_dist(s_uuid_gen);
+	}
 }

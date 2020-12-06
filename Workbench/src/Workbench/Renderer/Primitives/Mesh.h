@@ -17,7 +17,7 @@ namespace Workbench {
 		Mesh() {};
 		Mesh(
 			std::vector<VertexColoredBasic> verts, 
-			std::vector<uint16_t> inds, 
+			std::vector<uint32_t> inds, 
 			std::string name = "<undefined>"
 		) : Name(name), 
 			Verticies(verts), 
@@ -27,7 +27,7 @@ namespace Workbench {
 		std::string Name = "<undefined>";
 
 		std::vector<VertexColoredBasic> Verticies;
-		std::vector<uint16_t> Indicies;
+		std::vector<uint32_t> Indicies;
 	};
 }
 

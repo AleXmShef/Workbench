@@ -15,7 +15,7 @@ namespace Workbench {
 			for (int j = 0; j < 4; j++) {
 				if (j != 0)
 					os << ", ";
-				os << mat.r[j].m128_f32[i];
+				os << std::fixed << std::setprecision(2) << mat.r[j].m128_f32[i];
 			}
 			if (i != 4 - 1)
 				os << "],\n";

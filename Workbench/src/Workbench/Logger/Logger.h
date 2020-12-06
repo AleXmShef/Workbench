@@ -18,7 +18,7 @@ namespace Workbench {
 			for (int j = 0; j < Y; j++) {
 				if (j != 0)
 					os << ", ";
-				os << mat.GetColumn(j)[i];
+				os << std::fixed << std::setprecision(2) << mat.GetColumn(j)[i];
 			}
 			if (i != X - 1)
 				os << "],\n";

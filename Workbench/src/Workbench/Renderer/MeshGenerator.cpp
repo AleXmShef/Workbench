@@ -108,7 +108,7 @@ namespace Workbench {
 		mesh->Verticies.push_back(vert3);
 
 		mesh->Indicies = {
-			0, 1, 2
+			0, 2, 1
 		};
 
 		mesh->Name = "Triangle";
