@@ -19,4 +19,8 @@ namespace Workbench {
 	const UUID* ECSComponent::getUuid() const { 
 		return &m_uuid; 
 	}
+	uint32_t ECSComponent::getNumComponents()
+	{
+		return s_numComponents;
+	}
 }

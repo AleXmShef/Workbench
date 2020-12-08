@@ -166,9 +166,9 @@ namespace Workbench {
 			break;
 		}
 		case WM_KEYDOWN: {
-			if (!CHECK_BIT(lParam, 30)) {
+			//if (!CHECK_BIT(lParam, 30)) {
 				POST_EVENT(new WindowButtonPressedEvent(WinToWbKeycode(wParam)));
-			}
+			//}
 			return 0;
 			break;
 		}

@@ -20,7 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ExampleLayer.h">
+    <ClInclude Include="src\RotatingCubesDemo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OrbitCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParabolicTrajectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

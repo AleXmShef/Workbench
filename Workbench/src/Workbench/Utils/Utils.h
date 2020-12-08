@@ -12,3 +12,7 @@ struct shared_ptr_with_custom_deleter : public std::shared_ptr<T> {
 			std::shared_ptr<T>::reset(t, D());
 	}
 };
+
+inline float deg2rad(float deg) {
+	return (float)(deg * (M_PI / 180));
+}

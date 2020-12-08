@@ -50,18 +50,22 @@ namespace Workbench {
 		WB_VK_Y,
 		WB_VK_Z,
 
+		//Special keys
 		WB_VK_RETURN,
 		WB_VK_BACKSPACE,
 		WB_VK_TAB,
 		WB_VK_CAPS,
 		WB_VK_ESCAPE,
 		WB_VK_SPACE,
+		WB_VK_SUPER,
 
+		//Arrows
 		WB_VK_UP,
 		WB_VK_DOWN,
 		WB_VK_LEFT,
 		WB_VK_RIGHT,
 
+		//Action keys
 		WB_VK_LSHIFT,
 		WB_VK_RSHIFT,
 		WB_VK_LCTRL,
@@ -69,8 +73,7 @@ namespace Workbench {
 		WB_VK_LALT,
 		WB_VK_RALT,
 
-		WB_VK_SUPER,
-
+		//Functional keys
 		WB_VK_F1 = 112,
 		WB_VK_F2,
 		WB_VK_F3,
@@ -83,6 +86,5 @@ namespace Workbench {
 		WB_VK_F10,
 		WB_VK_F11,
 		WB_VK_F12
-
 	};
 }

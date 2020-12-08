@@ -2,60 +2,21 @@
 #include "Renderer/MeshGenerator.h"
 
 namespace Workbench {
-	Mesh* MeshGenerator::CreateBox(float height) {
+	Mesh* MeshGenerator::CreateBox(float height, mathfu::vec4 color) {
 		auto mesh = new Mesh();
 
-		VertexColoredBasic vert1;
-		vert1.Pos = {-0.5f*height, -0.5f*height, -0.5f*height};
-		vert1.Color = {1.0f, 0.0f, 0.0f, 1.0f};
+		mesh->Color = color;
 
-		VertexColoredBasic vert2;
-		vert2.Pos = { -0.5f * height, 0.5f * height, -0.5f * height };
-		vert2.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-		VertexColoredBasic vert3;
-		vert3.Pos = { 0.5f * height, 0.5f * height, -0.5f * height };
-		vert3.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-		VertexColoredBasic vert4;
-		vert4.Pos = { 0.5f * height, -0.5f * height, -0.5f * height };
-		vert4.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-		VertexColoredBasic vert5;
-		vert5.Pos = { -0.5f * height, -0.5f * height, 0.5f * height };
-		vert5.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-		VertexColoredBasic vert6;
-		vert6.Pos = { -0.5f * height, 0.5f * height, 0.5f * height };
-		vert6.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-		VertexColoredBasic vert7;
-		vert7.Pos = { 0.5f * height, 0.5f * height, 0.5f * height };
-		vert7.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		
-		VertexColoredBasic vert8;
-		vert8.Pos = { 0.5f * height, -0.5f * height, 0.5f * height };
-		vert8.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-
-		mesh->Verticies.push_back(vert1);
-		mesh->Verticies.push_back(vert2);
-		mesh->Verticies.push_back(vert3);
-		mesh->Verticies.push_back(vert4);
-		mesh->Verticies.push_back(vert5);
-		mesh->Verticies.push_back(vert6);
-		mesh->Verticies.push_back(vert7);
-		mesh->Verticies.push_back(vert8);
-		
-
-		//mesh->Verticies.push_back({mathfu::vec3_packed({-0.5f*height, -0.5f*height, -0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({-0.5f*height, +0.5f*height, -0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({+0.5f*height, +0.5f*height, -0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({+0.5f*height, -0.5f*height, -0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({-0.5f*height, -0.5f*height, +0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({-0.5f*height, +0.5f*height, +0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({+0.5f*height, +0.5f*height, +0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
-		//VertexColoredBasic({mathfu::vec3_packed({+0.5f*height, -0.5f*height, +0.5*height}), mathfu::vec4_packed({1.0f,1.0f,1.0f,1.0f})});
+		mesh->Verticies = {
+			VertexColoredBasic({(float)-0.5f * height, (float)-0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)-0.5f * height, (float)0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)0.5f * height, (float)0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)0.5f * height, (float)-0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)-0.5f * height, (float)-0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)-0.5f * height, (float)0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)0.5f * height, (float)0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)0.5f * height, (float)-0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f})
+		};
 
 		mesh->Indicies = {
 			// front face

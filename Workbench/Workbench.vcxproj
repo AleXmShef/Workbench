@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\ECS\ECSComponentContainer.cpp" />
     <ClCompile Include="src\Platform\DirectX\d3dRenderer.cpp" />
     <ClCompile Include="src\Platform\DirectX\Primitives\d3dConstantBuffer.cpp" />
     <ClCompile Include="src\Platform\DirectX\Primitives\d3dDynamicResource.cpp" />
@@ -48,6 +49,7 @@
     <ClCompile Include="src\Workbench\Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\ECS\ECSComponentContainer.h" />
     <ClInclude Include="src\Platform\DirectX\Primitives\d3dConstantBuffer.h" />
     <ClInclude Include="src\Platform\DirectX\Primitives\d3dDynamicResource.h" />
     <ClInclude Include="src\Platform\DirectX\Primitives\d3dPipeline.h" />
@@ -58,7 +60,7 @@
     <ClInclude Include="src\Workbench\Renderer\Primitives\Materials.h" />
     <ClInclude Include="src\Workbench\Renderer\Primitives\MeshResource.h" />
     <ClInclude Include="src\Platform\DirectX\D3D12MemoryAllocator\D3D12MemAlloc.h" />
-    <ClInclude Include="src\Workbench\Physics\TransformComponent.h" />
+    <ClInclude Include="src\Workbench\Physics\Components\TransformComponent.h" />
     <ClInclude Include="src\Workbench\Renderer\Components\CameraComponent.h" />
     <ClInclude Include="src\Workbench\Renderer\Primitives\Mesh.h" />
     <ClInclude Include="src\Workbench\Renderer\Components\MeshComponent.h" />
@@ -66,7 +68,7 @@
     <ClInclude Include="src\Workbench\Events\CallbackHandler.h" />
     <ClInclude Include="src\Workbench\Renderer\RenderSystem.h" />
     <ClInclude Include="src\Workbench\Physics\PhysicsSystem.h" />
-    <ClInclude Include="src\Workbench\Physics\PhysicsComponent.h" />
+    <ClInclude Include="src\Workbench\Physics\Components\RigidBodyComponent.h" />
     <ClInclude Include="src\Workbench\Renderer\MeshGenerator.h" />
     <ClInclude Include="src\Workbench\Utils\Utils.h" />
     <ClInclude Include="src\Workbench\Utils\ServiceLocator.h" />

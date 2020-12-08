@@ -8,7 +8,7 @@ namespace Workbench {
 		D3D12MA::Allocator* allocator
 	) : d3dDynamicResource(device, allocator)
 	{
-
+		
 	};
 
 	void d3dConstantBuffer::UpdateResource(const void* data, uint64_t size, uint64_t elementSize, uint64_t elementCount) {

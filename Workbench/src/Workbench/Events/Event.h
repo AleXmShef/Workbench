@@ -18,11 +18,11 @@ namespace Workbench {
 	
 }
 
-#define BIND_EVENT(instance, method) MainEventBus::getInstance()->subscribe(instance, &method)
+#define BIND_EVENT(instance, method) MainEventBus::GetInstance()->subscribe(instance, &method)
 
-#define BIND_EVENT_TO_LAMBDA(event_type, lamda) MainEventBus::getInstance()->subscribe<event_type>([](const Event<ECS::Events>* event) -> void lamda)
+#define BIND_EVENT_TO_LAMBDA(event_type, lamda) MainEventBus::GetInstance()->subscribe<event_type>([](const Event<ECS::Events>* event) -> void lamda)
 
-#define UNBIND_EVENT(instance, method) MainEventBus::getInstance()->unsubscribe(instance, &method)
+#define UNBIND_EVENT(instance, method) MainEventBus::GetInstance()->unsubscribe(instance, &method)
 
 #define EMITS_EVENTS enum class Events
 
@@ -36,10 +36,10 @@ virtual Events getType() const override {return Events::x;};
 
 #define GET_EVENT_TYPE(x) x->getType()
 
-#define POST_EVENT(event) MainEventBus::getInstance()->postEvent(static_cast<const Event<Events>*>(event)); 
+#define POST_EVENT(event) MainEventBus::GetInstance()->postEvent(static_cast<const Event<Events>*>(event)); 
 
-#define SEND_EVENT(event) MainEventBus::getInstance()->sendEvent(static_cast<const Event<Events>*>(event));
+#define SEND_EVENT(event) MainEventBus::GetInstance()->sendEvent(static_cast<const Event<Events>*>(event));
 
-#define FLUSH_EVENTS() MainEventBus::getInstance()->flush();
+#define FLUSH_EVENTS() MainEventBus::GetInstance()->flush();
 					
 

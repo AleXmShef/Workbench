@@ -9,6 +9,8 @@ namespace Workbench {
 		virtual ~ECSComponent();
 		const UUID* getEntityId() const;
 		const UUID* getUuid() const;
+
+		static uint32_t getNumComponents();
 	protected:
 		UUID m_uuid;
 		const UUID* m_Entity;

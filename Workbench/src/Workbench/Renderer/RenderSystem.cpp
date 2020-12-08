@@ -2,7 +2,7 @@
 #include "RenderSystem.h"
 #include "Components/MeshComponent.h"
 #include "Components/CameraComponent.h"
-#include "Physics/TransformComponent.h"
+#include "Physics/Components/TransformComponent.h"
 #include "DirectXMath.h"
 
 namespace Workbench {
@@ -31,17 +31,17 @@ namespace Workbench {
 	void RenderSystem::OnUpdate(WB_GAME_TIMER* timer) {
 		m_Renderer->Begin();
 		if (m_ActiveCamera != nullptr) {
-			UpdateObjects();
 			if (m_MeshResources[0]->IsDirty())
 				m_MeshResources[0]->UploadResource();
+			UpdateObjects();
 			m_Renderer->DrawMeshes(m_MeshResources[0]);
 		}
 		m_Renderer->End();
 	}
 
 	void RenderSystem::UpdateObjects() {
-		auto camera = ECS::getInstance()->GetEntityComponent<CameraComponent>(m_ActiveCamera);
-		auto camera_pos = ECS::getInstance()->GetEntityComponent<TransformComponent>(m_ActiveCamera);
+		auto camera = ECS::GetInstance()->GetEntityComponent<CameraComponent>(m_ActiveCamera);
+		auto camera_pos = ECS::GetInstance()->GetEntityComponent<TransformComponent>(m_ActiveCamera);
 		
 		camera->viewMatrix = mathfu::mat4::LookAt(
 			mathfu::vec3(0.0f, 0.0f, 0.0f),
@@ -59,11 +59,14 @@ namespace Workbench {
 			auto something = *it;
 			const UUID* entity = something.first;
 			Workbench::MeshResource::SubMesh& submesh = something.second;
-			auto entity_pos = ECS::getInstance()->GetEntityComponent<TransformComponent>(entity);
+			auto entity_pos = ECS::GetInstance()->GetEntityComponent<TransformComponent>(entity);
 
 			mathfu::mat4 worldViewProj = (camera->projMatrix * camera->viewMatrix * entity_pos->worldMatrix).Transpose();
 
 			worldViewProj.Pack(constants[i].WorldViewProj);
+
+			auto mesh_comp = ECS::GetInstance()->GetEntityComponent<MeshComponent>(entity);
+			constants[i].Color = mesh_comp->GetMesh()->Color;
 
 			++i;
 		}
@@ -83,23 +86,28 @@ namespace Workbench {
 
 	void RenderSystem::OnMeshComponentChanged(const Event<ECS::Events>* event) {
 		if (event->getType() == ECS::Events::EntityComponentsChangedEvent) {
-			auto _event = dynamic_cast<const ECS::EntityComponentsChangedEvent<MeshComponent>*>(event);
-			if (_event) {
-				if (_event->getActionType() == ECS::EntityComponentsChangedEvent<MeshComponent>::ActionType::ComponentCreated) {
-					auto component = _event->getComponent();
+			auto _event = dynamic_cast<const ECS::EntityComponentsChangedEvent*>(event);
+			if (_event && _event->GetComponentType() == typeid(MeshComponent)) {
+				if (_event->GetActionType() == ECS::EntityComponentsChangedEvent::ActionType::ComponentCreated) {
+					auto component = static_cast<MeshComponent*>(_event->GetComponent());
 					m_MeshResources[0]->AddMesh(component->getEntityId(), component->GetMesh());
 					m_MeshResources[0]->ReleaseResource();
 				}
+				else if (_event->GetActionType() == ECS::EntityComponentsChangedEvent::ActionType::ComponentDestroyed) {
+					auto component = _event->GetComponent();
+					m_MeshResources[0]->RemoveMesh(component->getEntityId());
+					m_MeshResources[0]->ReleaseResource();
+				}
 			}
-			auto event_ = dynamic_cast<const ECS::EntityComponentsChangedEvent<CameraComponent>*>(event);
-			if (event_) {
-				m_ActiveCamera = event_->getComponent()->getEntityId();
+			auto event_ = dynamic_cast<const ECS::EntityComponentsChangedEvent*>(event);
+			if (event_ && _event->GetComponentType() == typeid(CameraComponent)) {
+				m_ActiveCamera = event_->GetComponent()->getEntityId();
 			}
 		}
 	}
 
 	void RenderSystem::SetActiveCamera(const UUID* camera) {
-		if (ECS::getInstance()->GetEntityComponent<CameraComponent>(camera) != nullptr)
+		if (ECS::GetInstance()->GetEntityComponent<CameraComponent>(camera) != nullptr)
 			m_ActiveCamera = camera;
 		else
 			WB_RENDERER_ERROR("Tried to set entity {0} as active camera, but this enity doesn't have CameraComponent!", camera);

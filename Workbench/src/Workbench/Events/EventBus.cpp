@@ -18,7 +18,7 @@ namespace Workbench {
 		}
 	}
 
-	MainEventBus* MainEventBus::getInstance() { return m_Instance; };
+	MainEventBus* MainEventBus::GetInstance() { return m_Instance; };
 
 	MainEventBus* MainEventBus::m_Instance = new MainEventBus;
 }

@@ -54,7 +54,7 @@ namespace Workbench {
 
 	class WORKBENCH_API MainEventBus : public EventBus {
 	public:
-		static MainEventBus* getInstance();
+		static MainEventBus* GetInstance();
 	protected:
 		MainEventBus() {};
 		static MainEventBus* m_Instance;

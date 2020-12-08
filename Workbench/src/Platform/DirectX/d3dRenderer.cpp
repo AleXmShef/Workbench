@@ -38,10 +38,10 @@ namespace Workbench {
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 			debugController->EnableDebugLayer();
 		}
-		//#endif // DEBUG
+//#endif // DEBUG
 
-				//Begin Initialization
-				//Create DXGI Factory
+		//Begin Initialization
+		//Create DXGI Factory
 		HRESULT createdFactory = CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory));
 		if (FAILED(createdFactory)) {
 			WB_RENDERER_CRITICAL("Failed to create DXGIFactory");

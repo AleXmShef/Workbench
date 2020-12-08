@@ -1,7 +1,7 @@
 #include "wbpch.h"
 #include "PhysicsSystem.h"
-#include "PhysicsComponent.h"
-#include "TransformComponent.h"
+#include "Components/RigidBodyComponent.h"
+#include "Components/TransformComponent.h"
 #include "Renderer/Components/CameraComponent.h"
 #include "ECS/ECS.h"
 
@@ -12,40 +12,51 @@ namespace Workbench {
 	}
 
 	void PhysicsSystem::OnUpdate(WB_GAME_TIMER* timer) {
-		auto [it, end] = ECS::getInstance()->GetComponents<TransformComponent>();
-		for (; it != end; ++it) {
-			auto temp = *it;
-			auto transform = ECS::getInstance()->GetEntityComponent<TransformComponent>(temp->getEntityId());
-			auto camera = ECS::getInstance()->GetEntityComponent<CameraComponent>(temp->getEntityId());
-
-			if (camera == nullptr) {
-				transform->rotation = mathfu::vec4(
-					transform->rotation.x,
-					transform->rotation.y + 1 * timer->GetTickTime(),
-					transform->rotation.z,
-					transform->rotation.w
-				);
-				transform->rebuildWorldMatrix();
-			}
+		auto rigidBodies = ECS::GetInstance()->GetComponents<RigidBodyComponent>();
+		for (auto body : rigidBodies) {
+			auto transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+			if (body->physicsEnabled && transform)
+				Integrate(timer->GetTickTime(), body, transform);
 		}
 	}
 
 	void PhysicsSystem::OnPhysicsComponentChanged(const Event<ECS::Events>* event) {
 		if (event->getType() == ECS::Events::EntityComponentsChangedEvent) {
-			auto _event = dynamic_cast<const ECS::EntityComponentsChangedEvent<PhysicsComponent>*>(event);
-			if (_event) {
-				switch (_event->getActionType()) {
-				case ECS::EntityComponentsChangedEvent<PhysicsComponent>::ActionType::ComponentCreated:
+			auto _event = dynamic_cast<const ECS::EntityComponentsChangedEvent*>(event);
+			if (_event && _event->GetComponentType() == typeid(RigidBodyComponent)) {
+				switch (_event->GetActionType()) {
+				case ECS::EntityComponentsChangedEvent::ActionType::ComponentCreated:
 					WB_CORE_LOG("Physics component created!");
 					break;
-				case ECS::EntityComponentsChangedEvent<PhysicsComponent>::ActionType::ComponentChanged:
+				case ECS::EntityComponentsChangedEvent::ActionType::ComponentChanged:
 					WB_CORE_LOG("Physics component changed!");
 					break;
-				case ECS::EntityComponentsChangedEvent<PhysicsComponent>::ActionType::ComponentDestroyed:
+				case ECS::EntityComponentsChangedEvent::ActionType::ComponentDestroyed:
 					WB_CORE_LOG("Physics component destroyed!");
 					break;
 				}
 			}
 		}
+	}
+
+	void PhysicsSystem::Integrate(float tickTime, RigidBodyComponent* body, TransformComponent* transform) {
+
+		//update linear velocity and acceleration
+		body->linear_acceleration = { 0.0f, 0.0f, 0.0f };
+		body->linear_velocity += m_GravityAcc * tickTime;
+
+		//update angular velocity and acceleration
+		body->angular_acceleration = { 0.0f, 0.0f, 0.0f };
+		body->angular_velocity += body->angular_acceleration * tickTime;
+
+		//update position
+		transform->position += mathfu::vec4(body->linear_velocity * tickTime, 0.0f);
+
+		//update orientation
+		auto rotQuat = mathfu::quat(0, transform->rotation * body->angular_velocity * tickTime * 0.5f);
+		transform->rotation += (transform->rotation * rotQuat);
+		transform->rotation.Normalize();
+
+		transform->rebuildWorldMatrix();
 	}
 }

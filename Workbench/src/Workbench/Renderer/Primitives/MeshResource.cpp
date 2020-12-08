@@ -62,6 +62,16 @@ namespace Workbench {
 			m_IndexArray.begin() + subMesh.StartIndexLocation + subMesh.IndexCount
 		);
 
+		for (auto it = m_SubMeshes.begin(); it != m_SubMeshes.end(); ++it) {
+			auto& [id, _submesh] = *it;
+			if (_submesh.BaseVertexLocation > subMesh.BaseVertexLocation) {
+				_submesh.BaseVertexLocation -= subMesh.VertexCount;
+				_submesh.StartIndexLocation -= subMesh.IndexCount;
+			}
+		}
+
+		m_SubMeshes.erase(entityId);
+
 		m_VertexBuffer->UpdateResource(
 			m_VertexArray.data(), sizeof(VertexColoredBasic) * m_VertexArray.size()
 		);
@@ -69,6 +79,8 @@ namespace Workbench {
 		m_IndexBuffer->UpdateResource(
 			m_IndexArray.data(), sizeof(uint32_t) * m_IndexArray.size()
 		);
+
+		
 
 		isDirty = true;
 	}

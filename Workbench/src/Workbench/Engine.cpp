@@ -1,7 +1,5 @@
 #include "wbpch.h"
 #include "Engine.h"
-#include "Physics/PhysicsComponent.h"
-#include "Physics/TransformComponent.h"
 #include "Physics/PhysicsSystem.h"
 #include "Renderer/RenderSystem.h"
 
@@ -33,7 +31,7 @@ namespace Workbench {
 
 		m_BaseWindow = std::shared_ptr<Window>(WB_CREATE_NATIVE_WINDOW(pParams.windowProps));
 
-		m_World = ECS::getInstance();
+		m_World = ECS::GetInstance();
 
 		PushLayer(std::make_shared<RenderSystem>(m_BaseWindow));
 		PushLayer(std::make_shared<PhysicsSystem>());
