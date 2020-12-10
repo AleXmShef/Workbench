@@ -3,6 +3,8 @@
 #include "Components/RigidBodyComponent.h"
 #include "Components/TransformComponent.h"
 #include "Renderer/Components/CameraComponent.h"
+#include "Renderer/Components/MeshComponent.h"
+#include "CollisionDetector.h"
 #include "ECS/ECS.h"
 
 namespace Workbench {
@@ -13,10 +15,39 @@ namespace Workbench {
 
 	void PhysicsSystem::OnUpdate(WB_GAME_TIMER* timer) {
 		auto rigidBodies = ECS::GetInstance()->GetComponents<RigidBodyComponent>();
-		for (auto body : rigidBodies) {
-			auto transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
-			if (body->physicsEnabled && transform)
-				Integrate(timer->GetTickTime(), body, transform);
+		//for (auto body : rigidBodies) {
+		//	auto transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+		//	if (body->physicsEnabled && transform)
+		//		Integrate(timer->GetTickTime(), body, transform);
+		//}
+		for (int i = 0; i < rigidBodies.size(); i++) {
+			for (int j = i + 1; j < rigidBodies.size(); j++) {
+				auto body1 = rigidBodies[i];
+				auto body2 = rigidBodies[j];
+
+				auto transform1 = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body1->getEntityId());
+				auto transform2 = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body2->getEntityId());
+
+				body1->collider->transform = transform1->worldMatrix;
+				body2->collider->transform = transform2->worldMatrix;
+
+				auto contacts = CollisionDetector::CheckForCollisions(body1, body2);
+
+				auto mesh1 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(body1->getEntityId());
+				auto mesh2 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(body2->getEntityId());
+
+				if (!contacts.empty()) {
+					//resolve conflicts
+
+
+					mesh1->GetMesh()->Color = mathfu::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+					mesh2->GetMesh()->Color = mathfu::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+				}
+				else {
+					mesh1->GetMesh()->Color = mathfu::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+					mesh2->GetMesh()->Color = mathfu::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				}
+			}
 		}
 	}
 

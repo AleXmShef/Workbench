@@ -99,6 +99,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CollisionDetectionTest.h" />
     <ClInclude Include="src\OrbitCamera.h" />
     <ClInclude Include="src\ParabolicTrajectory.h" />
     <ClInclude Include="src\RotatingCubesDemo.h" />

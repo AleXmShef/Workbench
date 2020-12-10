@@ -29,5 +29,8 @@
     <ClInclude Include="src\ParabolicTrajectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\CollisionDetectionTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

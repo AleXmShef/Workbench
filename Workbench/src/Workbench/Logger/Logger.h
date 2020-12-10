@@ -34,7 +34,7 @@ namespace Workbench {
 	std::ostream& operator <<(std::ostream& os, const mathfu::Vector<Type, X>& vec) {
 		os << "{";
 		for (size_t i = 0; i < X; ++i) {
-			os << vec[i];
+			os << std::fixed << std::setprecision(2) << vec[i];
 			if (i < X - 1)
 				os << ", ";
 		}

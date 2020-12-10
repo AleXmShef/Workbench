@@ -1,20 +1,24 @@
 #pragma once
 #include "wbpch.h"
 #include "ECS/ECSComponent.h"
+#include "Physics/Primitives/Collider.h"
+#include "Physics/Primitives/ForceAccumulator.h"
 
 namespace Workbench {
 	struct RigidBodyComponent : ECSComponent {
 		RigidBodyComponent(
-			const UUID* entity, 
-			float mass, 
-			mathfu::vec3 vel = {0.0f, 0.0f, 0.0f},
+			const UUID* entity,
+			float mass,
+			mathfu::vec3 vel = { 0.0f, 0.0f, 0.0f },
 			mathfu::vec3 ang_vel = { 0.0f, 0.0f, 0.0f },
+			Collider3D* _collider = new BoxCollider({ 1.0f, 1.0f, 1.0f }, mathfu::mat4::Identity()),
 			mathfu::mat3 inertia_tensor = mathfu::mat3::Identity()
 		) :
 			ECSComponent(entity),
 			inverse_mass(1.0f/mass),
 			linear_velocity(vel),
 			angular_velocity(ang_vel),
+			collider(_collider),
 			inverse_inertia_tensor(inertia_tensor.Inverse())
 		{
 			
@@ -31,6 +35,10 @@ namespace Workbench {
 		mathfu::vec3 angular_acceleration;		//world space
 
 		mathfu::mat3 inverse_inertia_tensor;	//local space
+
+		Collider3D* collider;					//only box collider for now
+
+		ForceAccumulator force_accumulator;
 
 	};
 }

@@ -1,6 +1,7 @@
 #include <Workbench.h>
-#include "ParabolicTrajectory.h"
+//#include "ParabolicTrajectory.h"
 //#include "RotatingCubesDemo.h"
+#include "CollisionDetectionTest.h"
 
 extern "C" {
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
@@ -27,7 +28,7 @@ int main(int argc, char** argv) {
 
 		Workbench::Engine mEngine(engParams);
 		
-		mEngine.PushLayer(std::make_shared<ParabolicTrajectory>(&mEngine));
+		mEngine.PushLayer(std::make_shared<CollisionDetectionTest>(&mEngine));
 		//mEngine.PushLayer(std::make_shared<RotatinCubesDemo>(&mEngine));
 
 		result = mEngine.Run();

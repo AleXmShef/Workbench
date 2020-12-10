@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Workbench\Physics\CollisionDetector.cpp" />
+    <ClCompile Include="src\Workbench\Physics\Primitives\ForceAccumulator.cpp" />
+    <ClCompile Include="src\Workbench\Physics\Primitives\Collider.cpp" />
     <ClCompile Include="src\Workbench\ECS\ECSComponentContainer.cpp" />
     <ClCompile Include="src\Platform\DirectX\d3dRenderer.cpp" />
     <ClCompile Include="src\Platform\DirectX\Primitives\d3dConstantBuffer.cpp" />
@@ -49,6 +52,10 @@
     <ClCompile Include="src\Workbench\Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Workbench\Physics\CollisionDetector.h" />
+    <ClInclude Include="src\Workbench\Physics\Primitives\ForceAccumulator.h" />
+    <ClInclude Include="src\Workbench\Physics\Primitives\Contact.h" />
+    <ClInclude Include="src\Workbench\Physics\Primitives\Collider.h" />
     <ClInclude Include="src\Workbench\ECS\ECSComponentContainer.h" />
     <ClInclude Include="src\Platform\DirectX\Primitives\d3dConstantBuffer.h" />
     <ClInclude Include="src\Platform\DirectX\Primitives\d3dDynamicResource.h" />
