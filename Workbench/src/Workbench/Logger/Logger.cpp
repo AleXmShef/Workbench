@@ -105,7 +105,7 @@ namespace Workbench {
 		}
 	}
 
-	const char* Logger::parse_date_time(char opt) {
+	std::string Logger::parse_date_time(char opt) {
 		time_t rawtime;
 		struct tm timeinfo;
 		time(&rawtime);
@@ -117,7 +117,9 @@ namespace Workbench {
 		case 'T':
 		{
 			strftime(buff, sizeof(char)*70, "%T", &timeinfo);
-			return buff;
+			std::string str(buff);
+			delete[] buff;
+			return str;
 			break;
 		}
 		default: 

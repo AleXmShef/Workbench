@@ -54,6 +54,11 @@ namespace Workbench {
 				m_ComponentType(component_type), 
 				m_ActionType(action) {};
 
+			~EntityComponentsChangedEvent() {
+				if(m_ActionType == ActionType::ComponentDestroyed)
+					delete m_Component;
+			}
+
 			ECSComponent* GetComponent() const { return m_Component; };
 			std::type_index GetComponentType() const { return m_ComponentType; };
 			ActionType GetActionType() const { return m_ActionType; };

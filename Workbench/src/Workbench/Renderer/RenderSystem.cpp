@@ -30,7 +30,7 @@ namespace Workbench {
 
 	void RenderSystem::OnUpdate(WB_GAME_TIMER* timer) {
 		m_Renderer->Begin();
-		if (m_ActiveCamera != nullptr) {
+		if (m_ActiveCamera != nullptr && m_MeshResources[0]->GetSubmeshes()->size() > 0) {
 			if (m_MeshResources[0]->IsDirty())
 				m_MeshResources[0]->UploadResource();
 			UpdateObjects();
@@ -52,7 +52,8 @@ namespace Workbench {
 
 		auto submeshes = m_MeshResources[0]->GetSubmeshes();
 		
-		ObjectConstants* constants = new ObjectConstants[submeshes->size()];
+		std::vector<ObjectConstants> constants;
+		constants.resize(submeshes->size());
 		
 		int i = 0;
 		for (auto it = submeshes->begin(); it != submeshes->end(); ++it) {
@@ -72,7 +73,7 @@ namespace Workbench {
 		}
 		
 		m_MeshResources[0]->GetConstantBuffer()->UpdateResource(
-			(const void*)constants,
+			(const void*)constants.data(),
 			sizeof(ObjectConstants) * submeshes->size(),
 			sizeof(ObjectConstants),
 			submeshes->size()
@@ -92,6 +93,7 @@ namespace Workbench {
 					auto component = static_cast<MeshComponent*>(_event->GetComponent());
 					m_MeshResources[0]->AddMesh(component->getEntityId(), component->GetMesh());
 					m_MeshResources[0]->ReleaseResource();
+					UpdateObjects();
 				}
 				else if (_event->GetActionType() == ECS::EntityComponentsChangedEvent::ActionType::ComponentDestroyed) {
 					auto component = _event->GetComponent();

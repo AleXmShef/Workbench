@@ -32,5 +32,8 @@
     <ClInclude Include="src\CollisionDetectionTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\RigidBodyTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

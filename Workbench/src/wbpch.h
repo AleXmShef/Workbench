@@ -1,5 +1,4 @@
 #pragma once
-
 #ifdef WB_PLATFORM_WINDOWS
 	#define NOMINMAX
 	#include <Windows.h>
@@ -23,6 +22,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <stack>

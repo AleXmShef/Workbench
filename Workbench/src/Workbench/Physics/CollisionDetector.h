@@ -9,10 +9,11 @@
 namespace Workbench {
 	class CollisionDetector {
 	public:
-		static std::vector<Contact*> CheckForCollisions(RigidBodyComponent* body1, RigidBodyComponent* body2);
+		static std::vector<Contact> DetectContacts(const std::vector<RigidBodyComponent*>& bodies);
 
-		static std::vector<Contact*> _contactBoxAndBox(BoxCollider* box1, BoxCollider* box2);
-		static Contact* _contactBoxAndPoint(mathfu::vec3 point, BoxCollider* box);
+		static std::vector<Contact> CheckForCollisions(RigidBodyComponent* body1, RigidBodyComponent* body2);
+
+		static std::vector<Contact> _contactBoxAndBox(BoxCollider* box1, BoxCollider* box2);
 	};
 }
 

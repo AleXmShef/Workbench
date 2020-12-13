@@ -1,7 +1,13 @@
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+
 #include <Workbench.h>
 //#include "ParabolicTrajectory.h"
 //#include "RotatingCubesDemo.h"
-#include "CollisionDetectionTest.h"
+//#include "CollisionDetectionTest.h"
+#include "RigidBodyTest.h"
 
 extern "C" {
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
@@ -20,7 +26,7 @@ int main(int argc, char** argv) {
 	{
 		Workbench::Engine::EngineProps engParams = {};
 		Workbench::Window::WindowProps windowProps = {};
-		//windowProps.isVsync = true;
+		windowProps.isVsync = true;
 
 		windowProps.windowTitle = "Sandbox";
 		//windowProps.isFullScreen = true;
@@ -28,11 +34,12 @@ int main(int argc, char** argv) {
 
 		Workbench::Engine mEngine(engParams);
 		
-		mEngine.PushLayer(std::make_shared<CollisionDetectionTest>(&mEngine));
+		mEngine.PushLayer(std::make_shared<RigidBodyTest>(&mEngine));
 		//mEngine.PushLayer(std::make_shared<RotatinCubesDemo>(&mEngine));
 
 		result = mEngine.Run();
 	}
+
 #if defined(WB_DEBUG)
 	system("pause");
 #endif

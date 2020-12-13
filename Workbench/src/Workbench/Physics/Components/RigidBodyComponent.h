@@ -11,30 +11,36 @@ namespace Workbench {
 			float mass,
 			mathfu::vec3 vel = { 0.0f, 0.0f, 0.0f },
 			mathfu::vec3 ang_vel = { 0.0f, 0.0f, 0.0f },
-			Collider3D* _collider = new BoxCollider({ 1.0f, 1.0f, 1.0f }, mathfu::mat4::Identity()),
-			mathfu::mat3 inertia_tensor = mathfu::mat3::Identity()
+			Collider3D* _collider = new BoxCollider({ 1.0f, 1.0f, 1.0f }, mathfu::mat4::Identity())
 		) :
 			ECSComponent(entity),
 			inverse_mass(1.0f/mass),
 			linear_velocity(vel),
 			angular_velocity(ang_vel),
-			collider(_collider),
-			inverse_inertia_tensor(inertia_tensor.Inverse())
+			collider(_collider)
 		{
-			
+			float a = mass * 0.33f;
+			mathfu::mat3 inertia_tensor(
+				a, 0.0f, 0.0f,
+				0.0f, a, 0.0f,
+				0.0f, 0.0f, a
+			);
+
+			inverse_inertia_tensor_abc = inertia_tensor.Inverse();
 		};
 
 		bool physicsEnabled = true;
 
-		float inverse_mass;
+		float inverse_mass = 1.0f;
 
 		mathfu::vec3 linear_velocity;			//world space
 		mathfu::vec3 angular_velocity;			//world space
 
-		mathfu::vec3 linear_acceleration;		//world space
-		mathfu::vec3 angular_acceleration;		//world space
+		mathfu::vec3 linear_acceleration = {0.0f, 0.0f, 0.0f};		//world space
+		mathfu::vec3 angular_acceleration = {0.0f, 0.0f, 0.0f};		//world space
 
-		mathfu::mat3 inverse_inertia_tensor;	//local space
+		mathfu::mat3 inverse_inertia_tensor;	//world space
+		mathfu::mat3 inverse_inertia_tensor_abc;
 
 		Collider3D* collider;					//only box collider for now
 

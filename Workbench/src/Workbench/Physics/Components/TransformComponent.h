@@ -16,10 +16,10 @@ namespace Workbench {
 		};
 
 		void rebuildWorldMatrix() {
-			worldMatrix =
-				mathfu::mat4::FromTranslationVector(position.xyz()) *
-				rotation.ToMatrix4() *
-				mathfu::mat4::FromScaleVector(scale.xyz());
+			worldMatrix = mathfu::mat4::Transform(
+				position.xyz(),
+				rotation.ToMatrix(),
+				scale.xyz());
 				
 		}
 

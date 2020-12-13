@@ -4,17 +4,29 @@
 #include "Logger/Logger.h"
 
 namespace Workbench {
-	std::vector<Contact*> CollisionDetector::CheckForCollisions(RigidBodyComponent* body1, RigidBodyComponent* body2) {
-		try {
-			if (body1->collider->GetType() == ColliderType::BoxCollider && body2->collider->GetType() == ColliderType::BoxCollider)
-				return _contactBoxAndBox((BoxCollider*)body1->collider, (BoxCollider*)body2->collider);
-		}
-		catch (const std::exception& e) {
-			WB_CORE_ERROR("Exception thrown in CollisionDetector:\n{}", e.what());
+	std::vector<Contact> CollisionDetector::DetectContacts(const std::vector<RigidBodyComponent*>& bodies) {
+		std::vector<Contact> contacts;
 
-			std::vector<Contact*> contacts;
-			return contacts;
+		for (int i = 0; i < bodies.size(); i++) {
+			for (int j = i + 1; j < bodies.size(); j++) {
+				auto body1 = bodies[i];
+				auto body2 = bodies[j];
+
+				auto body_contacts = CheckForCollisions(body1, body2);
+				for (auto& contact : body_contacts) {
+					contact.body1 = body1;
+					contact.body2 = body2;
+					contacts.push_back(contact);
+				}
+			}
 		}
+
+		return contacts;
+	}
+
+	std::vector<Contact> CollisionDetector::CheckForCollisions(RigidBodyComponent* body1, RigidBodyComponent* body2) {
+		if (body1->collider->GetType() == ColliderType::BoxCollider && body2->collider->GetType() == ColliderType::BoxCollider)
+			return _contactBoxAndBox((BoxCollider*)body1->collider, (BoxCollider*)body2->collider);
 	}
 
 	mathfu::vec3 contactPoint(
@@ -103,11 +115,11 @@ namespace Workbench {
 		mathfu::vec3 axis,
 		mathfu::vec3 toCenter,
 		unsigned index,
-		float smallestPenetration,
-		unsigned smallestCase
+		float& smallestPenetration,
+		unsigned& smallestCase
 		)
 	{
-		if (axis.Length() * axis.Length() < 0.0001) return true;
+		if (axis.LengthSquared() < 0.0001) return true;
 		axis.Normalize();
 
 		float penetration = penetrationOnAxis(one, two, axis, toCenter);
@@ -124,7 +136,7 @@ namespace Workbench {
 		BoxCollider* one,
 		BoxCollider* two,
 		mathfu::vec3 toCenter,
-		std::vector<Contact*>& data,
+		std::vector<Contact>& data,
 		unsigned best,
 		float pen
 	)
@@ -132,7 +144,7 @@ namespace Workbench {
 		// This method is called when we know that a vertex from
 	// box two is in contact with box one.
 
-		Contact* contact = new Contact;
+		Contact contact;
 
 		// We know which axis the collision is on (i.e. best),
 		// but we need to work out which of the two faces on
@@ -151,21 +163,21 @@ namespace Workbench {
 		if (mathfu::vec3::DotProduct(two->GetAxis(2), normal) < 0) vertex.z = -vertex.z;
 
 		// Create the contact data
-		contact->contact_normal = normal;
-		contact->penetration_depth = pen;
-		contact->contact_point = two->transform * vertex;
+		contact.contact_normal = normal;
+		contact.penetration_depth = pen;
+		contact.contact_point = two->transform * vertex;
 		data.push_back(contact);
 	}
 
 	#define CHECK_OVERLAP(axis, index) \
 		if(!tryAxis(one, two, (axis), toCenter, (index), pen, best)) return contacts;
 
-	std::vector<Contact*> CollisionDetector::_contactBoxAndBox(BoxCollider* one, BoxCollider* two) {
-		std::vector<Contact*> contacts;
+	std::vector<Contact> CollisionDetector::_contactBoxAndBox(BoxCollider* one, BoxCollider* two) {
+		std::vector<Contact> contacts;
 
 		mathfu::vec3 toCenter = two->GetAxis(3) - one->GetAxis(3);
 
-		double pen = DBL_MAX;
+		float pen = FLT_MAX;
 		unsigned best = 0xffffff;
 
 		CHECK_OVERLAP(one->GetAxis(0), 0);
@@ -210,6 +222,7 @@ namespace Workbench {
 			best -= 6;
 			unsigned oneAxisIndex = best / 3;
 			unsigned twoAxisIndex = best % 3;
+
 			mathfu::vec3 oneAxis = one->GetAxis(oneAxisIndex);
 			mathfu::vec3 twoAxis = two->GetAxis(twoAxisIndex);
 			mathfu::vec3 axis = mathfu::vec3::CrossProduct(oneAxis, twoAxis);
@@ -250,46 +263,13 @@ namespace Workbench {
 			);
 
 			// We can fill the contact.
-			Contact* contact = new Contact;
+			Contact contact;
 
-			contact->penetration_depth = pen;
-			contact->contact_normal = axis;
-			contact->contact_point = vertex;
+			contact.penetration_depth = pen;
+			contact.contact_normal = axis;
+			contact.contact_point = vertex;
 			contacts.push_back(contact);
 		}
 		return contacts;
-	}
-
-	Contact* CollisionDetector::_contactBoxAndPoint(mathfu::vec3 _point, BoxCollider* box) {
-		auto point = _point + box->transform.Inverse().TranslationVector3D();	//MAY BE WRONG
-
-		mathfu::vec3 normal;
-
-		float min_depth = box->half_size.x - abs(point.x);
-		if (min_depth < 0) return nullptr;
-		normal = (mathfu::vec4(1.0f, 0.0f, 0.0f, 0.0f) * box->transform * ((point.x < 0) ? -1 : 1)).xyz();
-
-		float depth = box->half_size.y - abs(point.y);
-		if (depth < 0) return nullptr;
-		else if (depth < min_depth)
-		{
-			min_depth = depth;
-			normal = (mathfu::vec4(0.0f, 1.0f, 0.0f, 0.0f) * box->transform * ((point.y < 0) ? -1 : 1)).xyz();
-		}
-
-		depth = box->half_size.z - abs(point.z);
-		if (depth < 0) return nullptr;
-		else if (depth < min_depth)
-		{
-			min_depth = depth;
-			normal = (mathfu::vec4(0.0f, 0.0f, 1.0f, 0.0f) * box->transform * ((point.z < 0) ? -1 : 1)).xyz();
-		}
-
-		Contact* contact = new Contact();
-		contact->contact_normal = normal;
-		contact->contact_point = point;
-		contact->penetration_depth = min_depth;
-
-		return contact;
 	}
 }

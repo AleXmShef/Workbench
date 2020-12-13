@@ -4,6 +4,7 @@
 #include "ECS/ECS.h"
 #include "Physics/Components/RigidBodyComponent.h"
 #include "Physics/Components/TransformComponent.h"
+#include "Physics/Primitives/Contact.h"
 
 #define WB_PHYSICS_G -9.81f
 
@@ -15,6 +16,8 @@ namespace Workbench {
 		void OnUpdate(WB_GAME_TIMER* timer) override;
 	protected:
 		void OnPhysicsComponentChanged(const Event<ECS::Events>* event);
+
+		void ResolveContacts(std::vector<Contact>& contacts);
 
 		void Integrate(float tickTime, RigidBodyComponent* body, TransformComponent* transform);
 

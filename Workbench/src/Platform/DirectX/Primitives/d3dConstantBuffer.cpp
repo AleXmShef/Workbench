@@ -17,7 +17,7 @@ namespace Workbench {
 
 		d3dDynamicResource::UpdateResource(data, size, trueElementSize, elementCount);
 
-		if (isDirty) {
+		if (isDirty || m_Heap == nullptr) {
 			WB_RENDERER_INFO("HEAP IS DIRTY");
 			buildHeap();
 			buildDescriptors();

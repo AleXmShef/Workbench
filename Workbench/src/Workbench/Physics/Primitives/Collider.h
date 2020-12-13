@@ -1,6 +1,7 @@
 #pragma once
 #include "wbpch.h"
 #include "Core.h"
+#include "Logger/Logger.h"
 
 namespace Workbench {
 	enum class ColliderType {
@@ -12,7 +13,7 @@ namespace Workbench {
 		Collider3D(mathfu::mat4 _offset = mathfu::mat4::Identity()) : offset(_offset) {};
 		virtual ColliderType GetType() = 0;
 
-		mathfu::vec3 GetAxis(int _axis) {
+		mathfu::vec3 GetAxis(unsigned _axis) {
 			return mathfu::vec3(transform[0 + 4 * _axis], transform[1 + 4 * _axis], transform[2 + 4 * _axis]);
 		}
 	public:

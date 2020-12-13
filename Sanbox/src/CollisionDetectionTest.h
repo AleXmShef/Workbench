@@ -63,4 +63,3 @@ protected:
 
 	Workbench::Engine* m_Engine = nullptr;
 };
-#pragma once

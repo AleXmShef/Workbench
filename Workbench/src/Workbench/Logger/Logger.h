@@ -142,7 +142,7 @@ namespace Workbench {
 		};
 
 		void set_output_color(log_level level = log_level::regular);
-		const char* parse_date_time(char opt);
+		std::string parse_date_time(char opt);
 	
 	protected:
 		static std::mutex s_write_mutex;

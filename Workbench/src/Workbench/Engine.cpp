@@ -1,4 +1,9 @@
 #include "wbpch.h"
+
+#ifdef WB_MEMORY_PROFILING
+#include"vld.h"
+#endif
+
 #include "Engine.h"
 #include "Physics/PhysicsSystem.h"
 #include "Renderer/RenderSystem.h"
