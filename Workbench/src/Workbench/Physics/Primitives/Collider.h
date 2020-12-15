@@ -5,7 +5,8 @@
 
 namespace Workbench {
 	enum class ColliderType {
-		BoxCollider = 0
+		BoxCollider = 0,
+		HalfSpaceCollider
 	};
 
 	class Collider3D {
@@ -14,6 +15,8 @@ namespace Workbench {
 		virtual ColliderType GetType() = 0;
 
 		mathfu::vec3 GetAxis(unsigned _axis) {
+			if(_axis > 4)
+				WB_CORE_CRITICAL("axis: {}", _axis);
 			return mathfu::vec3(transform[0 + 4 * _axis], transform[1 + 4 * _axis], transform[2 + 4 * _axis]);
 		}
 	public:
@@ -29,6 +32,16 @@ namespace Workbench {
 		virtual ColliderType GetType() override { return ColliderType::BoxCollider; };
 	public:
 		mathfu::vec3 half_size;
+	};
+
+	class HalfSpaceCollider : public Collider3D {
+	public:
+		HalfSpaceCollider(mathfu::vec3 _direction, float _offset) : direction(_direction), offset(_offset) {};
+
+		virtual ColliderType GetType() override { return ColliderType::HalfSpaceCollider; };
+	public:
+		mathfu::vec3 direction;
+		float offset;
 	};
 }
 

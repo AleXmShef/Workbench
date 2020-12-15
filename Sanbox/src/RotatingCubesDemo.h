@@ -12,9 +12,9 @@
 
 using namespace Workbench;
 
-class RotatinCubesDemo : public Workbench::Layer {
+class RotatingCubesDemo : public Workbench::Layer {
 public:
-	RotatinCubesDemo(Workbench::Engine* engine) : m_Engine(engine) {};
+	RotatingCubesDemo(Workbench::Engine* engine) : m_Engine(engine) {};
 
 	void OnKeyboardPressed(const Workbench::Event<Workbench::Window::Events>* event) {
 		if (event->getType() == Workbench::Window::Events::WindowButtonPressedEvent) {
@@ -22,23 +22,23 @@ public:
 			if (_event->getButton() == Workbench::WB_KEYCODES::WB_VK_G) {
 				WB_LOG("Creating new entity!");
 
-				auto newCube = m_Engine->GetWorld()->CreateEntity();
-
-				int posX = Workbench::RandomGenerator::random_in_range(-5, 5);
-				int posY = Workbench::RandomGenerator::random_in_range(-5, 5);
-				int posZ = Workbench::RandomGenerator::random_in_range(-5, 5);
-
-				auto entityTransform = new Workbench::TransformComponent(newCube, { (float)posX, (float)posY, (float)posZ, 0.0f });
-				auto mesh = new Workbench::MeshComponent(newCube, Workbench::MeshGenerator::CreateBox());
-
-				m_Engine->GetWorld()->AddComponent(newCube, entityTransform);
-				m_Engine->GetWorld()->AddComponent(newCube, mesh);
+				//auto newCube = m_Engine->GetWorld()->CreateEntity();
+				//
+				//int posX = Workbench::RandomGenerator::random_in_range(-5, 5);
+				//int posY = Workbench::RandomGenerator::random_in_range(-5, 5);
+				//int posZ = Workbench::RandomGenerator::random_in_range(-5, 5);
+				//
+				//auto entityTransform = new Workbench::TransformComponent(newCube, { (float)posX, (float)posY, (float)posZ, 0.0f });
+				//auto mesh = new Workbench::MeshComponent(newCube, Workbench::MeshGenerator::CreateBox());
+				//
+				//m_Engine->GetWorld()->AddComponent(newCube, entityTransform);
+				//m_Engine->GetWorld()->AddComponent(newCube, mesh);
 			}
 		}
 	};
 
 	void OnAttach() override {
-		BIND_EVENT(this, RotatinCubesDemo::OnKeyboardPressed);
+		BIND_EVENT(this, RotatingCubesDemo::OnKeyboardPressed);
 
 		auto entity1 = m_Engine->GetWorld()->CreateEntity();
 
@@ -59,12 +59,9 @@ public:
 			auto test = timer->GetTickTime();
 
 			if (camera == nullptr) {
-				transform->rotation = mathfu::vec4(
-					transform->rotation.x,
-					transform->rotation.y + M_PI / 2 * timer->GetTickTime(),
-					transform->rotation.z,
-					transform->rotation.w
-				);
+				mathfu::vec3 vec(M_PI / 4, M_PI / 2, 0.0f);
+
+				RotateQuat(transform->rotation, vec, timer->GetTickTime());
 
 				transform->rebuildWorldMatrix();
 			}

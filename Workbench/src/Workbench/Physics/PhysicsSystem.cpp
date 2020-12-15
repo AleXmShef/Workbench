@@ -9,140 +9,348 @@
 
 namespace Workbench {
 
+	PhysicsSystem::PhysicsSystem(RenderSystem* render) {
+		renderer = render;
+	};
+
 	void PhysicsSystem::OnAttach() {
 		BIND_EVENT(this, PhysicsSystem::OnPhysicsComponentChanged);
 	}
 
-	mathfu::mat4 basisFromAxis(mathfu::vec3 x, mathfu::vec3 y = { 0.0f, 1.0f, 0.0f }) {
-		mathfu::vec3 z = mathfu::vec3::CrossProduct(x, y);
+	mathfu::mat3 basisFromAxis(mathfu::vec3 x) {
 
-		if (z.LengthSquared() == 0.0f) {
-			return basisFromAxis(x, { 0.0f, 0.0f, 1.0f });
+		mathfu::vec3 contactTangent[2];
+
+		if (fabs(x.x) > fabs(x.y))
+		{
+			// Scaling factor to ensure the results are normalised
+			const float s = 1.0f / sqrt(x.z * x.z +
+				x.x * x.x);
+
+			// The new X-axis is at right angles to the world Y-axis
+			contactTangent[0].x = x.z * s;
+			contactTangent[0].y = 0;
+			contactTangent[0].z = -x.x * s;
+
+			// The new Y-axis is at right angles to the new X- and Z- axes
+			contactTangent[1].x = x.y * contactTangent[0].x;
+			contactTangent[1].y = x.z * contactTangent[0].x -
+				x.x * contactTangent[0].z;
+			contactTangent[1].z = -x.y * contactTangent[0].x;
+		}
+		else
+		{
+			// Scaling factor to ensure the results are normalised
+			const float s = 1.0f / sqrt(x.z * x.z +
+				x.y * x.y);
+
+			// The new X-axis is at right angles to the world X-axis
+			contactTangent[0].x = 0;
+			contactTangent[0].y = -x.z * s;
+			contactTangent[0].z = x.y * s;
+
+			// The new Y-axis is at right angles to the new X- and Z- axes
+			contactTangent[1].x = x.y * contactTangent[0].z -
+				x.z * contactTangent[0].y;
+			contactTangent[1].y = -x.x * contactTangent[0].z;
+			contactTangent[1].z = x.x * contactTangent[0].y;
 		}
 
-		y = mathfu::vec3::CrossProduct(z, x);
+		mathfu::mat3 mat = mathfu::mat3(
+			x.x, x.y, x.z,
+			contactTangent[0].x, contactTangent[0].y, contactTangent[0].z,
+			contactTangent[1].x, contactTangent[1].y, contactTangent[1].z);
 
-		y.Normalize();
-		z.Normalize();
-
-		mathfu::mat4 _mat = mathfu::mat4(mathfu::vec4(x, 0.0f), mathfu::vec4(y, 0.0f), mathfu::vec4(z, 0.0f), mathfu::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-		auto transpose_mat = _mat.Transpose();
-		return _mat;
+		return mat;
 	}
 
-	void PhysicsSystem::ResolveContacts(std::vector<Contact>& contacts) {
+	void calculateInternals(Contact& contact, float tickTime) {
+		contact.transform = basisFromAxis(contact.contact_normal);
+
+		for (int i = 0; i < 2; i++) if (contact.bodies[i]) {
+			auto body = contact.bodies[i];
+			auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+			mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
+
+			mathfu::vec3 velocity = mathfu::vec3::CrossProduct(body->angular_velocity, relativeContactPosition);
+
+			velocity += body->linear_velocity;
+
+			velocity = velocity * contact.transform;
+
+			contact.contact_velocity += (i == 0 ? 1 : -1) * velocity;
+		}
+	}
+
+	void calculateDesiredVelocity(Contact& contact, float tickTime) {
+		float velocityFromAcc = 0;
+
+		for (int i = 0; i < 2; i++) if (contact.bodies[i]) {
+			auto body = contact.bodies[i];
+			auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+			mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
+
+			velocityFromAcc += (i == 0 ? 1 : -1) * mathfu::vec3::DotProduct(body->linear_acceleration * tickTime, contact.contact_normal);
+		}
+
+		float restitution = 0.6f;
+
+		contact.desiredDeltaVelocity = -contact.contact_velocity.x - restitution * (contact.contact_velocity.x);
+	}
+
+	struct VelResolve {
+		mathfu::vec3 velchange[2];
+		mathfu::vec3 rotchange[2];
+	};
+
+	struct PosResolve {
+		mathfu::vec3 linchange[2];
+		mathfu::vec3 angchange[2];
+	};
+
+	PosResolve resolvePosition(Contact& contact) {
+
+		float angular_move[2];
+		float linear_move[2];
+
+		float totalInertia = 0.0f;;
+		float angular_inertia[2];
+		float linear_inertia[2];
+
+		for (int i = 0; i < 2; i++) if (contact.bodies[i]) {
+			auto body = contact.bodies[i];
+			auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+			mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
+
+			mathfu::vec3 angInertiaWorld = mathfu::vec3::CrossProduct(relativeContactPosition, contact.contact_normal);
+
+			angInertiaWorld = angInertiaWorld * body->inverse_inertia_tensor;
+
+			angInertiaWorld = mathfu::vec3::CrossProduct(angInertiaWorld, relativeContactPosition);
+
+			angular_inertia[i] = mathfu::vec3::DotProduct(angInertiaWorld, contact.contact_normal);
+
+			linear_inertia[i] = body->inverse_mass;
+
+			totalInertia += angular_inertia[i] + linear_inertia[i];
+		}
+
+		PosResolve position_resolve;
+
+		for (int i = 0; i < 2; i++) if (contact.bodies[i]) {
+			auto body = contact.bodies[i];
+			auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+			mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
+
+			float sign = (i == 0 ? 1 : -1);
+
+			angular_move[i] = sign * contact.penetration_depth * (angular_inertia[i] / totalInertia);
+			linear_move[i] = sign * contact.penetration_depth * (linear_inertia[i] / totalInertia);
+
+			mathfu::vec3 proj = relativeContactPosition;
+
+			proj += contact.contact_normal * mathfu::vec3::DotProduct(-relativeContactPosition, contact.contact_normal);
+
+			float angularLimit = 0.2f;
+
+			float maxMag = angularLimit * proj.Length();
+
+			if (angular_move[i] < -maxMag) {
+				float totalMove = angular_move[i] + linear_move[i];
+				angular_move[i] = -maxMag;
+				linear_move[i] = totalMove - angular_move[i];
+			}
+			else if (angular_move[i] > maxMag) {
+				float totalMove = angular_move[i] + linear_move[i];
+				angular_move[i] = maxMag;
+				linear_move[i] = totalMove - angular_move[i];
+			}
+
+			mathfu::vec3 targetAngDirection = mathfu::vec3::CrossProduct(relativeContactPosition, contact.contact_normal);
+
+			position_resolve.angchange[i] = targetAngDirection * body->inverse_inertia_tensor * (angular_move[i] / angular_inertia[i]);
+
+			position_resolve.linchange[i] = contact.contact_normal * linear_move[i];
+
+			body_transform->position += mathfu::vec4(position_resolve.linchange[i], 0.0f);
+
+			RotateQuat(body_transform->rotation, position_resolve.angchange[i], 1.0f);
+
+			body_transform->rebuildWorldMatrix();
+
+			body->collider->transform = body_transform->worldMatrix;
+
+			body->inverse_inertia_tensor = body_transform->rotation.ToMatrix().Inverse().Transpose() * body->inverse_inertia_tensor_abc * body_transform->rotation.ToMatrix().Inverse();
+		}
+
+		return position_resolve;
+	}
+
+	VelResolve resolveVelocity(Contact& contact) {
+
+		mathfu::vec3 impulse;
+
+		float deltaVelocity = 0;
+
+		for (int i = 0; i < 2; i++) if (contact.bodies[i]) {
+			auto body = contact.bodies[i];
+			auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+			mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
+
+			mathfu::vec3 deltaVelWorld = mathfu::vec3::CrossProduct(relativeContactPosition, contact.contact_normal);
+
+			deltaVelWorld = deltaVelWorld * body->inverse_inertia_tensor;
+			deltaVelWorld = mathfu::vec3::CrossProduct(deltaVelWorld, relativeContactPosition);
+
+			deltaVelocity += mathfu::vec3::DotProduct(deltaVelWorld, contact.contact_normal);
+
+			deltaVelocity += body->inverse_mass;
+		}
+
+		impulse = { contact.desiredDeltaVelocity / deltaVelocity, 0.0f, 0.0f };
+
+		impulse = impulse * contact.transform.Inverse();
+
+		VelResolve _thing;
+
+		for (int i = 0; i < 2; i++) if (contact.bodies[i]) {
+			auto body = contact.bodies[i];
+			auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+			mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
+
+			mathfu::vec3 impulsiveTorque = mathfu::vec3::CrossProduct(relativeContactPosition, impulse);
+
+			mathfu::vec3 rotationChange = (body->inverse_inertia_tensor * impulsiveTorque) * (i == 0 ? 1 : -1);
+
+			mathfu::vec3 velocityChange = impulse * (i == 0 ? 1 : -1);
+
+			body->linear_velocity += velocityChange;
+			body->angular_velocity += rotationChange;
+			_thing.velchange[i] = velocityChange;
+			_thing.rotchange[i] = rotationChange;
+		}
+		return _thing;
+	}
+
+	void PhysicsSystem::ResolveContacts(std::vector<Contact>& contacts, float tickTime) {
 		for (auto& contact : contacts) {
-			contact.contact_normal.Normalize();
-			contact.transform = basisFromAxis(contact.contact_normal);
+			calculateInternals(contact, tickTime);
+			calculateDesiredVelocity(contact, tickTime);
+		}
 
-			float velocityPerUnitImpulseContact_normal = 0;
-			mathfu::vec3 separatingVelocity(0.0f, 0.0f, 0.0f);
+		ResolvePositions(contacts, tickTime);
 
-			RigidBodyComponent* bodies[2] = {contact.body1, contact.body2};
+		ResolveVelocities(contacts, tickTime);
+	}
 
-			for (int i = 0; i < 2; i++) if (bodies[i]) {
-				auto body = bodies[i];
-			
-				auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
-			
-				mathfu::vec3 relativeContactPosition = contact.contact_point - body_transform->position.xyz();
-			
-				mathfu::vec3 torquePerUnitImpulse = mathfu::vec3::CrossProduct(relativeContactPosition,  (i == 0 ? 1.0f : -1.0f) * contact.contact_normal);
-			
-				mathfu::vec3 rotationPerUnitImpulse = torquePerUnitImpulse * body->inverse_inertia_tensor;
-			
-				mathfu::vec3 velocityPerUnitImpulse = mathfu::vec3::CrossProduct(rotationPerUnitImpulse, relativeContactPosition);
-			
-				velocityPerUnitImpulseContact_normal += (velocityPerUnitImpulse * mathfu::mat3::ToRotationMatrix(contact.transform)).x;
-			
-				velocityPerUnitImpulseContact_normal += body->inverse_mass;
-			
-				separatingVelocity += mathfu::vec3::CrossProduct(body->angular_velocity, relativeContactPosition);
-				separatingVelocity += body->linear_velocity;
-			};
-			
-			float separatingVelocity_normal = (separatingVelocity * mathfu::mat3::ToRotationMatrix(contact.transform)).x;
-			
-			if (separatingVelocity_normal > 0)	//objects are moving apart
-				return;
-			
-			float restitution = 0.2f;
-			
-			float deltaVelocity = -1*separatingVelocity_normal * (1 + restitution);
-			
-			mathfu::vec3 impulse = { deltaVelocity / velocityPerUnitImpulseContact_normal , 0.0f, 0.0f};
-			
-			impulse = impulse * mathfu::mat3::ToRotationMatrix(contact.transform).Inverse();
-			
-			for (int i = 0; i < 2; i++) if (bodies[i]) {
-				
-				impulse = impulse * ((i == 0) ? 1.0f : -1.0f);
-				
-				auto body = bodies[i];
-				auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
-				
-				mathfu::vec3 linearChange = impulse * body->inverse_mass;
-				
-				mathfu::vec3 impulsiveTorque = mathfu::vec3::CrossProduct(impulse, contact.contact_point - body_transform->position.xyz());
-				mathfu::vec3 rotationalChange = impulsiveTorque * body->inverse_inertia_tensor;
-				
-				if (body->physicsEnabled) {
-					body->linear_velocity += linearChange;
-					body->angular_velocity += mathfu::vec3(rotationalChange.z, rotationalChange.y, -rotationalChange.x);
+	void PhysicsSystem::ResolvePositions(std::vector<Contact>& contacts, float tickTime) {
+		int iterations = 2048;
+
+		int cur_it = 0;
+
+		while (cur_it < iterations) {
+
+			contacts;
+
+			float max = 0.001f;
+			int index = -1;
+
+			for (int i = 0; i < contacts.size(); i++) {
+				if (contacts[i].penetration_depth > max) {
+					max = contacts[i].desiredDeltaVelocity;
+					index = i;
 				}
 			}
 
-			float angInertia[2];
-			float linInertia[2];
-			
-			float totalInertia = 0;
-			
-			for (int i = 0; i < 2; i++) if (bodies[i] && bodies[i]->physicsEnabled) {
-				auto body = bodies[i];
-				auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
-			
-				mathfu::vec3 _angInertia = mathfu::vec3::CrossProduct(contact.contact_point - body_transform->position.xyz(), contact.contact_normal);
-				_angInertia = _angInertia * body->inverse_inertia_tensor;
-				_angInertia = mathfu::vec3::CrossProduct(_angInertia, contact.contact_point - body_transform->position.xyz());
-			
-				angInertia[i] = mathfu::vec3::DotProduct(_angInertia, contact.contact_normal);
-			
-				linInertia[i] = body->inverse_mass;
-			
-				totalInertia += linInertia[i] + angInertia[i];
+			if (index >= 0) {
+				auto posresolve = resolvePosition(contacts[index]);
+
+				for (int i = 0; i < contacts.size(); i++) {
+					for (int b = 0; b < 2; b++) if (contacts[i].bodies[b] != nullptr) {
+						for (int d = 0; d < 2; d++) {
+							if (contacts[i].bodies[b]->getUuid() == contacts[index].bodies[d]->getUuid()) {
+								if (contacts[i].bodies[b]->physicsEnabled) {
+									auto body = contacts[i].bodies[b];
+									auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+									mathfu::vec3 relativeContactPosition = contacts[i].contact_point - body_transform->position.xyz();
+
+									mathfu::vec3 deltaPos = posresolve.linchange[d] + mathfu::vec3::CrossProduct(posresolve.angchange[d], relativeContactPosition);
+
+									// The sign of the change is positive if we're
+									// dealing with the second body in a contact
+									// and negative otherwise (because we're
+									// subtracting the resolution)..
+									contacts[i].penetration_depth += mathfu::vec3::DotProduct(deltaPos, contacts[i].contact_normal) * (b ? 1 : -1);
+								}
+							}
+						}
+					}
+				}
 			}
-			
-			float invInertia = 1.0f / totalInertia;
-			
-			float linearMove[2];
-			float angularMove[2];
-			
-			linearMove[0] = contact.penetration_depth * linInertia[0] * invInertia;
-			linearMove[1] = -1*contact.penetration_depth * linInertia[1] * invInertia;
-			angularMove[0] = contact.penetration_depth * angInertia[0] * invInertia;
-			angularMove[1] = -1*contact.penetration_depth * angInertia[1] * invInertia;
-			
-			for (int i = 0; i < 2; i++) if (bodies[i] && bodies[i]->physicsEnabled) {
-				auto body = bodies[i];
-				auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
-			
-				body_transform->position += (contact.contact_normal * linearMove[i], 0.0f);
-			
-				mathfu::vec3 impTorque = mathfu::vec3::CrossProduct(contact.contact_point - body_transform->position.xyz(), contact.contact_normal);
-				mathfu::vec3 impPerMove = impTorque * body->inverse_inertia_tensor;
-			
-				mathfu::vec3 rotPerMove = impPerMove * 1.0f / angInertia[i];
-			
-				mathfu::vec3 rot = rotPerMove * angularMove[i];
-			
-				auto rotQuat = mathfu::quat(0, rot * 0.5f);
-				body_transform->rotation += (body_transform->rotation * rotQuat);
-				body_transform->rotation.Normalize();
-			
-			
-				body_transform->rebuildWorldMatrix();
+			else {
+				break;
 			}
-			
+			cur_it++;
+		}
+	}
+
+	void PhysicsSystem::ResolveVelocities(std::vector<Contact>& contacts, float tickTime) {
+
+		int iterations = 2048;
+
+		int cur_it = 0;
+
+		while (cur_it < iterations) {
+
+			contacts;
+
+			float max = 0.01f;
+			int index = -1;
+
+			for (int i = 0; i < contacts.size(); i++) {
+				if (fabs(contacts[i].desiredDeltaVelocity) > max) {
+					max = fabs(contacts[i].desiredDeltaVelocity);
+					index = i;
+				}
+			}
+
+			if (index >= 0) {
+				auto _thing = resolveVelocity(contacts[index]);
+
+				for (int i = 0; i < contacts.size(); i++) {
+					for (int b = 0; b < 2; b++) if (contacts[i].bodies[b] != nullptr) {
+						for (int d = 0; d < 2; d++) {
+							if (contacts[i].bodies[b]->getUuid() == contacts[index].bodies[d]->getUuid()) {
+								if (contacts[i].bodies[b]->physicsEnabled) {
+									auto body = contacts[i].bodies[b];
+									auto body_transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
+
+									mathfu::vec3 relativeContactPosition = contacts[i].contact_point - body_transform->position.xyz();
+
+									mathfu::vec3 deltaVel = _thing.velchange[d] + mathfu::vec3::CrossProduct(_thing.rotchange[d], relativeContactPosition);
+
+									deltaVel = (deltaVel * contacts[i].transform) * (b ? -1 : 1);
+
+									contacts[i].contact_velocity += deltaVel;
+
+									calculateDesiredVelocity(contacts[i], tickTime);
+								}
+							}
+						}
+					}
+				}
+			}
+			else {
+				break;
+			}
+			cur_it++;
 		}
 	}
 
@@ -150,18 +358,29 @@ namespace Workbench {
 		auto rigidBodies = ECS::GetInstance()->GetComponents<RigidBodyComponent>();
 		for (auto body : rigidBodies) {
 			auto transform = ECS::GetInstance()->GetEntityComponent<TransformComponent>(body->getEntityId());
-			if (body->physicsEnabled && transform)
+			if (body->physicsEnabled && transform) {
 				Integrate(timer->GetTickTime(), body, transform);
+			}
+			auto mesh2 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(body->getEntityId());
+			mesh2->GetMesh()->Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		}
 
 		if (rigidBodies.size() > 1) {
 			auto contacts = CollisionDetector::DetectContacts(rigidBodies);
-
+			
 			if (!contacts.empty()) {
-				WB_CORE_LOG("Contact!");
+				for (auto& contact : contacts) {
+					auto mesh1 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(contact.bodies[0]->getEntityId());
+					mesh1->GetMesh()->Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+					if (contact.bodies[1]) {
+						auto mesh2 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(contact.bodies[1]->getEntityId());
+						mesh2->GetMesh()->Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+					}
+					//renderer->_debug_DrawDebugCubeAtPos(contact.contact_point);
+				}
+
+			ResolveContacts(contacts, timer->GetTickTime());
 			}
-		
-			ResolveContacts(contacts);
 		}
 		
 	}
@@ -187,26 +406,24 @@ namespace Workbench {
 
 	void PhysicsSystem::Integrate(float tickTime, RigidBodyComponent* body, TransformComponent* transform) {
 
-		body->inverse_inertia_tensor = body->inverse_inertia_tensor_abc * transform->rotation.ToMatrix();
-
 		//update linear velocity and acceleration
 		//body->linear_acceleration = body->linear_acceleration;
 		body->linear_velocity += body->linear_acceleration * tickTime;
 
 		//update angular velocity and acceleration
-		body->angular_acceleration = { 0.0f, 0.0f, 0.0f };
+		//body->angular_acceleration = { 0.0f, 0.0f, 0.0f };
 		body->angular_velocity += body->angular_acceleration * tickTime;
 
 		//update position
 		transform->position += mathfu::vec4(body->linear_velocity * tickTime, 0.0f);
 
 		//update orientation
-		auto rotQuat = mathfu::quat(0, transform->rotation * body->angular_velocity * tickTime * 0.5f);
-		transform->rotation += (transform->rotation * rotQuat);
-		transform->rotation.Normalize();
+		RotateQuat(transform->rotation, body->angular_velocity, tickTime);
 
 		transform->rebuildWorldMatrix();
 
 		body->collider->transform = transform->worldMatrix;
+
+		body->inverse_inertia_tensor = transform->rotation.ToMatrix().Inverse().Transpose() * body->inverse_inertia_tensor_abc * transform->rotation.ToMatrix().Inverse();
 	}
 }

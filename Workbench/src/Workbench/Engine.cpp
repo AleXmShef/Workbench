@@ -38,8 +38,14 @@ namespace Workbench {
 
 		m_World = ECS::GetInstance();
 
-		PushLayer(std::make_shared<RenderSystem>(m_BaseWindow));
-		PushLayer(std::make_shared<PhysicsSystem>());
+		auto renderSystem = new RenderSystem(m_BaseWindow);
+
+		std::shared_ptr<Layer> ptr;
+
+		ptr.reset(renderSystem);
+
+		PushLayer(ptr);
+		PushLayer(std::make_shared<PhysicsSystem>(renderSystem));
 
 		WB_CORE_INFO("Workbench successfuly initialized, main thread_id: {0}", std::this_thread::get_id());
 

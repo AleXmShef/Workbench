@@ -76,4 +76,26 @@ namespace Workbench {
 
 		return mesh;
 	}
+
+	Mesh* MeshGenerator::CreatePlane(float width) {
+		auto mesh = new Mesh();
+
+		mesh->Verticies = {
+			VertexColoredBasic({(float)-0.5f * width, (float)0.0f * width, (float)-0.5 * width}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)0.5f * width, (float)0.0f * width, (float)-0.5 * width}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)-0.5f * width, (float)0.0f * width, (float)0.5 * width}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)0.5f * width, (float)0.0f * width, (float)0.5 * width}, {1.0f,1.0f,1.0f,1.0f})
+		};
+
+		mesh->Indicies = {
+			// front face
+			0, 2, 3,
+			0, 3, 1
+		};
+
+		mesh->Name = "Plane";
+
+		return mesh;
+
+	};
 }

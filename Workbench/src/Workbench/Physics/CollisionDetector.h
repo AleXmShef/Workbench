@@ -14,6 +14,8 @@ namespace Workbench {
 		static std::vector<Contact> CheckForCollisions(RigidBodyComponent* body1, RigidBodyComponent* body2);
 
 		static std::vector<Contact> _contactBoxAndBox(BoxCollider* box1, BoxCollider* box2);
+
+		static std::vector<Contact> _contactBoxAndHalfSpace(BoxCollider* box, HalfSpaceCollider* plane);
 	};
 }
 

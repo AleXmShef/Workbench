@@ -26,7 +26,7 @@ namespace Workbench {
 				0.0f, 0.0f, a
 			);
 
-			inverse_inertia_tensor_abc = inertia_tensor.Inverse();
+			inverse_inertia_tensor_abc = mathfu::mat3(6.66f, 0.0f, 0.0f, 0.0f, 6.66f, 0.0f, 0.0f, 0.0f, 6.66f);
 		};
 
 		bool physicsEnabled = true;

@@ -39,5 +39,7 @@
 #include <mathfu/glsl_mappings.h>
 //#include <mathfu/hlsl_mappings.h>
 
+#include "Utils/Utils.h"
+
 #undef UpdateResource
 

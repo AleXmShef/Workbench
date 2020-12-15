@@ -25,7 +25,7 @@ namespace Workbench {
 
 		mathfu::vec4 position;
 		mathfu::vec4 scale;
-		mathfu::quat rotation;
+		mathfu::quat rotation = mathfu::quat(1,0,0,0);
 
 		mathfu::mat4 worldMatrix;
 	};

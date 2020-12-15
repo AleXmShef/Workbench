@@ -19,6 +19,8 @@ namespace Workbench {
 
 		void SetActiveCamera(const UUID* camera);
 
+		void _debug_DrawDebugCubeAtPos(mathfu::vec3 pos);
+
 	protected:
 		void OnMeshComponentChanged(const Event<ECS::Events>* event);
 

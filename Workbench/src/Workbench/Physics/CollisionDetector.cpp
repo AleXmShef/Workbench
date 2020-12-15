@@ -14,8 +14,6 @@ namespace Workbench {
 
 				auto body_contacts = CheckForCollisions(body1, body2);
 				for (auto& contact : body_contacts) {
-					contact.body1 = body1;
-					contact.body2 = body2;
 					contacts.push_back(contact);
 				}
 			}
@@ -25,9 +23,92 @@ namespace Workbench {
 	}
 
 	std::vector<Contact> CollisionDetector::CheckForCollisions(RigidBodyComponent* body1, RigidBodyComponent* body2) {
-		if (body1->collider->GetType() == ColliderType::BoxCollider && body2->collider->GetType() == ColliderType::BoxCollider)
-			return _contactBoxAndBox((BoxCollider*)body1->collider, (BoxCollider*)body2->collider);
+		if (body1->collider->GetType() == ColliderType::BoxCollider && body2->collider->GetType() == ColliderType::BoxCollider) {
+			auto contacts = _contactBoxAndBox((BoxCollider*)body1->collider, (BoxCollider*)body2->collider);
+			for (auto& contact : contacts) {
+				if(body1->physicsEnabled)
+					contact.bodies[0] = body1;
+				if(body2->physicsEnabled)
+					contact.bodies[1] = body2;
+			}
+			return contacts;
+		}
+
+		else if (body1->collider->GetType() == ColliderType::BoxCollider && body2->collider->GetType() == ColliderType::HalfSpaceCollider) {
+			auto contacts = _contactBoxAndHalfSpace((BoxCollider*)body1->collider, (HalfSpaceCollider*)body2->collider);
+			for (auto& contact : contacts) {
+				if(body1->physicsEnabled)
+					contact.bodies[0] = body1;
+				contact.bodies[1] = nullptr;
+			}
+			return contacts;
+		}
+		else if (body1->collider->GetType() == ColliderType::HalfSpaceCollider && body2->collider->GetType() == ColliderType::BoxCollider) {
+			auto contacts = _contactBoxAndHalfSpace((BoxCollider*)body2->collider, (HalfSpaceCollider*)body1->collider);
+			for (auto& contact : contacts) {
+				if (body2->physicsEnabled)
+					contact.bodies[0] = body2;
+				contact.bodies[1] = nullptr;
+			}
+			return contacts;
+		}
 	}
+
+	std::vector<Contact> CollisionDetector::_contactBoxAndHalfSpace(
+		BoxCollider* box,
+		HalfSpaceCollider* plane
+	)
+	{
+
+		// We have an intersection, so find the intersection points. We can make
+		// do with only checking vertices. If the box is resting on a plane
+		// or on an edge, it will be reported as four or two contact points.
+
+		// Go through each combination of + and - for each half-size
+		static float mults[8][3] = { {1,1,1},{-1,1,1},{1,-1,1},{-1,-1,1},
+								   {1,1,-1},{-1,1,-1},{1,-1,-1},{-1,-1,-1} };
+
+		std::vector<Contact> contacts;
+		for (unsigned i = 0; i < 8; i++) {
+
+			// Calculate the position of each vertex
+			mathfu::vec3 vertexPos(mults[i][0], mults[i][1], mults[i][2]);
+			vertexPos = vertexPos * box->half_size;
+
+			//auto test = vertexPos * box->transform.ToRotationMatrix(box->transform) + box->transform.TranslationVector3D();
+
+			auto test = box->transform * vertexPos;
+
+			vertexPos = test;
+
+			// Calculate the distance from the plane
+			float vertexDistance = mathfu::vec3::DotProduct(vertexPos, plane->direction);
+
+			// Compare this to the plane's distance
+			if (vertexDistance <= plane->offset)
+			{
+				// Create the contact data.
+
+				// The contact point is halfway between the vertex and the
+				// plane - we multiply the direction by half the separation
+				// distance and add the vertex location.
+				Contact contact;
+				contact.contact_point = plane->direction;
+				contact.contact_point *= (vertexDistance - plane->offset);
+				contact.contact_point += vertexPos;
+				contact.contact_normal = plane->direction;
+				contact.penetration_depth = plane->offset - vertexDistance;
+
+				// Write the appropriate data
+				contacts.push_back(contact);
+				// Move onto the next contact
+			}
+		}
+
+		return contacts;
+	};
+
+
 
 	mathfu::vec3 contactPoint(
 		mathfu::vec3 pOne,
@@ -43,8 +124,8 @@ namespace Workbench {
 		float dpStaOne, dpStaTwo, dpOneTwo, smOne, smTwo;
 		float denom, mua, mub;
 
-		smOne = dOne.Length() * dOne.Length();
-		smTwo = dTwo.Length() * dTwo.Length();
+		smOne = dOne.LengthSquared();
+		smTwo = dTwo.LengthSquared();
 		dpOneTwo = mathfu::vec3::DotProduct(dTwo, dOne);
 
 		toSt = pOne - pTwo;
@@ -77,7 +158,7 @@ namespace Workbench {
 			cOne = pOne + dOne * mua;
 			cTwo = pTwo + dTwo * mub;
 
-			return cOne * 0.5 + cTwo * 0.5;
+			return cOne * 0.5f + cTwo * 0.5f;
 		}
 	}
 
@@ -165,7 +246,7 @@ namespace Workbench {
 		// Create the contact data
 		contact.contact_normal = normal;
 		contact.penetration_depth = pen;
-		contact.contact_point = two->transform * vertex;
+		contact.contact_point = (two->transform * vertex);
 		data.push_back(contact);
 	}
 

@@ -8,5 +8,6 @@ namespace Workbench {
 	public:
 		static Mesh* CreateBox(float height = 1, mathfu::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f});
 		static Mesh* CreateTriangle(float length = 1);
+		static Mesh* CreatePlane(float width = 1);
 	};
 }

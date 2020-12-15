@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	{
 		Workbench::Engine::EngineProps engParams = {};
 		Workbench::Window::WindowProps windowProps = {};
-		windowProps.isVsync = true;
+		//windowProps.isVsync = true;
 
 		windowProps.windowTitle = "Sandbox";
 		//windowProps.isFullScreen = true;
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 		Workbench::Engine mEngine(engParams);
 		
 		mEngine.PushLayer(std::make_shared<RigidBodyTest>(&mEngine));
-		//mEngine.PushLayer(std::make_shared<RotatinCubesDemo>(&mEngine));
+		//mEngine.PushLayer(std::make_shared<RotatingCubesDemo>(&mEngine));
 
 		result = mEngine.Run();
 	}

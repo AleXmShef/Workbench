@@ -16,3 +16,23 @@ struct shared_ptr_with_custom_deleter : public std::shared_ptr<T> {
 inline float deg2rad(float deg) {
 	return (float)(deg * (M_PI / 180));
 }
+
+inline mathfu::quat RotateQuat(mathfu::quat& q, mathfu::vec3& vec, float scale = 1.0f) {
+	mathfu::quat _q(0,
+		vec.x * scale,
+		vec.y * scale,
+		vec.z * scale);
+
+	_q = _q * q;
+
+	q = mathfu::quat(
+		q.scalar() + _q.scalar() * 0.5f,
+		q.vector().x + _q.vector().x * 0.5f,
+		q.vector().y + _q.vector().y * 0.5f,
+		q.vector().z + _q.vector().z * 0.5f
+	);
+
+	q.Normalize();
+
+	return q;
+}

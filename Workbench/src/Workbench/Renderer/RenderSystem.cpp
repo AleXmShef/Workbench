@@ -2,6 +2,7 @@
 #include "RenderSystem.h"
 #include "Components/MeshComponent.h"
 #include "Components/CameraComponent.h"
+#include "MeshGenerator.h"
 #include "Physics/Components/TransformComponent.h"
 #include "DirectXMath.h"
 
@@ -38,6 +39,49 @@ namespace Workbench {
 		}
 		m_Renderer->End();
 	}
+
+	void RenderSystem::_debug_DrawDebugCubeAtPos(mathfu::vec3 pos) {
+		auto VertexBuffer = m_Renderer->CreateConstantResource();
+		auto IndexBuffer = m_Renderer->CreateConstantResource();
+
+		auto ConstantBuffer = m_Renderer->CreateDynamicResource(true);
+
+		auto meshResource = new MeshResource(VertexBuffer, IndexBuffer, ConstantBuffer);
+
+		auto mesh = MeshGenerator::CreateBox(0.2, { 0.0f, 1.0f, 0.0f, 1.0f });
+
+		auto uuid = new UUID();
+
+		meshResource->AddMesh(uuid, mesh);
+
+		mathfu::mat4 worldMatrix = mathfu::mat4::Transform(pos, mathfu::mat3::Identity(), { 1.0f, 1.0f, 1.0f });
+
+		auto camera = ECS::GetInstance()->GetEntityComponent<CameraComponent>(m_ActiveCamera);
+
+		mathfu::mat4 worldViewProj = (camera->projMatrix * camera->viewMatrix * worldMatrix).Transpose();
+
+		ObjectConstants* constant = new ObjectConstants;
+
+		worldViewProj.Pack(constant->WorldViewProj);
+		constant->Color = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		meshResource->GetConstantBuffer()->UpdateResource(
+			(const void*)constant,
+			sizeof(ObjectConstants),
+			sizeof(ObjectConstants),
+			1
+		);
+
+		m_Renderer->Begin();
+
+		meshResource->UploadResource();
+
+		m_Renderer->DrawMeshes(meshResource);
+
+		m_Renderer->End();
+
+		delete meshResource;
+	};
 
 	void RenderSystem::UpdateObjects() {
 		auto camera = ECS::GetInstance()->GetEntityComponent<CameraComponent>(m_ActiveCamera);

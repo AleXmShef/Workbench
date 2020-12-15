@@ -28,14 +28,14 @@ protected:
 		if (event->getType() == Window::Events::WindowMouseButtonPressedEvent) {
 			auto _event = dynamic_cast<const Window::WindowMouseButtonPressedEvent*>(event);
 
-			if (_event->getButton() == WB_KEYCODES::RMB) {
+			if (_event->getButton() == WB_KEYCODES::LMB) {
 				captured = true;
 			}
 		}
 		else if (event->getType() == Window::Events::WindowMouseButtonReleasedEvent) {
 			auto _event = dynamic_cast<const Window::WindowMouseButtonReleasedEvent*>(event);
 
-			if (_event->getButton() == WB_KEYCODES::RMB) {
+			if (_event->getButton() == WB_KEYCODES::LMB) {
 				captured = false;
 			}
 		}
@@ -89,9 +89,13 @@ protected:
 	float last_x = 0;
 	float last_y = 0;
 
-	float mPhi = (float)(0.25f * M_PI);
-	float mTheta = (float)(0.25f * M_PI);
-	float r = 4;
+	//float mPhi = (float)(0.25f * M_PI);
+	//float mTheta = (float)(0.25f * M_PI);
+
+	float mPhi = (float)(0.5f * M_PI) + -0.3f;
+	float mTheta = (float)(0.5f * M_PI);
+
+	float r = 8;
 
 	Engine* m_Engine;
 	const Workbench::UUID* camera;

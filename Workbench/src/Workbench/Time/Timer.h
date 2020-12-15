@@ -20,7 +20,7 @@ namespace Workbench {
 
 		template<typename Type = std::ratio<1>>
 		float GetTickTime() {
-			//return (std::chrono::duration_cast<std::chrono::duration<float, Type>>(m_TimeSinceLastTick)).count()/10.0f;
+			//return (std::chrono::duration_cast<std::chrono::duration<float, Type>>(m_TimeSinceLastTick)).count();
 			return 0.01f;
 		};
 
