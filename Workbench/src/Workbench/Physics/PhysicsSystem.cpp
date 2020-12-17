@@ -364,21 +364,23 @@ namespace Workbench {
 			auto mesh2 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(body->getEntityId());
 			mesh2->GetMesh()->Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		}
-
+		
 		if (rigidBodies.size() > 1) {
 			auto contacts = CollisionDetector::DetectContacts(rigidBodies);
 			
 			if (!contacts.empty()) {
 				for (auto& contact : contacts) {
-					auto mesh1 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(contact.bodies[0]->getEntityId());
-					mesh1->GetMesh()->Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+					if (contact.bodies[0]) {
+						auto mesh1 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(contact.bodies[0]->getEntityId());
+						mesh1->GetMesh()->Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+					}
 					if (contact.bodies[1]) {
 						auto mesh2 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(contact.bodies[1]->getEntityId());
 						mesh2->GetMesh()->Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 					}
 					//renderer->_debug_DrawDebugCubeAtPos(contact.contact_point);
 				}
-
+		
 			ResolveContacts(contacts, timer->GetTickTime());
 			}
 		}

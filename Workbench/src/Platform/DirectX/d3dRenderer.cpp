@@ -33,12 +33,12 @@ namespace Workbench {
 		m_isFullScreen = m_window->IsFullscreen();
 
 		//initialize DirectX debug layer when in debug build
-//#ifdef WB_DEBUG
+#ifdef WB_DEBUG
 		pCom<ID3D12Debug> debugController;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 			debugController->EnableDebugLayer();
 		}
-//#endif // DEBUG
+#endif // DEBUG
 
 		//Begin Initialization
 		//Create DXGI Factory
@@ -515,7 +515,7 @@ namespace Workbench {
 			};
 
 			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+			psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 			psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 			psoDesc.SampleMask = UINT_MAX;

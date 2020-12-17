@@ -25,12 +25,19 @@ public:
 	}
 
 	void buildCubes() {
+		//plane = world->CreateEntity();
+		//auto collider = new HalfSpaceCollider({ 0.0f, 1.0f, 0.0f }, 0.0f);
+		//auto _plane = world->CreateComponentForEntity<RigidBodyComponent>(plane, 1.0f, mathfu::vec3(0.0f, 0.0f, 0.0f), mathfu::vec3(0.0f, 0.0f, 0.0f), collider);
+		//_plane->physicsEnabled = false;
+		//world->CreateComponentForEntity<TransformComponent>(plane);
+		//world->CreateComponentForEntity<MeshComponent>(plane, MeshGenerator::CreatePlane(5));
 		plane = world->CreateEntity();
-		auto collider = new HalfSpaceCollider({ 0.0f, 1.0f, 0.0f }, 0.0f);
+		auto collider = new BoxCollider(mathfu::vec3{ 5.0f, 1.0f, 5.0f });
 		auto _plane = world->CreateComponentForEntity<RigidBodyComponent>(plane, 1.0f, mathfu::vec3(0.0f, 0.0f, 0.0f), mathfu::vec3(0.0f, 0.0f, 0.0f), collider);
 		_plane->physicsEnabled = false;
-		world->CreateComponentForEntity<TransformComponent>(plane);
-		world->CreateComponentForEntity<MeshComponent>(plane, MeshGenerator::CreatePlane(5));
+		auto transform = world->CreateComponentForEntity<TransformComponent>(plane, mathfu::vec3(0.0f, -0.5f, 0.0f));
+		_plane->collider->transform = transform->worldMatrix;
+		world->CreateComponentForEntity<MeshComponent>(plane, MeshGenerator::CreateBox({5.0f, 1.0f, 5.0f}));
 
 		cube1 = world->CreateEntity();
 		cube2 = world->CreateEntity();

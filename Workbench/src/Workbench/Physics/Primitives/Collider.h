@@ -27,7 +27,7 @@ namespace Workbench {
 
 	class BoxCollider : public Collider3D {
 	public:
-		BoxCollider(mathfu::vec3 _dimensions, mathfu::mat4 _offset) : Collider3D(_offset), half_size(_dimensions / 2) {};
+		BoxCollider(mathfu::vec3 _dimensions, mathfu::mat4 _offset = mathfu::mat4::Identity()) : Collider3D(_offset), half_size(_dimensions / 2) {};
 
 		virtual ColliderType GetType() override { return ColliderType::BoxCollider; };
 	public:

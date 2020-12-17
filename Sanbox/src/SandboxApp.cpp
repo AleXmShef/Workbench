@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	{
 		Workbench::Engine::EngineProps engParams = {};
 		Workbench::Window::WindowProps windowProps = {};
-		//windowProps.isVsync = true;
+		windowProps.isVsync = true;
 
 		windowProps.windowTitle = "Sandbox";
 		//windowProps.isFullScreen = true;

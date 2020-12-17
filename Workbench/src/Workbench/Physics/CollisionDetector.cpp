@@ -28,8 +28,12 @@ namespace Workbench {
 			for (auto& contact : contacts) {
 				if(body1->physicsEnabled)
 					contact.bodies[0] = body1;
+				else
+					contact.bodies[0] = nullptr;
 				if(body2->physicsEnabled)
 					contact.bodies[1] = body2;
+				else
+					contact.bodies[1] = nullptr;
 			}
 			return contacts;
 		}

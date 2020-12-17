@@ -3,19 +3,23 @@
 
 namespace Workbench {
 	Mesh* MeshGenerator::CreateBox(float height, mathfu::vec4 color) {
+		return CreateBox(mathfu::vec3(height, height, height), color);
+	}
+
+	Mesh* MeshGenerator::CreateBox(mathfu::vec3 dimensions, mathfu::vec4 color) {
 		auto mesh = new Mesh();
 
 		mesh->Color = color;
 
 		mesh->Verticies = {
-			VertexColoredBasic({(float)-0.5f * height, (float)-0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)-0.5f * height, (float)0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)0.5f * height, (float)0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)0.5f * height, (float)-0.5f * height, (float)-0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)-0.5f * height, (float)-0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)-0.5f * height, (float)0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)0.5f * height, (float)0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f}),
-			VertexColoredBasic({(float)0.5f * height, (float)-0.5f * height, (float)0.5 * height}, {1.0f,1.0f,1.0f,1.0f})
+			VertexColoredBasic({(float)	-0.5f * dimensions.x,	(float)	-0.5f * dimensions.y, (float)	-0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	-0.5f * dimensions.x,	(float)	 0.5f * dimensions.y, (float)	-0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	 0.5f * dimensions.x,	(float)	 0.5f * dimensions.y, (float)	-0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	 0.5f * dimensions.x,	(float)	-0.5f * dimensions.y, (float)	-0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	-0.5f * dimensions.x,	(float)	-0.5f * dimensions.y, (float)	 0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	-0.5f * dimensions.x,	(float)	 0.5f * dimensions.y, (float)	 0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	 0.5f * dimensions.x,	(float)	 0.5f * dimensions.y, (float)	 0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f}),
+			VertexColoredBasic({(float)	 0.5f * dimensions.x,	(float)	-0.5f * dimensions.y, (float)	 0.5 * dimensions.z}, {1.0f,1.0f,1.0f,1.0f})
 		};
 
 		mesh->Indicies = {
