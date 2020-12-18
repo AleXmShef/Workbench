@@ -4,6 +4,7 @@
 #include "Components/TransformComponent.h"
 #include "Renderer/Components/CameraComponent.h"
 #include "Renderer/Components/MeshComponent.h"
+#include "Renderer/MeshGenerator.h"
 #include "CollisionDetector.h"
 #include "ECS/ECS.h"
 
@@ -378,13 +379,36 @@ namespace Workbench {
 						auto mesh2 = ECS::GetInstance()->GetEntityComponent<MeshComponent>(contact.bodies[1]->getEntityId());
 						mesh2->GetMesh()->Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 					}
-					//renderer->_debug_DrawDebugCubeAtPos(contact.contact_point);
+					
 				}
-		
 			ResolveContacts(contacts, timer->GetTickTime());
 			}
+			updateContactCubes(contacts);
 		}
 		
+	}
+
+	void PhysicsSystem::updateContactCubes(std::vector<Contact>& contacts) {
+		if (contacts.size() < contactCubes.size()) {
+			for (int i = contactCubes.size(); i > contacts.size(); i--) {
+				ECS::GetInstance()->DestroyEntity(contactCubes[i - 1]->getEntityId());
+				contactCubes.erase(contactCubes.begin() + (i - 1));
+			}
+		}
+		else if (contacts.size() > contactCubes.size()) {
+			for (int i = 0; i < contacts.size() - contactCubes.size(); i++) {
+				auto newCube = ECS::GetInstance()->CreateEntity();
+				auto newTransform = ECS::GetInstance()->CreateComponentForEntity<TransformComponent>(newCube);
+				ECS::GetInstance()->CreateComponentForEntity<MeshComponent>(newCube, MeshGenerator::CreateBox(0.2, {0.0f, 1.0f, 0.0f, 0.0f}));
+				contactCubes.push_back(newTransform);
+			}
+		}
+		if (contacts.size() > 0) {
+			for (int i = 0; i < contactCubes.size(); i++) {
+				contactCubes[i]->position = { contacts[i].contact_point, 0.0f };
+				contactCubes[i]->rebuildWorldMatrix();
+			}
+		}
 	}
 
 	void PhysicsSystem::OnPhysicsComponentChanged(const Event<ECS::Events>* event) {

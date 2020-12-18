@@ -29,10 +29,14 @@ namespace Workbench {
 
 		void Integrate(float tickTime, RigidBodyComponent* body, TransformComponent* transform);
 
+		void updateContactCubes(std::vector<Contact>& contacts);
+
 	protected:
 		mathfu::vec3 m_GravityAcc = mathfu::vec3(0, WB_PHYSICS_G, 0);
 
 		RenderSystem* renderer = nullptr;
+
+		std::vector<TransformComponent*> contactCubes;
 	};
 }
 
